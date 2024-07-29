@@ -25,9 +25,10 @@ class Tenant extends Model implements HasCurrentTenantLabel
     {
         return $this->hasMany(Customer::class);
     }
-    public function roomStatuses()
+   
+    public function rooms()
     {
-        return $this->hasMany(RoomStatus::class);
+        return $this->hasMany(Room::class);
     }
     public function getCurrentTenantLabel(): string
     {

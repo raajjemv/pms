@@ -7,6 +7,7 @@ use Filament\Panel;
 use Filament\Widgets;
 use App\Models\Tenant;
 use Filament\PanelProvider;
+use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use App\Http\Middleware\ApplyTenantScopes;
 use App\Http\Middleware\TenantsPermission;
@@ -39,6 +40,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([
                 Pages\Dashboard::class,
             ])
@@ -64,6 +66,9 @@ class AdminPanelProvider extends PanelProvider
             ], isPersistent: true)
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+           
+            ->sidebarCollapsibleOnDesktop()
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

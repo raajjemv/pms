@@ -2,21 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\RoomFeatures;
-use App\Filament\Resources\RoomTypeResource\Pages;
-use App\Filament\Resources\RoomTypeResource\RelationManagers;
-use App\Models\RoomType;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Amenity;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Filament\Clusters\RoomFeatures;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\AmenityResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\AmenityResource\RelationManagers;
 
-class RoomTypeResource extends Resource
+class AmenityResource extends Resource
 {
-    protected static ?string $model = RoomType::class;
+    protected static ?string $model = Amenity::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -26,15 +26,7 @@ class RoomTypeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make([
-                    Forms\Components\TextInput::make('name')
-                        ->required(),
-                    Forms\Components\Textarea::make('description')
-                        ->required()
-                        ->columnSpanFull(),
-                ])
-
-
+                //
             ]);
     }
 
@@ -71,8 +63,7 @@ class RoomTypeResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->defaultSort('created_at','DESC');
+            ]);
     }
 
     public static function getRelations(): array
@@ -85,10 +76,10 @@ class RoomTypeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRoomTypes::route('/'),
-            'create' => Pages\CreateRoomType::route('/create'),
-            'view' => Pages\ViewRoomType::route('/{record}'),
-            'edit' => Pages\EditRoomType::route('/{record}/edit'),
+            'index' => Pages\ListAmenities::route('/'),
+            'create' => Pages\CreateAmenity::route('/create'),
+            'view' => Pages\ViewAmenity::route('/{record}'),
+            'edit' => Pages\EditAmenity::route('/{record}/edit'),
         ];
     }
 }

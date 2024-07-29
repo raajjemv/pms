@@ -11,12 +11,12 @@ trait HasTenants
         // if (auth()->check() && $this->id == 1) {
         //     return Tenant::get();
         // }
-        return $this->belongsToMany(Tenant::class)->withTimestamps();;
+        return $this->belongsToMany(Tenant::class)->withTimestamps();
     }
 
     public function ownedTenants()
     {
-        return $this->hasMany(Tenant::class,'owner_id','id');
+        return $this->hasMany(Tenant::class, 'owner_id', 'id');
     }
 
     public function defaultTenant()
@@ -36,12 +36,11 @@ trait HasTenants
     {
 
         $this->forceFill([
-            'current_tenant_id' => $tenant->id,
+            'current_tenant_id' => $tenant->id ?? 1000,
         ])->save();
 
         $this->setRelation('currentTenant', $tenant);
 
         return true;
     }
-    
 }

@@ -15,6 +15,8 @@ class TenantConfiguration extends Page
 
     protected static string $view = 'filament.pages.tenant-configuration';
 
+    protected static ?string $navigationGroup = 'System Settings';
+
     public ?array $data = [];
 
     public function mount()

@@ -1,18 +1,21 @@
 <?php
 
-namespace App\Filament\Resources\RoomStatusResource\Pages;
+namespace App\Filament\Resources\RoomResource\Pages;
 
 use Filament\Actions;
 use Filament\Facades\Filament;
+use App\Filament\Resources\RoomResource;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\RoomStatusResource;
 
-class CreateRoomStatus extends CreateRecord
+class CreateRoom extends CreateRecord
 {
-    protected static string $resource = RoomStatusResource::class;
+    protected static string $resource = RoomResource::class;
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['tenant_id'] = Filament::getTenant()->id;
+        $data['user_id'] = auth()->id();
+        $data['room_status_id'] = 1;
         return $data;
     }
 

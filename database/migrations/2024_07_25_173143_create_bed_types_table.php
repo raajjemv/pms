@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('room_statuses', function (Blueprint $table) {
+        Schema::create('bed_types', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('tenant_id')->constrained();
             $table->string('name');
-            $table->string('code');
-            $table->text('description')->nullable();
+            $table->foreignId('user_id')->constrained();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('room_statuses');
+        Schema::dropIfExists('bed_types');
     }
 };

@@ -84,7 +84,6 @@ class RoomStatusSeeder extends Seeder
 
         for ($i = 0; $i < count($codes); $i++) {
             RoomStatus::create([
-                'tenant_id' => 1001,
                 'name' => $names[$i],
                 'code' => $codes[$i],
                 'description' => $informations[$i],

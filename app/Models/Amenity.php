@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[ScopedBy([TenantScope::class])]
-class RoomType extends Model
+class Amenity extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -24,4 +24,6 @@ class RoomType extends Model
     {
         return $this->belongsTo(Tenant::class);
     }
+
+   
 }

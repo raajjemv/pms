@@ -2,21 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\RoomFeatures;
-use App\Filament\Resources\RoomTypeResource\Pages;
-use App\Filament\Resources\RoomTypeResource\RelationManagers;
-use App\Models\RoomType;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\RoomView;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Filament\Clusters\RoomFeatures;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\RoomViewResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\RoomViewResource\RelationManagers;
 
-class RoomTypeResource extends Resource
+class RoomViewResource extends Resource
 {
-    protected static ?string $model = RoomType::class;
+    protected static ?string $model = RoomView::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -26,15 +26,11 @@ class RoomTypeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make([
-                    Forms\Components\TextInput::make('name')
-                        ->required(),
-                    Forms\Components\Textarea::make('description')
-                        ->required()
-                        ->columnSpanFull(),
-                ])
-
-
+             
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+               
             ]);
     }
 
@@ -42,6 +38,7 @@ class RoomTypeResource extends Resource
     {
         return $table
             ->columns([
+             
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
@@ -71,8 +68,7 @@ class RoomTypeResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->defaultSort('created_at','DESC');
+            ]);
     }
 
     public static function getRelations(): array
@@ -85,10 +81,10 @@ class RoomTypeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRoomTypes::route('/'),
-            'create' => Pages\CreateRoomType::route('/create'),
-            'view' => Pages\ViewRoomType::route('/{record}'),
-            'edit' => Pages\EditRoomType::route('/{record}/edit'),
+            'index' => Pages\ListRoomViews::route('/'),
+            'create' => Pages\CreateRoomView::route('/create'),
+            'view' => Pages\ViewRoomView::route('/{record}'),
+            'edit' => Pages\EditRoomView::route('/{record}/edit'),
         ];
     }
 }

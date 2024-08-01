@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-#[ScopedBy([TenantScope::class])]
-class RoomType extends Model
+class Booking extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -20,13 +17,21 @@ class RoomType extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function rooms()
+    public function room()
     {
-        return $this->hasMany(Room::class);
+        return $this->belongsTo(Room::class);
     }
 
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'from' => 'date',
+            'to' => 'date'
+        ];
     }
 }

@@ -1,15 +1,15 @@
 <?php
 
-namespace App\Filament\Resources\AmenityResource\Pages;
+namespace App\Filament\Resources\BookingResource\Pages;
 
 use Filament\Actions;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
-use App\Filament\Resources\AmenityResource;
+use App\Filament\Resources\BookingResource;
 
-class CreateAmenity extends CreateRecord
+class CreateBooking extends CreateRecord
 {
-    protected static string $resource = AmenityResource::class;
+    protected static string $resource = BookingResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {

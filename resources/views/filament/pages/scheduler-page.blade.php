@@ -1,34 +1,82 @@
 <x-filament-panels::page>
-    <div class="overflow-hidden text-black bg-gray-100 rounded-lg">
-        <div class="p-2 text-center">{{ $selectedMonth->format('M Y') }}</div>
-        <div class="w-full text-sm text-center">
-            <div class="flex">
-                <div class="w-20 p-1 border">Room</div>
-                <div class="w-20 p-1 border">Status</div>
-                @for ($i = 15; $i < $totalDaysInMonth; $i++)
-                    <div class="flex-1 p-1 border ">{{ $i }}</div>
-                @endfor
+    <div class="overflow-x-scroll text-sm text-black rounded-lg bg-gray-50">
+        <div class="flex">
+            <div class="w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200">Rooms
             </div>
-            <div class="">
-                @foreach ($rooms as $room)
-                    @php
-                        $bookedDays = $room->id == 1 ? collect([4, 5, 6, 7, 8]) : collect([9, 10, 11, 12, 13,14]);
-                    @endphp
-                    <div class="flex">
-                        <div class="w-20 p-1 border">{{ $room->name }}</div>
-                        <div class="w-20 p-1 border">V</div>
-                        @for ($i = 1 + $bookedDays->count(); $i < $totalDaysInMonth; $i++)
-                            <div @class([
-                                'flex-1 p-1 border',
-                                'bg-red-100' => $room->id == 1 && in_array($i, $bookedDays->toArray()),
-                                'bg-blue-100' => $room->id == 2 && in_array($i, $bookedDays->toArray()),
-                            ])>
-
-                            </div>
-                        @endfor
+            @foreach ($monthDays as $day)
+                <div
+                    class="flex-none border-[0.8px] border-gray-200 flex items-center justify-center w-[90px] px-1 py-1">
+                    <div class="text-center">
+                        <div>{{ $day->format('D') }}</div>
+                        <div class="font-semibold">{{ $day->format('d') }}</div>
+                        <div>{{ $day->format('M') }}</div>
                     </div>
-                @endforeach
-            </div>
+                </div>
+            @endforeach
+        </div>
+        <div class="">
+            @foreach ($rooms->groupBy('roomType.name') as $groupKey => $roomNumbers)
+                <div class="overflow-hidden w-max">
+                    <div class="flex bg-zinc-200">
+                        <div
+                            class="flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold">
+                            {{ $groupKey }}
+                        </div>
+                        <div class="flex">
+                            @foreach ($monthDays as $day)
+                                <div
+                                    class="flex-none  flex items-center w-[90px] px-1 py-5 border-[0.8px] border-gray-300">
+
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @foreach ($roomNumbers as $room)
+                        <div class="flex ">
+                            <div
+                                class="flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
+                                {{ $room->room_number }}</div>
+                            <div class="relative flex">
+                                @foreach ($monthDays as $day)
+                                    <div
+                                        class="flex-none  flex items-center w-[90px] px-1  border-[0.8px] border-gray-200">
+
+                                    </div>
+                                @endforeach
+                                @php
+                                    $bookings = $room->bookings;
+                                @endphp
+                                @foreach ($bookings as $booking)
+                                    @php
+                                        $from = $booking->from;
+                                        $to = $booking->to;
+                                        $totalDays = $from->diffInDays($to);
+                                        $dayNumber = $booking->from->day;
+                                        $left =
+                                            $from->month == $to->month
+                                                ? $dayNumber * 90 - 45
+                                                : ($from->month == $startOfMonth->month
+                                                    ? $dayNumber * 90 - 45
+                                                    : 0);
+
+                                        $width =
+                                            $from->month == $to->month
+                                                ? $totalDays * 90
+                                                : ($from->month == $startOfMonth->month
+                                                    ? $totalDays * 90
+                                                    : $to->day * 90 - 45);
+                                    @endphp
+                                    <div style="width: {{ $width }}px;left:{{ $left }}px"
+                                        class="absolute bg-green-600 h-full flex items-center overflow-hidden rounded  border-[0.8px] border-gray-200">
+                                        <div class="px-1 text-white rounded ">{{ $booking->booking_number }} </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                        </div>
+                    @endforeach
+                </div>
+            @endforeach
         </div>
     </div>
 </x-filament-panels::page>

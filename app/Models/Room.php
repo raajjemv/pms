@@ -55,6 +55,12 @@ class Room extends Model
         return $this->belongsTo(Tenant::class);
     }
 
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+
     protected function casts(): array
     {
         return [

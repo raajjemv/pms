@@ -26,13 +26,13 @@ class SchedulerPage extends Page
 
         $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::parse('2024-08-01');
 
-        $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::parse('2024-08-15');
+        $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::parse('2024-08-30');
 
         $this->startOfMonth = $startOfMonth;
         $this->endOfMonth = $endOfMonth;
 
         $this->rooms = Room::with(['roomType', 'bookings' => function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->where(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->with('customer')->where(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('from', '>=', $startOfMonth)
                     ->where('from', '<=', $endOfMonth);
             })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {

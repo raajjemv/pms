@@ -17,6 +17,14 @@ class Booking extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class)
+            ->withDefault(function (Customer $customer,Booking $booking) {
+                $customer->name = $booking->booking_customer;
+            });
+    }
+
     public function room()
     {
         return $this->belongsTo(Room::class);

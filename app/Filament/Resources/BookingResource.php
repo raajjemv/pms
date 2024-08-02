@@ -38,6 +38,8 @@ class BookingResource extends Resource
                     ->required(),
                 Forms\Components\DatePicker::make('to')
                     ->required(),
+                Forms\Components\TextInput::make('booking_customer')
+                    ->required(),
                 Forms\Components\TextInput::make('status')
                     ->required()
                     ->maxLength(255)

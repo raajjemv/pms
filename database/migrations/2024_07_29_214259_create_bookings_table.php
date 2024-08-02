@@ -18,6 +18,8 @@ return new class extends Migration
             $table->foreignId('room_id')->constrained();
             $table->date('from');
             $table->date('to');
+            $table->string('booking_customer')->nullable();
+            $table->foreignId('customer_id')->nullable()->constrained();
             $table->string('status')->default('pending');
             $table->foreignId('user_id')->constrained();
             $table->softDeletes();

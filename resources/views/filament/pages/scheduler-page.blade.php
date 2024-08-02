@@ -67,8 +67,8 @@
                                                     : $to->day * 90 - 45);
                                     @endphp
                                     <div style="width: {{ $width }}px;left:{{ $left }}px"
-                                        class="absolute bg-green-600 h-full flex items-center overflow-hidden rounded  border-[0.8px] border-gray-200">
-                                        <div class="px-1 text-white rounded ">{{ $booking->booking_number }} </div>
+                                        class="absolute bg-green-500 h-full flex items-center overflow-hidden rounded  border-[0.8px] border-gray-200">
+                                        <div class="px-1 text-white rounded ">{{ $booking->customer->name }} </div>
                                     </div>
                                 @endforeach
                             </div>

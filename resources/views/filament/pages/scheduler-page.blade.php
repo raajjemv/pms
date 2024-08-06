@@ -24,12 +24,11 @@
                         </div>
                         <div class="flex">
                             @foreach ($monthDays as $day)
-                                <div
-                                    class="flex-none  w-[90px] border-[0.8px] border-gray-300">
+                                <div class="flex-none  w-[90px] border-[0.8px] border-gray-300">
                                     <div>
                                         <x-rooms-available-count :day="$day" :roomNumbers="$roomNumbers" />
                                     </div>
-                                    
+
                                 </div>
                             @endforeach
                         </div>
@@ -70,6 +69,7 @@
                                                     : $to->day * 90 - 45);
                                     @endphp
                                     <div style="width: {{ $width }}px;left:{{ $left }}px"
+                                        wire:click="viewBookingSummary('{{ $booking->id }}')"
                                         class="absolute bg-green-500 h-full flex items-center overflow-hidden rounded  border-[0.8px] border-gray-200">
                                         <div class="px-1 text-white rounded whitespace-nowrap">
                                             {{ $booking->customer->name }} </div>
@@ -83,4 +83,8 @@
             @endforeach
         </div>
     </div>
+
+    <x-filament::modal id="booking-summary" slide-over>
+       <x-booking-scheduler.booking-summary :booking="$bookingSummary" />
+    </x-filament::modal>
 </x-filament-panels::page>

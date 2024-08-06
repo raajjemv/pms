@@ -24,7 +24,13 @@ class BookingResource extends Resource
     {
         return $form
             ->schema([
-
+                Forms\Components\Select::make('booking_type')
+                    ->options([
+                        'agoda' => 'Agoda',
+                        'booking.com' => 'Booking.com',
+                        'direct' => 'Direct',
+                        'walk-in' => "Walk In"
+                    ])->required(),
                 Forms\Components\TextInput::make('booking_number')
                     ->required()
                     ->formatStateUsing(fn () => Str::random()),
@@ -44,7 +50,12 @@ class BookingResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->default('pending'),
-
+                Forms\Components\TextInput::make('adults')
+                    ->numeric()
+                    ->required(),
+                Forms\Components\TextInput::make('childrens')
+                    ->numeric()
+                    ->required(),
             ]);
     }
 

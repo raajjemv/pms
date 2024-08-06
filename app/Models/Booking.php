@@ -20,8 +20,9 @@ class Booking extends Model
     public function customer()
     {
         return $this->belongsTo(Customer::class)
-            ->withDefault(function (Customer $customer,Booking $booking) {
+            ->withDefault(function (Customer $customer, Booking $booking) {
                 $customer->name = $booking->booking_customer;
+                $customer->country = '-';
             });
     }
 
@@ -33,6 +34,16 @@ class Booking extends Model
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function bookingNights()
+    {
+        return $this->hasMany(BookingNight::class);
+    }
+
+    public function averageRate()
+    {
+        return $this->bookingNights->avg('rate');
     }
 
     protected function casts(): array

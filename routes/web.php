@@ -8,18 +8,15 @@ use Filament\Facades\Filament;
 use Faker\Provider\en_US\Address;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\TenantsPermission;
+use App\Models\Booking;
 use App\Models\RoomType;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
 
-    $startOfMonth = Carbon::parse('2024-08-01');
-
-    $endOfMonth = Carbon::parse('2024-08-30');
-
-    $roomTypes = RoomType::with('rooms.bookings')->find(4);
-
-    return $roomTypes->rooms->pluck('bookings')->flatten()->unique('room_id');
+    $booking = Booking::first();
+    $bookingNights = $booking->bookingNights;
+    return $booking->bookingNights->avg('rate');
 
     return view('welcome');
 });

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
+            $table->string('booking_type');
             $table->foreignId('tenant_id')->constrained();
             $table->string('booking_number');
             $table->foreignId('room_id')->constrained();
@@ -21,6 +22,9 @@ return new class extends Migration
             $table->string('booking_customer')->nullable();
             $table->foreignId('customer_id')->nullable()->constrained();
             $table->string('status')->default('pending');
+            $table->decimal('booking_rate', 10, 2);
+            $table->tinyInteger('adults')->default(0);
+            $table->tinyInteger('childrens')->default(0);
             $table->foreignId('user_id')->constrained();
             $table->softDeletes();
             $table->timestamps();

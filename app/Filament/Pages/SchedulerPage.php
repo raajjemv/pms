@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Models\Booking;
 use App\Models\Room;
 use App\Models\RoomType;
 use Carbon\Carbon;
@@ -19,10 +20,10 @@ class SchedulerPage extends Page
 
     public $startOfMonth, $endOfMonth;
 
+    public  $bookingSummary;
+
     public function mount()
     {
-
-
 
         $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::parse('2024-08-01');
 
@@ -51,5 +52,11 @@ class SchedulerPage extends Page
         }
 
         $this->monthDays = $monthDays;
+    }
+
+    public function viewBookingSummary(Booking $booking)
+    {
+        $this->bookingSummary = $booking;
+        $this->dispatch('open-modal', id: 'booking-summary');
     }
 }

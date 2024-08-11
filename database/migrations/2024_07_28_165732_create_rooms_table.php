@@ -28,7 +28,6 @@ return new class extends Migration
             $table->string('floor_number')->nullable();
             $table->foreignId('room_status_id')->constrained();
             $table->text('room_description');
-            $table->decimal('base_rate', 10, 2);
             $table->foreignId('user_id')->constrained();
             $table->softDeletes();
             $table->timestamps();

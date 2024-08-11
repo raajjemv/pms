@@ -2,21 +2,21 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\RoomFeatures;
-use App\Filament\Resources\RoomTypeResource\Pages;
-use App\Filament\Resources\RoomTypeResource\RelationManagers;
-use App\Models\RoomType;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\RatePlan;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Filament\Clusters\RoomFeatures;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\RatePlanResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\RatePlanResource\RelationManagers;
 
-class RoomTypeResource extends Resource
+class RatePlanResource extends Resource
 {
-    protected static ?string $model = RoomType::class;
+    protected static ?string $model = RatePlan::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -26,30 +26,15 @@ class RoomTypeResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Section::make([
-                    Forms\Components\Select::make('rate_plans')
-                        ->required()
-                        ->multiple()
-                        ->preload()
-                        ->relationship('ratePlans', 'name'),
-                    Forms\Components\TextInput::make('name')
-                        ->required(),
-                    Forms\Components\Textarea::make('description')
-                        ->required()
-                        ->columnSpanFull(),
-                    Forms\Components\TextInput::make('base_rate')
-                        ->required()
-                        ->numeric(),
-                    Forms\Components\TextInput::make('adults')
-                        ->minValue(0)
-                        ->numeric()
-                        ->required(),
-                    Forms\Components\TextInput::make('children')
-                        ->minValue(0)
-                        ->numeric(),
-                ])->columns(2)
-
-
+                Forms\Components\TextInput::make('name')
+                    ->required()
+                    ->maxLength(255),
+                Forms\Components\TextInput::make('code')
+                    ->required()
+                    ->maxLength(4),
+                Forms\Components\TextInput::make('rate')
+                    ->required()
+                    ->numeric(),
             ]);
     }
 
@@ -58,11 +43,11 @@ class RoomTypeResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->description(fn ($record) => $record->code)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('base_rate'),
-                Tables\Columns\TextColumn::make('ratePlans.name')
-                    ->badge()
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('rate')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
@@ -90,8 +75,7 @@ class RoomTypeResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ])
-            ->defaultSort('created_at', 'DESC');
+            ]);
     }
 
     public static function getRelations(): array
@@ -104,10 +88,10 @@ class RoomTypeResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRoomTypes::route('/'),
-            'create' => Pages\CreateRoomType::route('/create'),
-            'view' => Pages\ViewRoomType::route('/{record}'),
-            'edit' => Pages\EditRoomType::route('/{record}/edit'),
+            'index' => Pages\ListRatePlans::route('/'),
+            'create' => Pages\CreateRatePlan::route('/create'),
+            'view' => Pages\ViewRatePlan::route('/{record}'),
+            'edit' => Pages\EditRatePlan::route('/{record}/edit'),
         ];
     }
 }

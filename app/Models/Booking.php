@@ -36,6 +36,11 @@ class Booking extends Model
         return $this->belongsTo(Tenant::class);
     }
 
+    public function ratePlan()
+    {
+        return $this->belongsTo(RatePlan::class);
+    }
+
     public function bookingNights()
     {
         return $this->hasMany(BookingNight::class);

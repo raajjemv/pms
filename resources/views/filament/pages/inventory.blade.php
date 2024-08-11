@@ -1,0 +1,113 @@
+<x-filament-panels::page>
+
+    <div class="overflow-x-scroll text-sm text-black rounded-lg bg-gray-50" x-data="rateUpdater">
+        <div class="flex">
+            <div class="w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200">Rooms
+                Types
+            </div>
+            @foreach ($monthDays as $day)
+                <div @class([
+                    'flex-none border-[0.8px] border-gray-200 flex items-center justify-center w-[90px] px-1 py-1',
+                    'bg-amber-100' => $day->isFriday() || $day->isSaturday(),
+                ])>
+                    <div class="text-center">
+                        <div>{{ $day->format('D') }}</div>
+                        <div class="font-semibold">{{ $day->format('d') }}</div>
+                        <div>{{ $day->format('M') }}</div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+        <div class="">
+            @foreach ($roomTypes as $roomTypeKey => $roomType)
+                <div class="overflow-hidden w-max">
+                    <div class="flex bg-zinc-200">
+                        <div
+                            class="flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold">
+                            {{ $roomType->name }}
+                        </div>
+                        <div class="flex">
+                            @foreach ($monthDays as $day)
+                                <div class="flex-none  w-[90px] border-[0.8px] border-gray-300">
+                                    <div class="p-3">
+                                    </div>
+
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @foreach ($roomType->ratePlans as $ratePlan)
+                        <div class="flex ">
+                            <div
+                                class="flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
+                                {{ $ratePlan->name }}</div>
+                            <div class="relative flex">
+                                @foreach ($monthDays as $day)
+                                    <div
+                                        class="flex-none  flex items-center w-[90px] p-1  border-[0.8px] border-gray-200">
+                                        @php
+                                            $rateQ = $roomType->rates
+                                                ->where('rate_plan_id', $ratePlan->id)
+                                                ->where('date', $day->format('Y-m-d'))
+                                                ->first();
+                                            $rate = $rateQ
+                                                ? $rateQ->rate
+                                                : number_format($ratePlan->rate + $roomType->base_rate, 2);
+
+                                        @endphp
+                                        <input
+                                            x-on:change="handleRateUpdate({
+                                            event: $event,
+                                            ratePlan: '{{ $ratePlan->id }}',
+                                            date: '{{ $day }}',
+                                            roomType: '{{ $roomType->id }}'
+                                        })"
+                                            type="text" step="0.01" value="{{ $rate }}"
+                                            class="w-full border border-gray-200 appearance-none">
+
+                                    </div>
+                                @endforeach
+
+                            </div>
+
+                        </div>
+                    @endforeach
+                </div>
+            @endforeach
+        </div>
+
+    </div>
+    {{-- <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('rateUpdater', () => ({
+                loading: false,
+                handleRateUpdate(event) {
+                    @this.updateRoomRate(
+                        event.event.target.value,
+                        event.ratePlan,
+                        event.roomType,
+                        event.date,
+                    );
+                    this.$wire.$refresh
+
+                },
+
+            }))
+        })
+    </script> --}}
+</x-filament-panels::page>
+@script
+    <script>
+        Alpine.data('rateUpdater', () => ({
+            handleRateUpdate(event) {
+                $wire.updateRoomRate(
+                    event.event.target.value,
+                    event.ratePlan,
+                    event.roomType,
+                    event.date,
+                )
+                // console.log(v.promise.value)
+            },
+        }))
+    </script>
+@endscript

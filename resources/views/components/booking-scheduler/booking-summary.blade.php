@@ -126,7 +126,7 @@ H59.055v-35.824h30.417V350.671z M89.472,287.133H59.055v-35.824h30.417V287.133z M
                                     fill="currentColor" />
                             </svg>
 
-                            <span class="">{{ $booking?->childrens }}</span>
+                            <span class="">{{ $booking?->children }}</span>
                         </div>
                     </div>
                 </td>

@@ -69,9 +69,7 @@ class RoomResource extends Resource
                     Forms\Components\Textarea::make('room_description')
                         ->required()
                         ->columnSpanFull(),
-                    Forms\Components\TextInput::make('base_rate')
-                        ->required()
-                        ->numeric(),
+                  
                 ])
                 ->columns(3)
 
@@ -98,9 +96,6 @@ class RoomResource extends Resource
                 Tables\Columns\TextColumn::make('floor_number')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('status.name')
-                    ->numeric()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('base_rate')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('deleted_at')

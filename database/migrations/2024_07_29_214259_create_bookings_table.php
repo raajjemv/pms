@@ -22,10 +22,11 @@ return new class extends Migration
             $table->string('booking_customer')->nullable();
             $table->foreignId('customer_id')->nullable()->constrained();
             $table->string('status')->default('pending');
-            $table->decimal('booking_rate', 10, 2);
+            // $table->decimal('booking_rate', 10, 2);
             $table->tinyInteger('adults')->default(0);
-            $table->tinyInteger('childrens')->default(0);
+            $table->tinyInteger('children')->default(0);
             $table->foreignId('user_id')->constrained();
+            $table->foreignId('rate_plan_id')->constrained();
             $table->softDeletes();
             $table->timestamps();
         });

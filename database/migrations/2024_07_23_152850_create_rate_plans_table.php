@@ -11,15 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('room_types', function (Blueprint $table) {
+        Schema::create('rate_plans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained();
-            $table->foreignId('rate_plan_id')->constrained();
             $table->string('name');
-            $table->decimal('base_rate', 10, 2);
-            $table->text('description');
-            $table->tinyInteger('adults')->default(1);
-            $table->tinyInteger('children')->default(0);
+            $table->string('code');
+            $table->decimal('rate', 10, 2);
             $table->foreignId('user_id')->constrained();
             $table->softDeletes();
             $table->timestamps();
@@ -31,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('room_types');
+        Schema::dropIfExists('rate_plans');
     }
 };

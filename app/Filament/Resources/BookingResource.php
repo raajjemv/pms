@@ -33,12 +33,15 @@ class BookingResource extends Resource
                     ])->required(),
                 Forms\Components\TextInput::make('booking_number')
                     ->required()
-                    ->formatStateUsing(fn () => Str::random()),
+                    ->formatStateUsing(fn() => Str::random()),
+                Forms\Components\Select::make('rate_plan_id')
+                    ->required()
+                    ->relationship('ratePlan', 'name'),
                 Forms\Components\Select::make('room_id')
                     ->relationship(
                         name: 'room'
                     )
-                    ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->room_number}-{$record->roomType->name}")
+                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->room_number}-{$record->roomType->name}")
                     ->required(),
                 Forms\Components\DatePicker::make('from')
                     ->required(),
@@ -52,9 +55,11 @@ class BookingResource extends Resource
                     ->default('pending'),
                 Forms\Components\TextInput::make('adults')
                     ->numeric()
+                    ->default(1)
                     ->required(),
-                Forms\Components\TextInput::make('childrens')
+                Forms\Components\TextInput::make('children')
                     ->numeric()
+                    ->default(0)
                     ->required(),
             ]);
     }

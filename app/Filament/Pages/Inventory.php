@@ -87,14 +87,18 @@ class Inventory extends Page
                             'thursday' => 'Thursday',
                             'friday' => 'Friday',
                             'saturday' => 'Saturday',
-                        ]),
+                        ])
+                        ->required(),
                     Forms\Components\Select::make('room_type')
                         ->options($this->roomTypes->pluck('name', 'id'))
+                        ->required()
                         ->live(),
                     Forms\Components\Select::make('rate_plan')
+                        ->required()
                         ->visible(fn($get) => $get('room_type'))
                         ->options(fn($get) => $this->roomTypes->where('id', $get('room_type'))->first()->ratePlans->pluck('name', 'id')),
                     Forms\Components\TextInput::make('rate')
+                        ->required()
                 ])
                 ->action(function ($data) {
                     try {

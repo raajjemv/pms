@@ -14,26 +14,13 @@ use App\Http\Middleware\TenantsPermission;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
-    $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::parse('2024-08-01');
+    $fridays = [];
+    $startDate = Carbon::now()->startofmonth()->modify('this sunday'); // Get the first friday. If $fromDate is a friday, it will include $fromDate as a friday
+    $endDate = Carbon::now()->endOfMonth();
 
-    $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::parse('2024-08-30');
-
-    $types = RoomType::whereHas('ratePlans')->with([
-        'ratePlans',
-        'rates' => function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->where(function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->where('date', '>=', $startOfMonth)
-                    ->where('date', '<=', $endOfMonth);
-            })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->where('date', '>=', $startOfMonth)
-                    ->where('date', '<=', $endOfMonth);
-            })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->where('date', '<', $startOfMonth)
-                    ->where('date', '>', $endOfMonth);
-            });
-        }
-    ])->get();
-
-    return $types;
+    for ($date = $startDate; $date->lte($endDate); $date->addWeek()) {
+        $fridays[] = $date->format('Y-m-d');
+    }
+    return $fridays;
     return view('welcome');
 });

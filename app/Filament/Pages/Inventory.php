@@ -8,6 +8,8 @@ use App\Models\RoomTypeRate;
 use Carbon\Carbon;
 use Filament\Pages\Page;
 use Filament\Notifications\Notification;
+use Filament\Actions\Action;
+use Filament\Forms;
 
 class Inventory extends Page
 {
@@ -69,5 +71,65 @@ class Inventory extends Page
                 ->danger()
                 ->send();
         }
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('bulk update')
+                ->form([
+                    Forms\Components\Select::make('day')
+                        ->options([
+                            'sunday' => 'Sunday',
+                            'monday' => 'Monday',
+                            'tuesday' => 'Tuesday',
+                            'wednesday' => 'Wednesday',
+                            'thursday' => 'Thursday',
+                            'friday' => 'Friday',
+                            'saturday' => 'Saturday',
+                        ]),
+                    Forms\Components\Select::make('room_type')
+                        ->options($this->roomTypes->pluck('name', 'id'))
+                        ->live(),
+                    Forms\Components\Select::make('rate_plan')
+                        ->visible(fn($get) => $get('room_type'))
+                        ->options(fn($get) => $this->roomTypes->where('id', $get('room_type'))->first()->ratePlans->pluck('name', 'id')),
+                    Forms\Components\TextInput::make('rate')
+                ])
+                ->action(function ($data) {
+                    try {
+                        $days = $this->daysByName($data['day']);
+                        foreach ($days as $day) {
+                            $rate = RoomTypeRate::updateOrCreate(
+                                ['room_type_id' => $data['room_type'], 'rate_plan_id' => $data['rate_plan'], 'date' => $day],
+                                ['rate' => $data['rate'], 'tenant_id' => auth()->user()->current_tenant_id, 'user_id' => auth()->id()]
+                            );
+                        }
+                        Notification::make()
+                            ->title('Bulk updated room rates successfully')
+                            ->success()
+                            ->send();
+                    } catch (\Throwable $th) {
+                        Notification::make()
+                            ->title('An error occured, please try again!')
+                            ->danger()
+                            ->send();
+                    }
+                })
+                ->requiresConfirmation(),
+
+        ];
+    }
+
+    public function daysByName($dayName)
+    {
+        $fridays = [];
+        $startDate = $this->startOfMonth->modify('this ' . $dayName);
+        $endDate = $this->endOfMonth;
+
+        for ($date = $startDate; $date->lte($endDate); $date->addWeek()) {
+            $fridays[] = $date->format('Y-m-d');
+        }
+        return $fridays;
     }
 }

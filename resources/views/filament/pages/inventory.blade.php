@@ -1,8 +1,8 @@
 <x-filament-panels::page>
 
     <div class="overflow-x-scroll text-sm text-black rounded-lg bg-gray-50" x-data="rateUpdater">
-        <div class="flex">
-            <div class="w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200">Rooms
+        <div class="flex ">
+            <div class="bg-white sticky top-0 left-0 w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200">Rooms
                 Types
             </div>
             @foreach ($monthDays as $day)
@@ -20,10 +20,10 @@
         </div>
         <div class="">
             @foreach ($roomTypes as $roomTypeKey => $roomType)
-                <div class="overflow-hidden w-max">
-                    <div class="flex bg-zinc-200">
+                <div class=" w-max">
+                    <div class="relative flex bg-zinc-200">
                         <div
-                            class="flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold">
+                            class="sticky top-0 left-0 flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold">
                             {{ $roomType->name }}
                         </div>
                         <div class="flex">
@@ -39,7 +39,7 @@
                     @foreach ($roomType->ratePlans as $ratePlan)
                         <div class="flex ">
                             <div
-                                class="flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
+                                class="sticky top-0 left-0 z-20 bg-white flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
                                 {{ $ratePlan->name }}</div>
                             <div class="relative flex">
                                 @foreach ($monthDays as $day)

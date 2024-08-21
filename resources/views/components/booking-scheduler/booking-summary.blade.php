@@ -98,7 +98,7 @@ H59.055v-35.824h30.417V350.671z M89.472,287.133H59.055v-35.824h30.417V287.133z M
                 </td>
                 <td class="px-2 py-3">
                     <div class="text-xs">Rate Plan</div>
-                    <div class="text-sm font-medium">-</div>
+                    <div class="text-sm font-medium">{{ $booking?->ratePlan->code }}</div>
                 </td>
             </tr>
             <tr>

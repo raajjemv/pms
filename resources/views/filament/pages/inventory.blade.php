@@ -23,7 +23,7 @@
                 <div class=" w-max">
                     <div class="relative flex bg-zinc-200">
                         <div
-                            class="sticky top-0 left-0 flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold">
+                            class="sticky top-0 left-0 flex-none w-[200px] px-2 flex items-center border-[0.8px] bg-zinc-200 border-gray-300 font-semibold">
                             {{ $roomType->name }}
                         </div>
                         <div class="flex">

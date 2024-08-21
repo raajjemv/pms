@@ -17,4 +17,11 @@ class EditBooking extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        
+        $data = collect($data)->forget('date')->toArray();
+        return $data;
+    }
 }

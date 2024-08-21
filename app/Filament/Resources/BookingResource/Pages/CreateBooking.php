@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\BookingResource\Pages;
 
+use Carbon\Carbon;
 use Filament\Actions;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
@@ -13,8 +14,17 @@ class CreateBooking extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        $date = explode(" to ", $data['date']);
+
+        $from_date = Carbon::parse($date[0]);
+        $to_date = isset($date[1]) ? Carbon::parse($date[1]) : $from_date;
+
+        $data['from'] = $from_date;
+        $data['to'] = $to_date;
+
         $data['tenant_id'] = Filament::getTenant()->id;
         $data['user_id'] = auth()->id();
+        $data = collect($data)->forget('date')->toArray();
         return $data;
     }
 

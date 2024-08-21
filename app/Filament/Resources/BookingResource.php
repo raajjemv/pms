@@ -2,17 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\BookingResource\Pages;
-use App\Filament\Resources\BookingResource\RelationManagers;
-use App\Models\Booking;
+use Carbon\Carbon;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Booking;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\BookingResource\Pages;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\BookingResource\RelationManagers;
+use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
 
 class BookingResource extends Resource
 {
@@ -43,10 +45,16 @@ class BookingResource extends Resource
                     )
                     ->getOptionLabelFromRecordUsing(fn($record) => "{$record->room_number}-{$record->roomType->name}")
                     ->required(),
-                Forms\Components\DatePicker::make('from')
-                    ->required(),
-                Forms\Components\DatePicker::make('to')
-                    ->required(),
+                // Forms\Components\DatePicker::make('from')
+                //     ->live()
+                //     ->required(),
+                // Forms\Components\DatePicker::make('to')
+                //     ->required(),
+                DateRangePicker::make('date')
+                    ->separator(' to ')
+                    ->live()
+                    ->displayFormat('Y-MM-D')
+                    ->format('Y-MM-D'),
                 Forms\Components\TextInput::make('booking_customer')
                     ->required(),
                 Forms\Components\TextInput::make('status')

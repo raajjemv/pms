@@ -7,6 +7,7 @@ use Filament\Panel;
 use Filament\Widgets;
 use App\Models\Tenant;
 use Filament\PanelProvider;
+use App\Filament\LoginBackground;
 use Filament\Navigation\MenuItem;
 use Filament\Support\Colors\Color;
 use App\Http\Middleware\ApplyTenantScopes;
@@ -20,6 +21,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
+use Swis\Filament\Backgrounds\FilamentBackgroundsPlugin;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -68,6 +70,13 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->sidebarCollapsibleOnDesktop()
+            ->plugins([
+                FilamentBackgroundsPlugin::make()
+                    ->imageProvider(
+                        LoginBackground::make()
+                            ->directory('backgrounds')
+                    ),
+            ])
             ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

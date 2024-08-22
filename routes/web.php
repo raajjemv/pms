@@ -10,17 +10,11 @@ use Faker\Factory as Faker;
 use Filament\Facades\Filament;
 use Faker\Provider\en_US\Address;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Middleware\TenantsPermission;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
-    $fridays = [];
-    $startDate = Carbon::now()->startofmonth()->modify('this sunday'); // Get the first friday. If $fromDate is a friday, it will include $fromDate as a friday
-    $endDate = Carbon::now()->endOfMonth();
-
-    for ($date = $startDate; $date->lte($endDate); $date->addWeek()) {
-        $fridays[] = $date->format('Y-m-d');
-    }
-    return $fridays;
+    return $images = Storage::disk('public_storage')->files('backgrounds');
     return view('welcome');
 });

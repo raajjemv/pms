@@ -17,9 +17,18 @@ class Tenant extends Model implements HasCurrentTenantLabel
     {
         return $this->belongsToMany(User::class);
     }
+    public function owner()
+    {
+        return $this->belongsTo(User::class, 'owner_id', 'id');
+    }
+
     public function roomTypes()
     {
         return $this->hasMany(RoomType::class);
+    }
+    public function channelGroups()
+    {
+        return $this->hasMany(ChannelGroup::class);
     }
     public function customers()
     {

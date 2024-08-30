@@ -13,10 +13,17 @@ return new class extends Migration
     {
         Schema::create('channels', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained('tenants');
             $table->string('name');
             $table->softDeletes();
             $table->timestamps();
+        });
+
+        Schema::create('channel_channel_group', function (Blueprint $table) {
+            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('channel_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('channel_group_id')->constrained()->cascadeOnDelete();
+            $table->string('token');
+            $table->unique(['channel_id', 'tenant_id']);
         });
     }
 

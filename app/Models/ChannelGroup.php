@@ -5,20 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Channel extends Model
+class ChannelGroup extends Model
 {
     use HasFactory;
 
     protected $guarded = [];
 
-    
+
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);
     }
 
-    public function channelGroups()
+    public function channels()
     {
-        return $this->belongsToMany(ChannelGroup::class);
+        return $this->belongsToMany(Channel::class)
+            ->withPivot(['tenant_id','token']);
     }
 }

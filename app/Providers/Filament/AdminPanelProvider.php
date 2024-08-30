@@ -65,17 +65,28 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->tenantMiddleware([
                 TenantsPermission::class,
+                \Hasnayeen\Themes\Http\Middleware\SetTheme::class
             ], isPersistent: true)
             ->authMiddleware([
                 Authenticate::class,
             ])
             ->sidebarCollapsibleOnDesktop()
+            ->darkMode(false)
+
             ->plugins([
                 FilamentBackgroundsPlugin::make()
                     ->imageProvider(
                         LoginBackground::make()
                             ->directory('backgrounds')
                     ),
+                \Hasnayeen\Themes\ThemesPlugin::make()
+                    ->canViewThemesPage(fn() => false)
+                    ->registerTheme(
+                        [
+                            \Hasnayeen\Themes\Themes\Sunset::class,
+                        ],
+                        override: true,
+                    )
             ])
             ->viteTheme('resources/css/filament/admin/theme.css');
     }

@@ -11,7 +11,7 @@ use Filament\Forms;
 class TenantConfiguration extends Page
 {
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-cog-8-tooth';
 
     protected static string $view = 'filament.pages.tenant-configuration';
 

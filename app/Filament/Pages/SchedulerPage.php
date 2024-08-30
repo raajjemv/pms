@@ -10,7 +10,9 @@ use Filament\Pages\Page;
 
 class SchedulerPage extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+
+    protected static ?string $navigationLabel = 'Scheduler';
 
     protected static string $view = 'filament.pages.scheduler-page';
 

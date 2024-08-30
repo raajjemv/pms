@@ -11,15 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('room_type_rates', function (Blueprint $table) {
+        Schema::create('channel_groups', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained('tenants');
-            $table->foreignId('channel_group_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('room_type_id')->constrained();
-            $table->foreignId('rate_plan_id')->nullable()->constrained();
-            $table->date('date');
-            $table->decimal('rate', 10, 2);
-            $table->foreignId('user_id')->constrained('users');
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -29,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('room_type_rates');
+        Schema::dropIfExists('channel_groups');
     }
 };

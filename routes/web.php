@@ -12,9 +12,10 @@ use Faker\Provider\en_US\Address;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Middleware\TenantsPermission;
+use App\Models\ChannelGroup;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
-    return $images = Storage::disk('public_storage')->files('backgrounds');
+    
     return view('welcome');
 });

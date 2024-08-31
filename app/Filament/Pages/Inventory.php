@@ -23,7 +23,7 @@ class Inventory extends Page
     #[Url(except: '')]
     public $selectedChannelGroup;
 
-    public $channgelGroups;
+    public $channelGroups;
 
     public $startOfMonth, $endOfMonth;
 
@@ -50,7 +50,7 @@ class Inventory extends Page
 
     public function mount()
     {
-        $this->channgelGroups = Filament::getTenant()->channelGroups;
+        $this->channelGroups = Filament::getTenant()->channelGroups;
 
         $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
 
@@ -106,12 +106,12 @@ class Inventory extends Page
         return [
             Action::make('select_channel_group')
                 ->color('gray')
-                ->label($this->channgelGroups->where('id', $this->selectedChannelGroup)->first()->name ?? 'Select Group')
+                ->label($this->channelGroups->where('id', $this->selectedChannelGroup)->first()->name ?? 'Select Pool')
                 ->modalWidth(MaxWidth::Small)
                 ->form(function () {
                     return [
                         Forms\Components\Select::make('channel_group')
-                            ->options($this->channgelGroups->pluck('name', 'id'))
+                            ->options($this->channelGroups->pluck('name', 'id'))
 
                     ];
                 })

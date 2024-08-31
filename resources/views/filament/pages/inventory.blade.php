@@ -1,13 +1,12 @@
 <x-filament-panels::page>
     @if (!$selectedChannelGroup)
-        Select a Channel Pool
+       <div class="font-medium"> Select a Channel Pool </div>
     @else
         <div class="overflow-x-scroll text-sm text-black rounded-lg bg-gray-50" x-data="rateUpdater">
             <div class="flex ">
                 <div
                     class="bg-gray-50 sticky top-0 left-0 w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200">
                     Rooms
-                    Types
                 </div>
                 @foreach ($monthDays as $day)
                     <div @class([

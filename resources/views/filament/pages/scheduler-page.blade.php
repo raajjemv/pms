@@ -1,4 +1,4 @@
-<x-filament-panels::page>
+<x-filament-panels::page wire:poll.60s>
     <div x-init="() => {
         var date = '{{ !request('date') ? now()->format('d') : '' }}';
         if (date && date > '09') {

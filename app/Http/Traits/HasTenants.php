@@ -8,9 +8,6 @@ trait HasTenants
 {
     public function tenants()
     {
-        // if (auth()->check() && $this->id == 1) {
-        //     return Tenant::get();
-        // }
         return $this->belongsToMany(Tenant::class)->withTimestamps();
     }
 

@@ -7,7 +7,9 @@ use Filament\Tables;
 use App\Models\RatePlan;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Facades\Filament;
 use Filament\Resources\Resource;
+use Illuminate\Support\Facades\Cache;
 use App\Filament\Clusters\RoomFeatures;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\RatePlanResource\Pages;
@@ -43,7 +45,7 @@ class RatePlanResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->description(fn ($record) => $record->code)
+                    ->description(fn($record) => $record->code)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('rate')
                     ->numeric()
@@ -68,8 +70,25 @@ class RatePlanResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\Action::make('default')
+                    ->visible(fn($record) => !$record->default)
+                    ->icon('heroicon-m-check-circle')
+                    ->requiresConfirmation()
+                    ->action(function ($record) {
+                        foreach (RatePlan::all() as $ratePlan) {
+                            $ratePlan->default = false;
+                            $ratePlan->save();
+                        }
+
+                        $record->update([
+                            'default' => true
+                        ]);
+                        Cache::forget('default_rate_plan_' . Filament::getTenant()->id);
+                    }),
+                Tables\Actions\ViewAction::make()
+                    ->hiddenLabel(),
+                Tables\Actions\EditAction::make()
+                    ->hiddenLabel(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

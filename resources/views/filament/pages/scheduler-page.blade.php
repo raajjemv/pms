@@ -1,11 +1,16 @@
 <x-filament-panels::page>
     <div x-init="() => {
-        var container = document.getElementById('scheduler-wrapper');
-        const targetDiv = document.getElementById('day-20');
-        const targetOffset = targetDiv.offsetLeft;
-        container.scrollTo({ left: targetOffset, behavior: 'smooth' });
+        var date = '{{ !request('date') ? now()->format('d') : '' }}';
+        if (date && date > '09') {
+            var container = document.getElementById('scheduler-wrapper');
+            const targetDiv = document.getElementById('day-03');
+            const targetOffset = targetDiv.offsetLeft;
+            container.scrollTo({ left: targetOffset, behavior: 'smooth' });
+    
+        }
     }" x-data="{
         scrollScheduler(type) {
+    
             var container = document.getElementById('scheduler-wrapper');
             if (type == 'right') {
                 container.scrollTo({ left: container.scrollLeft + 200, behavior: 'smooth' });
@@ -56,6 +61,7 @@
                                     <div class="flex-none  w-[90px] border-[0.8px] border-gray-300">
                                         <div>
                                             <x-rooms-available-count :day="$day" :roomNumbers="$roomNumbers" />
+                                            @livewire('pms.room-rate', ['roomNumbers' => $roomNumbers, 'day' => $day], key(str()->random()))
                                         </div>
 
                                     </div>

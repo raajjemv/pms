@@ -16,6 +16,30 @@ use App\Models\ChannelGroup;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
-    
+
+    return defaultRatePlan();
+    $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
+
+    $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::now()->endOfMonth();
+
+    $rooms = Room::with(['roomType' => function ($q) use ($startOfMonth, $endOfMonth) {
+        $q->with(['rates' => function ($qq) use ($startOfMonth, $endOfMonth) {
+            $qq->whereBetween('date', [$startOfMonth, $endOfMonth]);
+        }]);
+    }, 'bookings' => function ($query) use ($startOfMonth, $endOfMonth) {
+        $query->with('customer')->where(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->where('from', '>=', $startOfMonth)
+                ->where('from', '<=', $endOfMonth);
+        })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->where('to', '>=', $startOfMonth)
+                ->where('to', '<=', $endOfMonth);
+        })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->where('from', '<', $startOfMonth)
+                ->where('to', '>', $endOfMonth);
+        });
+    }])->get();
+
+    return $rooms->groupBy('roomType.name');
+    return redirect('/admin');
     return view('welcome');
 });

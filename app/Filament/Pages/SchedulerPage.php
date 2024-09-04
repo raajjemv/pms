@@ -27,14 +27,18 @@ class SchedulerPage extends Page
     public function mount()
     {
 
-        $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::parse('2024-08-01');
+        $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
 
-        $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::parse('2024-08-30');
+        $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::now()->endOfMonth();
 
         $this->startOfMonth = $startOfMonth;
         $this->endOfMonth = $endOfMonth;
 
-        $this->rooms = Room::with(['roomType', 'bookings' => function ($query) use ($startOfMonth, $endOfMonth) {
+        $this->rooms = Room::with(['roomType' => function ($q) use ($startOfMonth, $endOfMonth) {
+            $q->with(['rates' => function ($qq) use ($startOfMonth, $endOfMonth) {
+                $qq->whereBetween('date', [$startOfMonth, $endOfMonth]);
+            }]);
+        }, 'bookings' => function ($query) use ($startOfMonth, $endOfMonth) {
             $query->with('customer')->where(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('from', '>=', $startOfMonth)
                     ->where('from', '<=', $endOfMonth);

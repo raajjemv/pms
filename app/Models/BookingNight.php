@@ -15,5 +15,11 @@ class BookingNight extends Model
     {
         return $this->belongsTo(Booking::class);
     }
-   
+
+    protected function casts(): array
+    {
+        return [
+            'date' => 'datetime:Y-m-d'
+        ];
+    }
 }

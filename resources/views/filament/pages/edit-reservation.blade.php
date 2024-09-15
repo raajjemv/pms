@@ -15,4 +15,27 @@
             Room Charges
         </x-filament::tabs.item>
     </x-filament::tabs>
+
+
+
+    @switch($activeTab)
+        @case('guest-accounting')
+            @livewire('pms.reservation.guest-accounting', ['booking' => $booking])
+        @break
+
+        @case('booking-details')
+            <div>bd</div>
+        @break
+
+        @case('guest-details')
+            <div>gd</div>
+        @break
+
+        @case('room-charges')
+            <div>rc</div>
+        @break
+
+        @default
+    @endswitch
+
 </x-filament-panels::page>

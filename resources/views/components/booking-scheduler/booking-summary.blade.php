@@ -26,8 +26,8 @@
 
     <div>
         <div class="flex space-x-2">
-            <x-filament::button class="flex-1" href="{{ App\Filament\Pages\EditReservation::getUrl() }}" tag="a">
-                Edit
+            <x-filament::button class="flex-1" href="{{ App\Filament\Pages\EditReservation::getUrl(['record' => encrypt($booking?->id)]) }}" tag="a">
+                Edit 
             </x-filament::button>
             <x-filament::button color="gray">
                 Print / E-Mail

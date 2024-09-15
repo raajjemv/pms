@@ -35,7 +35,7 @@ class BookingResource extends Resource
                     ])->required(),
                 Forms\Components\TextInput::make('booking_number')
                     ->required()
-                    ->formatStateUsing(fn() => Str::random()),
+                    ->formatStateUsing(fn() => strtoupper(Str::random())),
                 Forms\Components\Select::make('rate_plan_id')
                     ->required()
                     ->relationship('ratePlan', 'name'),

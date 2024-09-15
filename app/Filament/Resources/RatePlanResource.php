@@ -10,7 +10,7 @@ use Filament\Tables\Table;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Illuminate\Support\Facades\Cache;
-use App\Filament\Clusters\RoomFeatures;
+use App\Filament\Clusters\RoomConfigurations;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\RatePlanResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -22,7 +22,7 @@ class RatePlanResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $cluster = RoomFeatures::class;
+    protected static ?string $cluster = RoomConfigurations::class;
 
     public static function form(Form $form): Form
     {

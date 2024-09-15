@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\RoomFeatures;
+use App\Filament\Clusters\RoomConfigurations;
 use App\Filament\Resources\RoomTypeResource\Pages;
 use App\Filament\Resources\RoomTypeResource\RelationManagers;
 use App\Models\RoomType;
@@ -20,7 +20,7 @@ class RoomTypeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $cluster = RoomFeatures::class;
+    protected static ?string $cluster = RoomConfigurations::class;
 
     public static function form(Form $form): Form
     {

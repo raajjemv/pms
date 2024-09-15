@@ -23,7 +23,41 @@
 
         <x-filament::button @click="scrollScheduler('right')" icon="heroicon-m-chevron-right" />
     </div>
-    <div>
+
+    <div x-data="{
+        roomId: '',
+        selectedDays: [],
+        startGridDate: null,
+        endGridDate: null,
+        isSelecting: false,
+    
+        selectDays() {
+            const start = parseInt(this.startGridDate);
+            const end = parseInt(this.endGridDate);
+            this.selectedDays = [];
+    
+            for (let i = start; i <= end; i++) {
+                this.selectedDays.push(i);
+            }
+        },
+        isDateWithinRange(dateToCheck, room) {
+            const checkDate = new Date(dateToCheck);
+            const start = new Date(this.startGridDate);
+            const end = new Date(this.endGridDate);
+    
+            if (isNaN(checkDate) || isNaN(start) || isNaN(end)) {
+                return false;
+            }
+    
+            return checkDate >= start && checkDate <= end && room == this.roomId;
+        }
+    }">
+        <button @click="isDateWithinRange('2024-09-05',2) ? console.log('ok') : null">ss</button>
+
+        <div class="absolute top-0 left-0 z-10 p-2 text-white bg-black rounded-lg">
+            <p x-text="startGridDate"></p>
+            <p x-text="endGridDate"></p>
+        </div>
         <div class="py-2 font-medium">
             <div class="text-center">{{ $startOfMonth->format('F, Y') }}</div>
         </div>
@@ -75,15 +109,16 @@
                                     {{ $room->room_number }}</div>
                                 <div class="relative flex overflow-hidden">
                                     @foreach ($monthDays as $day)
-                                        <div
+                                        <div wire:key="selection-day-{{ $day }}" day="{{ $day }}"
+                                            :class="{ 'bg-gray-500': isDateWithinRange('{{ $day }}', {{ $room->id }}) }"
+                                            @mousedown="isSelecting = true; startGridDate = $event.target.getAttribute('day');roomId = '{{ $room->id }}'"
+                                            @mouseup="isSelecting = false; endGridDate = $event.target.getAttribute('day'); selectDays($event)"
+                                            @mousemove="isSelecting && (endGridDate = $event.target.getAttribute('day'))"
                                             class="flex-none  flex items-center w-[90px] px-1  border-[0.8px] border-gray-200">
-
                                         </div>
                                     @endforeach
-                                    @php
-                                        $bookings = $room->bookings;
-                                    @endphp
-                                    @foreach ($bookings as $booking)
+
+                                    @foreach ($room->bookings as $booking)
                                         @php
                                             $from = $booking->from;
                                             $to = $booking->to;

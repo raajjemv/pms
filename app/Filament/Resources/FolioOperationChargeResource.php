@@ -4,19 +4,19 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
-use App\Models\RoomView;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use App\Filament\Clusters\RoomConfigurations;
+use App\Models\FolioOperationCharge;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\RoomViewResource\Pages;
+use App\Filament\Clusters\RoomConfigurations;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\RoomViewResource\RelationManagers;
+use App\Filament\Resources\FolioOperationChargeResource\Pages;
+use App\Filament\Resources\FolioOperationChargeResource\RelationManagers;
 
-class RoomViewResource extends Resource
+class FolioOperationChargeResource extends Resource
 {
-    protected static ?string $model = RoomView::class;
+    protected static ?string $model = FolioOperationCharge::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -26,11 +26,14 @@ class RoomViewResource extends Resource
     {
         return $form
             ->schema([
-             
+              
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
-               
+                Forms\Components\TextInput::make('rate')
+                    ->required()
+                    ->numeric(),
+                
             ]);
     }
 
@@ -38,9 +41,12 @@ class RoomViewResource extends Resource
     {
         return $table
             ->columns([
-             
+              
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('rate')
+                    ->numeric()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
@@ -81,10 +87,10 @@ class RoomViewResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListRoomViews::route('/'),
-            'create' => Pages\CreateRoomView::route('/create'),
-            'view' => Pages\ViewRoomView::route('/{record}'),
-            'edit' => Pages\EditRoomView::route('/{record}/edit'),
+            'index' => Pages\ListFolioOperationCharges::route('/'),
+            'create' => Pages\CreateFolioOperationCharge::route('/create'),
+            'view' => Pages\ViewFolioOperationCharge::route('/{record}'),
+            'edit' => Pages\EditFolioOperationCharge::route('/{record}/edit'),
         ];
     }
 }

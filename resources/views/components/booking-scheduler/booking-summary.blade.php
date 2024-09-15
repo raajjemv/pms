@@ -3,35 +3,7 @@
     <x-slot name="heading">
         <div>
             <div class="flex items-center space-x-3">
-                <svg fill="none" class="size-10" version="1.1" id="Layer_1" stroke-width="10" stroke="currentColor"
-                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512"
-                    xml:space="preserve">
-                    <g>
-                        <g>
-                            <path d="M393.892,120.137v30.417v331.029V512h102.899H512V120.137H393.892z M452.946,415.431h-30.417v-35.824h30.417V415.431z
-M452.946,350.671h-30.417v-35.824h30.417V350.671z M452.946,287.133h-30.417v-35.824h30.417V287.133z M452.946,223.595h-30.417
-V187.77h30.417V223.595z" />
-                        </g>
-                    </g>
-                    <g>
-                        <g>
-                            <path d="M148.526,0v30.417v89.719v361.446v30.417h35.994h142.961h35.994v-30.416V120.137v-89.72V0H148.526z M211.838,62.344
-h30.417v31.6h27.49v-31.6h30.417v93.617h-30.417v-31.599h-27.49v31.599h-30.417V62.344z M240.792,287.133v-35.824h30.417v35.824
-H240.792z M271.209,314.847v35.824h-30.417v-35.824H271.209z M240.792,223.595V187.77h30.417v35.825H240.792z M184.52,187.77
-h30.417v35.825H184.52V187.77z M184.52,251.308h30.417v35.824H184.52V251.308z M184.52,314.847h30.417v35.824H184.52V314.847z
-M327.481,481.583h-30.417v-70.117h-25.855v70.117h-30.417v-70.117h-25.855v70.117H184.52V381.049h142.961V481.583z
-M327.481,350.671h-30.417v-35.824h30.417V350.671z M327.481,287.133h-30.417v-35.824h30.417V287.133z M327.481,223.595h-30.417
-V187.77h30.417V223.595z" />
-                        </g>
-                    </g>
-                    <g>
-                        <g>
-                            <path
-                                d="M0,120.137V512h15.209h102.9v-30.417V150.554v-30.417H0z M89.472,415.431H59.055v-35.824h30.417V415.431z M89.472,350.671
-H59.055v-35.824h30.417V350.671z M89.472,287.133H59.055v-35.824h30.417V287.133z M89.472,223.595H59.055V187.77h30.417V223.595z" />
-                        </g>
-                    </g>
-                </svg>
+                <x-svg-icons.location />
                 <div>
                     <div>{{ $booking?->customer?->name }}</div>
                     <div class="flex items-center space-x-2">
@@ -53,6 +25,36 @@ H59.055v-35.824h30.417V350.671z M89.472,287.133H59.055v-35.824h30.417V287.133z M
     </x-slot>
 
     <div>
+        <div class="flex space-x-2">
+            <x-filament::button class="flex-1" href="{{ App\Filament\Pages\EditReservation::getUrl() }}" tag="a">
+                Edit
+            </x-filament::button>
+            <x-filament::button color="gray">
+                Print / E-Mail
+            </x-filament::button>
+            <x-filament::dropdown>
+                <x-slot name="trigger">
+                    <x-filament::button color="gray" icon="heroicon-m-ellipsis-vertical" icon-position="after">
+                        More
+                    </x-filament::button>
+                </x-slot>
+
+                <x-filament::dropdown.list>
+                    <x-filament::dropdown.list.item wire:click="openViewModal">
+                        View
+                    </x-filament::dropdown.list.item>
+
+                    <x-filament::dropdown.list.item wire:click="openEditModal">
+                        Edit
+                    </x-filament::dropdown.list.item>
+
+                    <x-filament::dropdown.list.item wire:click="openDeleteModal">
+                        Delete
+                    </x-filament::dropdown.list.item>
+                </x-filament::dropdown.list>
+            </x-filament::dropdown>
+
+        </div>
         <table class="w-full">
             <tr>
                 <td class="px-2 py-3">
@@ -111,7 +113,7 @@ H59.055v-35.824h30.417V350.671z M89.472,287.133H59.055v-35.824h30.417V287.133z M
                     <div class="flex items-end space-x-3 text-sm">
                         <div class="flex items-end">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
-                                xmlns="http://www.w3.org/2000/svg" > 
+                                xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M10.2 0.800003C8.9875 0.800003 8 1.7875 8 3C8 4.2125 8.9875 5.2 10.2 5.2C11.4125 5.2 12.4 4.2125 12.4 3C12.4 1.7875 11.4125 0.800003 10.2 0.800003ZM8.2 5.6C6.9875 5.6 6 6.5875 6 7.8V12.8C6 13.2422 6.35938 13.6 6.8 13.6C7.24063 13.6 7.6 13.2422 7.6 12.8V8.9875C7.6 8.87969 7.69219 8.7875 7.8 8.7875C7.90781 8.7875 8 8.87969 8 8.9875V18.125C8 18.75 8.33594 19.2 8.9625 19.2C9.55469 19.2 10 18.7406 10 18.125V12.9875C10 12.8766 10.0891 12.7875 10.2 12.7875C10.3109 12.7875 10.4 12.8766 10.4 12.9875V18.2375C10.4016 18.2406 10.4109 18.2344 10.4125 18.2375C10.4672 18.7906 10.8844 19.2 11.4375 19.2C12.0625 19.2 12.4 18.75 12.4 18.125V9.0625C12.4 8.95469 12.4922 8.8625 12.6 8.8625C12.7078 8.8625 12.8 8.95469 12.8 9.0625V12.8C12.8 13.2422 13.1594 13.6 13.6 13.6C14.0406 13.6 14.4 13.2422 14.4 12.8V7.8C14.4 6.5875 13.4125 5.6 12.2 5.6H8.2Z"
                                     fill="currentColor" />

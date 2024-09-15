@@ -34,6 +34,10 @@ class Tenant extends Model implements HasCurrentTenantLabel
     {
         return $this->hasMany(Customer::class);
     }
+    public function folioOperationCharges()
+    {
+        return $this->hasMany(FolioOperationCharge::class);
+    }
     public function rooms()
     {
         return $this->hasMany(Room::class);

@@ -2,10 +2,11 @@
 
 namespace App\Providers;
 
+use Filament\Support\Assets\Css;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use App\Http\Middleware\TenantsPermission;
-
+use Filament\Support\Facades\FilamentAsset;
+use Filament\Http\Responses\Auth\Contracts\LoginResponse;
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -13,7 +14,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(
+            LoginResponse::class,
+            \App\Http\Responses\LoginResponse::class
+        );
     }
 
     /**
@@ -21,6 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        
+        FilamentAsset::register([
+            Css::make('font-awesome-icons', 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css'),
+        ]);
     }
 }

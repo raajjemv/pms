@@ -8,7 +8,7 @@ use App\Models\Amenity;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
-use App\Filament\Clusters\RoomFeatures;
+use App\Filament\Clusters\RoomConfigurations;
 use Illuminate\Database\Eloquent\Builder;
 use App\Filament\Resources\AmenityResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -20,7 +20,7 @@ class AmenityResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $cluster = RoomFeatures::class;
+    protected static ?string $cluster = RoomConfigurations::class;
 
     public static function form(Form $form): Form
     {

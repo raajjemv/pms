@@ -48,7 +48,7 @@ class Booking extends Model
 
     public function averageRate()
     {
-        return $this->bookingNights->avg('rate');
+        return $this->bookingNights->where('charge_type', 'room_charge')->avg('rate');
     }
 
     protected function casts(): array

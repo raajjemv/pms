@@ -48,6 +48,9 @@ class TenantConfiguration extends Page
                         ->optimize('webp')
                         ->disk(env('FILESYSTEM_DISK'))
                         ->required(),
+                    Forms\Components\TextInput::make('usd_exchange_rate')
+                        ->required(),
+
                 ])
                     ->columns(2)
             ])

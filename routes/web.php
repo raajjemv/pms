@@ -15,7 +15,6 @@ use App\Models\ChannelGroup;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
-
     return defaultRatePlan();
     $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
 

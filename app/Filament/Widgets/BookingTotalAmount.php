@@ -10,14 +10,9 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
 class BookingTotalAmount extends BaseWidget
 {
-    use ExposesTableToWidgets;
+    protected static ?string $pollingInterval = '1s';
 
     public $total, $paid;
-
-    protected function getTablePage(): string
-    {
-        return EditReservation::class;
-    }
 
     protected function getStats(): array
     {

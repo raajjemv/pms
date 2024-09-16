@@ -82,4 +82,11 @@ class Tenant extends Model implements HasCurrentTenantLabel
     {
         return 'Current Tenant';
     }
+
+    protected function casts(): array
+    {
+        return [
+            'currencies' => 'array'
+        ];
+    }
 }

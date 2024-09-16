@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('bill_initials')->nullable();
             $table->text('address')->nullable();
             $table->string('tin')->nullable();
+            $table->decimal('usd_exchange_rate', 10, 2)->default(10);
             $table->foreignId('owner_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->softDeletes();

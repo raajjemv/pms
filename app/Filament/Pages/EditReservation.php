@@ -2,17 +2,24 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\BookingTotalAmount;
 use App\Models\Booking;
 use Filament\Pages\Page;
-use Illuminate\Contracts\Support\Htmlable;
+use Livewire\Attributes\On;
 use Illuminate\Support\HtmlString;
+use Illuminate\Contracts\Support\Htmlable;
+use App\Filament\Widgets\BookingTotalAmount;
 
 class EditReservation extends Page
 {
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     protected static string $view = 'filament.pages.edit-reservation';
+
+    protected static bool $shouldRegisterNavigation = false;
+
+    public $activeTab = 'guest-accounting';
+
+    public $booking;
 
     protected function getHeaderWidgets(): array
     {
@@ -30,9 +37,7 @@ class EditReservation extends Page
         ];
     }
 
-    public $activeTab = 'guest-accounting';
-
-    public $booking;
+   
 
     public function getHeading(): string | Htmlable
     {

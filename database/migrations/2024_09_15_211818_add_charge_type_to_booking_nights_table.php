@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('booking_nights', function (Blueprint $table) {
             $table->string('charge_type')->nullable();
+            $table->softDeletes();
         });
     }
 
@@ -22,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('booking_nights', function (Blueprint $table) {
-            $table->dropColumn('charge_type');
+            $table->dropColumn('charge_type',);
+            $table->dropSoftDeletes();
         });
     }
 };

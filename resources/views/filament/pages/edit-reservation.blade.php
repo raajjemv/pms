@@ -20,7 +20,8 @@
 
     @switch($activeTab)
         @case('guest-accounting')
-            @livewire('pms.reservation.guest-accounting', ['booking' => $booking])
+            {{-- @livewire('pms.reservation.guest-accounting', ['booking' => $booking]) --}}
+            <livewire:pms.reservation.guest-accounting :booking="$booking" @refresh-edit-reservation="$refresh">
         @break
 
         @case('booking-details')

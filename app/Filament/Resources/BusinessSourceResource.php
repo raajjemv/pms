@@ -4,23 +4,23 @@ namespace App\Filament\Resources;
 
 use Filament\Forms;
 use Filament\Tables;
-use App\Models\Amenity;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\BusinessSource;
 use Filament\Resources\Resource;
 use App\Filament\Clusters\Configurations;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Resources\AmenityResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\AmenityResource\RelationManagers;
+use App\Filament\Resources\BusinessSourceResource\Pages;
+use App\Filament\Resources\BusinessSourceResource\RelationManagers;
 
-class AmenityResource extends Resource
+class BusinessSourceResource extends Resource
 {
-    protected static ?string $model = Amenity::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $model = BusinessSource::class;
 
     protected static ?string $cluster = Configurations::class;
+
+    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
     {
@@ -29,6 +29,15 @@ class AmenityResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\TextInput::make('business_registration')
+                    ->maxLength(255),
+                Forms\Components\Select::make('type')
+                    ->options([
+                        'ota' => 'OTA',
+                        'city_ledger' => 'City Ledger',
+                        'local_travel_agent' => 'Local Travel Agent',
+                        'foreign_travel_agent' => 'Foreign Travel Agent'
+                    ]),
 
             ]);
     }
@@ -38,6 +47,10 @@ class AmenityResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('business_registration')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('type')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
@@ -79,10 +92,10 @@ class AmenityResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAmenities::route('/'),
-            'create' => Pages\CreateAmenity::route('/create'),
-            'view' => Pages\ViewAmenity::route('/{record}'),
-            'edit' => Pages\EditAmenity::route('/{record}/edit'),
+            'index' => Pages\ListBusinessSources::route('/'),
+            'create' => Pages\CreateBusinessSource::route('/create'),
+            'view' => Pages\ViewBusinessSource::route('/{record}'),
+            'edit' => Pages\EditBusinessSource::route('/{record}/edit'),
         ];
     }
 }

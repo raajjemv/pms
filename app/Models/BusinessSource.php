@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[ScopedBy([TenantScope::class])]
-class FolioOperationCharge extends Model
+class BusinessSource extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -24,4 +24,5 @@ class FolioOperationCharge extends Model
     {
         return $this->belongsTo(Tenant::class);
     }
+
 }

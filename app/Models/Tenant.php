@@ -78,6 +78,10 @@ class Tenant extends Model implements HasCurrentTenantLabel
     {
         return $this->hasMany(RoomTypeRate::class);
     }
+    public function businessSources()
+    {
+        return $this->hasMany(BusinessSource::class);
+    }
     public function getCurrentTenantLabel(): string
     {
         return 'Current Tenant';

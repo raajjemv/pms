@@ -40,10 +40,11 @@ class CreateBooking extends CreateRecord
 
         for ($i = 0; $i < $nights; $i++) {
             $date = $booking->from->copy()->addDays($i);
-            $booking->bookingNights()->create([
+            $booking->bookingTransactions()->create([
                 'rate' => $booking->room->roomType->base_rate,
                 'date' => $date,
-                'charge_type' => 'room_charge'
+                'transaction_type' => 'room_charge',
+                'user_id' => auth()->user()->id()
             ]);
         }
     }

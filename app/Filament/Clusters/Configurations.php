@@ -4,10 +4,10 @@ namespace App\Filament\Clusters;
 
 use Filament\Clusters\Cluster;
 
-class RoomConfigurations extends Cluster
+class Configurations extends Cluster
 {
     protected static ?string $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static ?string $navigationGroup = 'Rooms Management';
+    protected static ?string $navigationGroup = 'System Settings';
 
 }

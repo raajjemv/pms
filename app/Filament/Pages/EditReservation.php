@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\PaymentType;
 use App\Models\Booking;
 use Filament\Pages\Page;
 use Livewire\Attributes\On;
@@ -26,12 +27,12 @@ class EditReservation extends Page
         return [
             BookingTotalAmount::make([
                 'total' => $this->booking
-                    ->bookingNights
-                    ->where('charge_type', 'room_charge')
+                    ->bookingTransactions
+                    ->whereNotIn('transaction_type', PaymentType::getAllValues())
                     ->sum('rate'),
                 'paid' => $this->booking
-                    ->bookingNights
-                    ->whereIn('charge_type', ['credit_card', 'cash', 'bank_transfer'])
+                    ->bookingTransactions
+                    ->whereIn('transaction_type', PaymentType::getAllValues())
                     ->sum('rate')
             ]),
         ];
@@ -52,7 +53,7 @@ class EditReservation extends Page
     }
     public function mount()
     {
-        $booking = Booking::with(['customer', 'room.roomType', 'bookingNights'])->findOrFail(decrypt(request('record')));
+        $booking = Booking::with(['customer', 'room.roomType', 'bookingTransactions'])->findOrFail(decrypt(request('record')));
         return $this->booking = $booking;
     }
 }

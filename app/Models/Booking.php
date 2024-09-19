@@ -41,14 +41,14 @@ class Booking extends Model
         return $this->belongsTo(RatePlan::class);
     }
 
-    public function bookingNights()
+    public function bookingTransactions()
     {
-        return $this->hasMany(BookingNight::class);
+        return $this->hasMany(BookingTransaction::class);
     }
 
     public function averageRate()
     {
-        return $this->bookingNights->where('charge_type', 'room_charge')->avg('rate');
+        return $this->bookingTransactions->where('transaction_type', 'room_charge')->avg('rate');
     }
 
     protected function casts(): array

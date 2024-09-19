@@ -1,9 +1,11 @@
 <?php
 
+use App\Enums\PaymentType;
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
 use App\Models\Booking;
+use App\Models\BusinessSource;
 use App\Models\RatePlan;
 use App\Models\RoomType;
 use Faker\Factory as Faker;
@@ -15,7 +17,8 @@ use App\Models\ChannelGroup;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
-    return defaultRatePlan();
+    // return PaymentType::cases();
+    return in_array("cash", PaymentType::getAllValues());
     $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
 
     $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::now()->endOfMonth();

@@ -9,7 +9,7 @@ use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use App\Models\FolioOperationCharge;
 use Illuminate\Database\Eloquent\Builder;
-use App\Filament\Clusters\RoomConfigurations;
+use App\Filament\Clusters\Configurations;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\FolioOperationChargeResource\Pages;
 use App\Filament\Resources\FolioOperationChargeResource\RelationManagers;
@@ -20,7 +20,7 @@ class FolioOperationChargeResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    protected static ?string $cluster = RoomConfigurations::class;
+    protected static ?string $cluster = Configurations::class;
 
     public static function form(Form $form): Form
     {

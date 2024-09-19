@@ -14,6 +14,8 @@ class BookingTotalAmount extends BaseWidget
 
     public $total, $paid;
 
+    protected static bool $isDiscovered = false;
+
     protected function getStats(): array
     {
         return [

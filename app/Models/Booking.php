@@ -26,6 +26,12 @@ class Booking extends Model
             });
     }
 
+    public function customers()
+    {
+        return $this->belongsToMany(Customer::class)
+            ->withTimestamps();
+    }
+
     public function room()
     {
         return $this->belongsTo(Room::class);

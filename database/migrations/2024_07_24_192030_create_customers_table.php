@@ -14,10 +14,13 @@ return new class extends Migration
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained();
+            $table->string('type')->nullable();
             $table->string('name');
             $table->string('photo')->nullable();
-            $table->string('document_number');
-            $table->string('country');
+            $table->string('document_type')->nullable();
+            $table->string('document_number')->nullable();
+            $table->string('document_photo')->nullable();
+            $table->string('email')->nullable();
             $table->string('phone_number')->nullable();
             $table->string('gender')->nullable();
             $table->string('profession')->nullable();

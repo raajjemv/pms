@@ -14,11 +14,12 @@ use Faker\Provider\en_US\Address;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use App\Models\ChannelGroup;
+use App\Models\Customer;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
+    return Customer::selectRaw('CONCAT(name, " - ", document_number) AS name, id')->get();
     // return PaymentType::cases();
-    return in_array("cash", PaymentType::getAllValues());
     $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
 
     $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::now()->endOfMonth();

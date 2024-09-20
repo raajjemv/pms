@@ -23,4 +23,5 @@ trait CachedQueries
             return FolioOperationCharge::all();
         });
     }
+   
 }

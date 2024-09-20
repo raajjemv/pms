@@ -18,7 +18,7 @@ class EditReservation extends Page
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public $activeTab = 'guest-accounting';
+    public $activeTab = 'guest-profile';
 
     public $booking;
 
@@ -43,17 +43,16 @@ class EditReservation extends Page
     public function getHeading(): string | Htmlable
     {
         $customerName = $this->booking->customer_id ? $this->booking->customer->name : $this->booking->booking_customer;
-        // return "{$customerName}";
         return new HtmlString("{$customerName} <span class='text-lg font-normal text-gray-500'>{$this->booking->booking_number}</span>");
     }
 
-    public function getSubheading(): string | Htmlable | null
-    {
-        return "[{$this->booking->room->roomType->name}-{$this->booking->room->room_number}]";
-    }
+    // public function getSubheading(): string | Htmlable | null
+    // {
+    //     return "[{$this->booking->room->roomType->name}-{$this->booking->room->room_number}]";
+    // }
     public function mount()
     {
-        $booking = Booking::with(['customer', 'room.roomType', 'bookingTransactions'])->findOrFail(decrypt(request('record')));
+        $booking = Booking::with(['customer', 'bookingTransactions','customers'])->findOrFail(decrypt(request('record')));
         return $this->booking = $booking;
     }
 }

@@ -2,15 +2,16 @@
 
 namespace App\Livewire\Pms\Reservation;
 
-use App\Enums\PaymentType;
-use App\Http\Traits\CachedQueries;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
 use Livewire\Component;
+use App\Enums\PaymentType;
 use Filament\Tables\Table;
-use App\Models\BookingTransaction;
+use Filament\Support\RawJs;
 use Filament\Tables\Actions;
+use App\Http\Traits\CachedQueries;
+use App\Models\BookingTransaction;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Contracts\HasTable;
@@ -56,42 +57,54 @@ class GuestAccounting extends Component implements HasForms, HasTable
                     ->formatStateUsing(fn($state) => number_format($state, 2))
                     ->color(fn($record) => !in_array($record->transaction_type, PaymentType::getAllValues()) ?: 'success'),
 
+                Tables\Columns\TextColumn::make('user.name')
+
             ])
             ->filters([
                 // ...
             ])
             ->headerActions([
-                Actions\CreateAction::make()
-                    ->label('Add Payment')
+                Actions\Action::make('Add Payment')
                     ->modalSubmitActionLabel('Add')
                     ->icon('heroicon-m-currency-dollar')
                     ->color('gray')
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['booking_id'] = $this->booking->id;
+                        $data['user_id'] = auth()->id();
                         return $data;
                     })
                     ->modalWidth(MaxWidth::Small)
                     ->form([
-                        Forms\Components\DatePicker::make('date'),
+                        Forms\Components\DatePicker::make('date')
+                            ->required(),
                         Forms\Components\TextInput::make('rate')
                             ->label('Amount')
-                            ->numeric(),
+                            ->numeric()
+                            ->required(),
+
                         Forms\Components\Select::make('transaction_type')
                             ->options(PaymentType::class)
+                            ->required()
                             ->live(),
+
                         Forms\Components\Select::make('business_source_id')
                             ->label('Business Source')
                             ->options($businessSources->pluck('name', 'id'))
                             ->searchable()
-                            ->visible(fn($get) => $get('transaction_type') == 'city_ledger'),
+                            ->visible(fn($get) => $get('transaction_type') == 'city_ledger')
+                            ->required(fn($get) => $get('transaction_type') == 'city_ledger' ? true : false),
+
                     ])
-                    ->createAnother(false),
-                Actions\CreateAction::make()
-                    ->label('Add Charge')
+                    ->action(function ($data) {
+                        BookingTransaction::create($data);
+                    }),
+                Actions\Action::make('Add Charge')
                     ->icon('heroicon-m-plus-circle')
                     ->color('gray')
-                    ->mutateFormDataUsing(function (array $data): array {
+                    ->mutateFormDataUsing(function (array $data) use ($folioOperationCharges) {
                         $data['booking_id'] = $this->booking->id;
+                        $data['transaction_type'] = $folioOperationCharges->where('id', $data['transaction_type'])->first()->name;
+                        $data['user_id'] = auth()->id();
                         return $data;
                     })
                     ->modalWidth(MaxWidth::Small)
@@ -102,15 +115,23 @@ class GuestAccounting extends Component implements HasForms, HasTable
                             ->options($folioOperationCharges->pluck('name', 'id'))
                             ->afterStateUpdated(fn($set, $state) => $set('rate', $folioOperationCharges->where('id', $state)->first()->rate))
                             ->live(),
-                        Forms\Components\TextInput::make('quantity')
-                            ->dehydrated(true)
-                            ->numeric(),
+                        \LaraZeus\Quantity\Components\Quantity::make('quantity')
+                            ->dehydrated(false)
+                            ->default(1)
+                            ->maxValue(10)
+                            ->minValue(1)
+                            ->afterStateUpdated(fn($get, $set, $state) => $set('rate', $folioOperationCharges->where('id', $get('transaction_type'))->first()->rate * $state))
+                            ->visible(fn($get) => $get('transaction_type')),
                         Forms\Components\TextInput::make('rate')
                             ->label('Amount')
-                            ->numeric(),
+                            ->numeric()
+                            ->visible(fn($get) => $get('transaction_type')),
+
 
                     ])
-                    ->createAnother(false),
+                    ->action(function ($data) {
+                        BookingTransaction::create($data);
+                    }),
 
                 Actions\Action::make('Change History')
                     ->icon('heroicon-m-list-bullet')

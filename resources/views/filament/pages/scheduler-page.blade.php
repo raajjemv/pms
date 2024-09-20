@@ -3,7 +3,7 @@
         var date = '{{ !request('date') ? now()->format('d') : '' }}';
         if (date && date > '09') {
             var container = document.getElementById('scheduler-wrapper');
-            const targetDiv = document.getElementById('day-03');
+            const targetDiv = document.getElementById('day-' + date);
             const targetOffset = targetDiv.offsetLeft;
             container.scrollTo({ left: targetOffset, behavior: 'smooth' });
     
@@ -110,7 +110,8 @@
                                 <div class="relative flex overflow-hidden">
                                     @foreach ($monthDays as $day)
                                         <div wire:key="selection-day-{{ $day }}" day="{{ $day }}"
-                                            :class="{ 'bg-gray-500': isDateWithinRange('{{ $day }}', {{ $room->id }}) }"
+                                            :class="{ 'bg-gray-500': isDateWithinRange('{{ $day }}',
+                                                    {{ $room->id }}) }"
                                             @mousedown="isSelecting = true; startGridDate = $event.target.getAttribute('day');roomId = '{{ $room->id }}'"
                                             @mouseup="isSelecting = false; endGridDate = $event.target.getAttribute('day'); selectDays($event)"
                                             @mousemove="isSelecting && (endGridDate = $event.target.getAttribute('day'))"

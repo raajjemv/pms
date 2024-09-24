@@ -110,8 +110,10 @@
                                 <div class="relative flex overflow-hidden">
                                     @foreach ($monthDays as $day)
                                         <div wire:key="selection-day-{{ $day }}" day="{{ $day }}"
-                                            :class="{ 'bg-gray-500': isDateWithinRange('{{ $day }}',
-                                                    {{ $room->id }}) }"
+                                            :class="{
+                                                'bg-gray-500': isDateWithinRange('{{ $day }}',
+                                                    {{ $room->id }})
+                                            }"
                                             @mousedown="isSelecting = true; startGridDate = $event.target.getAttribute('day');roomId = '{{ $room->id }}'"
                                             @mouseup="isSelecting = false; endGridDate = $event.target.getAttribute('day'); selectDays($event)"
                                             @mousemove="isSelecting && (endGridDate = $event.target.getAttribute('day'))"
@@ -119,12 +121,12 @@
                                         </div>
                                     @endforeach
 
-                                    @foreach ($room->bookings as $booking)
+                                    @foreach ($room->bookingReservations as $reservation)
                                         @php
-                                            $from = $booking->from;
-                                            $to = $booking->to;
+                                            $from = $reservation->from;
+                                            $to = $reservation->to;
                                             $totalDays = $from->diffInDays($to);
-                                            $dayNumber = $booking->from->day;
+                                            $dayNumber = $reservation->from->day;
                                             $left =
                                                 $from->month == $to->month
                                                     ? $dayNumber * 90 - 45
@@ -140,10 +142,10 @@
                                                         : $to->day * 90 - 45);
                                         @endphp
                                         <div style="width: {{ $width }}px;left:{{ $left }}px"
-                                            wire:click="viewBookingSummary('{{ $booking->id }}')"
+                                            wire:click="viewBookingSummary('{{ $reservation->booking_id }}','{{ $reservation->id }}')"
                                             class="absolute bg-green-500 h-full flex items-center overflow-hidden rounded  border-[0.8px] border-gray-200">
                                             <div class="px-1 text-white rounded whitespace-nowrap">
-                                                {{ $booking->customer->name }} </div>
+                                                {{ $reservation->customer->name }} </div>
                                         </div>
                                     @endforeach
                                 </div>
@@ -156,7 +158,11 @@
         </div>
     </div>
 
-    <x-filament::modal id="booking-summary" slide-over>
-        <x-booking-scheduler.booking-summary :booking="$bookingSummary" />
+    <x-filament::modal closeEventName="close-reservation-modal" id="booking-summary" slide-over :width="$bookingSummary?->bookingReservations->count() > 1 ? 'xl' : 'sm'">
+        {{-- <x-booking-scheduler.booking-summary :booking="$bookingSummary" /> --}}
+        @if ($bookingSummary)
+            <livewire:pms.reservation.booking-summary :booking="$bookingSummary" :reservation-id="$bookingSummaryReservationId" />
+            {{-- <x-pms.reservation.booking-summary :booking="$bookingSummary" /> --}}
+        @endif
     </x-filament::modal>
 </x-filament-panels::page>

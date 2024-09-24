@@ -18,7 +18,7 @@ use App\Models\Customer;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
-    return Customer::selectRaw('CONCAT(name, " - ", document_number) AS name, id')->get();
+    return $booking = Booking::with('customers')->find(17);
     // return PaymentType::cases();
     $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
 

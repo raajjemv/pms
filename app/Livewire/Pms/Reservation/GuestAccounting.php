@@ -10,6 +10,8 @@ use App\Enums\PaymentType;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Filament\Tables\Actions;
+use Livewire\Attributes\Url;
+use Livewire\Attributes\Reactive;
 use App\Http\Traits\CachedQueries;
 use App\Models\BookingTransaction;
 use Filament\Support\Enums\MaxWidth;
@@ -26,6 +28,9 @@ class GuestAccounting extends Component implements HasForms, HasTable
 
     public $booking;
 
+    #[Reactive]
+    public $selectedFolio;
+
     public ?array $data = [];
 
     public function mount(): void
@@ -35,7 +40,10 @@ class GuestAccounting extends Component implements HasForms, HasTable
 
     public function table(Table $table): Table
     {
-        $query = BookingTransaction::query()->where('booking_id', $this->booking->id)->withTrashed();
+        $query = BookingTransaction::query()
+            ->where('booking_id', $this->booking->id)
+            ->where('booking_reservation_id', $this->selectedFolio->id)
+            ->withTrashed();
         $businessSources = static::businessSources();
         $folioOperationCharges = static::folioOperationCharges();
 
@@ -71,6 +79,7 @@ class GuestAccounting extends Component implements HasForms, HasTable
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['booking_id'] = $this->booking->id;
                         $data['user_id'] = auth()->id();
+                        $data['booking_reservation_id'] = $this->selectedFolio->id;
                         return $data;
                     })
                     ->modalWidth(MaxWidth::Small)
@@ -97,6 +106,9 @@ class GuestAccounting extends Component implements HasForms, HasTable
                     ])
                     ->action(function ($data) {
                         BookingTransaction::create($data);
+                    })
+                    ->after(function () {
+                        $this->dispatch('refresh-edit-reservation');
                     }),
                 Actions\Action::make('Add Charge')
                     ->icon('heroicon-m-plus-circle')
@@ -105,6 +117,7 @@ class GuestAccounting extends Component implements HasForms, HasTable
                         $data['booking_id'] = $this->booking->id;
                         $data['transaction_type'] = $folioOperationCharges->where('id', $data['transaction_type'])->first()->name;
                         $data['user_id'] = auth()->id();
+                        $data['booking_reservation_id'] = $this->selectedFolio->id;
                         return $data;
                     })
                     ->modalWidth(MaxWidth::Small)
@@ -131,6 +144,9 @@ class GuestAccounting extends Component implements HasForms, HasTable
                     ])
                     ->action(function ($data) {
                         BookingTransaction::create($data);
+                    })
+                    ->after(function () {
+                        $this->dispatch('refresh-edit-reservation');
                     }),
 
                 Actions\Action::make('Change History')
@@ -158,6 +174,8 @@ class GuestAccounting extends Component implements HasForms, HasTable
                             $record->update([
                                 'rate' => $data['rate']
                             ]);
+                        })
+                        ->after(function () {
                             $this->dispatch('refresh-edit-reservation');
                         })
                         ->modalWidth(MaxWidth::Small)
@@ -167,6 +185,9 @@ class GuestAccounting extends Component implements HasForms, HasTable
                         ->visible(fn($record) => $record->transaction_type !== 'room_charge'),
                     Actions\DeleteAction::make()
                         ->label('Void')
+                        ->after(function () {
+                            $this->dispatch('refresh-edit-reservation');
+                        })
                         ->modalHeading('Delete record?')
                         ->visible(fn($record) => $record->transaction_type !== 'room_charge'),
 

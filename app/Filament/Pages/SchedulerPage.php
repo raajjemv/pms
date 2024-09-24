@@ -2,11 +2,12 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\Booking;
-use App\Models\Room;
-use App\Models\RoomType;
 use Carbon\Carbon;
+use App\Models\Room;
+use App\Models\Booking;
+use App\Models\RoomType;
 use Filament\Pages\Page;
+use Livewire\Attributes\On;
 
 class SchedulerPage extends Page
 {
@@ -23,6 +24,7 @@ class SchedulerPage extends Page
     public $startOfMonth, $endOfMonth;
 
     public  $bookingSummary;
+    public  $bookingSummaryReservationId;
 
     protected function getViewData(): array
     {
@@ -33,7 +35,7 @@ class SchedulerPage extends Page
             $q->with(['rates' => function ($qq) use ($startOfMonth, $endOfMonth) {
                 $qq->whereBetween('date', [$startOfMonth, $endOfMonth]);
             }]);
-        }, 'bookings' => function ($query) use ($startOfMonth, $endOfMonth) {
+        }, 'bookingReservations' => function ($query) use ($startOfMonth, $endOfMonth) {
             $query->with('customer')->where(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('from', '>=', $startOfMonth)
                     ->where('from', '<=', $endOfMonth);
@@ -84,9 +86,17 @@ class SchedulerPage extends Page
         $this->monthDays = $monthDays;
     }
 
-    public function viewBookingSummary(Booking $booking)
+    public function viewBookingSummary($booking_id, $reservation_id)
     {
+        $booking = Booking::with('bookingReservations.room.roomType')->find($booking_id);
         $this->bookingSummary = $booking;
+        $this->bookingSummaryReservationId = $reservation_id;
         $this->dispatch('open-modal', id: 'booking-summary');
+    }
+
+    #[On('close-reservation-modal')]
+    public function closeReservationModal()
+    {
+        $this->reset(['bookingSummary', 'bookingSummaryReservationId']);
     }
 }

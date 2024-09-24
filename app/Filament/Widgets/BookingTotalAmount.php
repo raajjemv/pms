@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use Illuminate\Support\Number;
+use Livewire\Attributes\Reactive;
 use App\Filament\Pages\EditReservation;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Filament\Pages\Concerns\ExposesTableToWidgets;
@@ -12,6 +13,7 @@ class BookingTotalAmount extends BaseWidget
 {
     protected static ?string $pollingInterval = '1s';
 
+    #[Reactive]
     public $total, $paid;
 
     protected static bool $isDiscovered = false;

@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\BookingType;
+use App\Enums\PaymentStatus;
+use App\Enums\Status;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,36 +35,34 @@ class Booking extends Model
             ->withTimestamps();
     }
 
-    public function room()
-    {
-        return $this->belongsTo(Room::class);
-    }
+   
 
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);
     }
 
-    public function ratePlan()
-    {
-        return $this->belongsTo(RatePlan::class);
-    }
-
+    
     public function bookingTransactions()
     {
         return $this->hasMany(BookingTransaction::class);
     }
 
-    public function averageRate()
+    public function bookingReservations()
     {
-        return $this->bookingTransactions->where('transaction_type', 'room_charge')->avg('rate');
+        return $this->hasMany(BookingReservation::class);
     }
+
+    
 
     protected function casts(): array
     {
         return [
             'from' => 'date',
-            'to' => 'date'
+            'to' => 'date',
+            'booking_type' => BookingType::class,
+
         ];
     }
+    protected $casts = [];
 }

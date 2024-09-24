@@ -1,11 +1,10 @@
-@props(['booking' => null])
 <div>
     <x-slot name="heading">
         <div>
             <div class="flex items-center space-x-3">
                 <x-svg-icons.location />
                 <div>
-                    <div>{{ $booking?->customer?->name }}</div>
+                    <div>{{ $selectedReservation->customer->name }}</div>
                     <div class="flex items-center space-x-2">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                             stroke="currentColor" class="size-4">
@@ -15,7 +14,7 @@
                                 d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                         </svg>
 
-                        <div class="text-sm font-thin">{{ $booking?->customer->country }}</div>
+                        <div class="text-sm font-thin">{{ $selectedReservation->customer->country }}</div>
                     </div>
                 </div>
             </div>
@@ -27,7 +26,7 @@
         <div class="flex-1 pr-3">
             <div class="flex space-x-2">
                 <x-filament::button class="flex-1"
-                    href="{{ App\Filament\Pages\EditReservation::getUrl(['record' => encrypt($booking?->id)]) }}"
+                    href="{{ App\Filament\Pages\EditReservation::getUrl(['record' => encrypt($booking->id)]) }}"
                     tag="a">
                     Edit
                 </x-filament::button>
@@ -61,54 +60,55 @@
                 <tr>
                     <td class="px-2 py-3">
                         <div class="text-xs">Booking Type</div>
-                        {{-- <div class="text-sm font-medium">{{ $booking?->booking_type?->name }}</div> --}}
+                        <div class="text-sm font-medium">{{ $booking->booking_type->name }}</div>
                     </td>
 
                 </tr>
                 <tr>
                     <td class="px-2 py-3">
                         <div class="text-xs">Booking Number</div>
-                        <div class="text-sm font-medium">{{ $booking?->booking_number }}</div>
+                        <div class="text-sm font-medium">{{ $booking->booking_number }}</div>
                     </td>
                     <td class="px-2 py-3">
                         <div class="text-xs">Status</div>
-                        <div class="text-sm font-medium">{{ $booking?->status }}</div>
+                        <div class="text-sm font-medium">{{ $selectedReservation->status->name }}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="px-2 py-3">
                         <div class="text-xs">Arrival Date</div>
-                        <div class="text-sm font-medium">{{ $booking?->from->format('jS M Y') }}</div>
+                        <div class="text-sm font-medium">{{ $selectedReservation->from->format('jS M Y') }}</div>
                     </td>
                     <td class="px-2 py-3">
                         <div class="text-xs">Departure Date</div>
-                        <div class="text-sm font-medium">{{ $booking?->to->format('jS M Y') }}</div>
+                        <div class="text-sm font-medium">{{ $selectedReservation->to->format('jS M Y') }}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="px-2 py-3">
                         <div class="text-xs">Booking Date</div>
-                        <div class="text-sm font-medium">{{ $booking?->created_at->format('jS M Y | H:i') }}</div>
+                        <div class="text-sm font-medium">{{ $selectedReservation->created_at->format('jS M Y | H:i') }}
+                        </div>
                     </td>
                     <td class="px-2 py-3">
                         <div class="text-xs">Room Category</div>
-                        <div class="text-sm font-medium">{{ $booking?->room?->roomType->name }}</div>
+                        <div class="text-sm font-medium">{{ $selectedReservation->room->roomType->name }}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="px-2 py-3">
                         <div class="text-xs">Room Number</div>
-                        <div class="text-sm font-medium">{{ $booking?->room->room_number }}</div>
+                        <div class="text-sm font-medium">{{ $selectedReservation->room->room_number }}</div>
                     </td>
                     <td class="px-2 py-3">
                         <div class="text-xs">Rate Plan</div>
-                        <div class="text-sm font-medium">{{ $booking?->ratePlan->code }}</div>
+                        <div class="text-sm font-medium">{{ $selectedReservation->ratePlan->code }}</div>
                     </td>
                 </tr>
                 <tr>
                     <td class="px-2 py-3">
                         <div class="text-xs">Room Rate (avg)</div>
-                        <div class="text-sm font-medium">USD {{ $booking?->averageRate() }}</div>
+                        <div class="text-sm font-medium">USD {{ $selectedReservation->averageRate() }}</div>
                     </td>
                     <td class="px-2 py-3">
                         <div class="text-xs">Pax</div>
@@ -120,7 +120,7 @@
                                         d="M10.2 0.800003C8.9875 0.800003 8 1.7875 8 3C8 4.2125 8.9875 5.2 10.2 5.2C11.4125 5.2 12.4 4.2125 12.4 3C12.4 1.7875 11.4125 0.800003 10.2 0.800003ZM8.2 5.6C6.9875 5.6 6 6.5875 6 7.8V12.8C6 13.2422 6.35938 13.6 6.8 13.6C7.24063 13.6 7.6 13.2422 7.6 12.8V8.9875C7.6 8.87969 7.69219 8.7875 7.8 8.7875C7.90781 8.7875 8 8.87969 8 8.9875V18.125C8 18.75 8.33594 19.2 8.9625 19.2C9.55469 19.2 10 18.7406 10 18.125V12.9875C10 12.8766 10.0891 12.7875 10.2 12.7875C10.3109 12.7875 10.4 12.8766 10.4 12.9875V18.2375C10.4016 18.2406 10.4109 18.2344 10.4125 18.2375C10.4672 18.7906 10.8844 19.2 11.4375 19.2C12.0625 19.2 12.4 18.75 12.4 18.125V9.0625C12.4 8.95469 12.4922 8.8625 12.6 8.8625C12.7078 8.8625 12.8 8.95469 12.8 9.0625V12.8C12.8 13.2422 13.1594 13.6 13.6 13.6C14.0406 13.6 14.4 13.2422 14.4 12.8V7.8C14.4 6.5875 13.4125 5.6 12.2 5.6H8.2Z"
                                         fill="currentColor" />
                                 </svg>
-                                <span class="">{{ $booking?->adults }}</span>
+                                <span class="">{{ $selectedReservation->adults }}</span>
                             </div>
                             <div class="flex items-end ">
                                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none"
@@ -130,26 +130,29 @@
                                         fill="currentColor" />
                                 </svg>
 
-                                <span class="">{{ $booking?->children }}</span>
+                                <span class="">{{ $selectedReservation->children }}</span>
                             </div>
                         </div>
                     </td>
                 </tr>
             </table>
         </div>
-        @if ($booking?->bookingReservations->count() > 1)
+        @if ($booking->bookingReservations->count() > 1)
             <div class="w-2/5 px-3 border-l">
-                <div>Reservations</div>
-                <div class="space-y-5 ">
-                    @foreach ($booking?->bookingReservations as $reservation)
-                        <div class="p-2 border border-blue-600 rounded-lg">
-                            <div class="font-semibold text-blue-600">{{ $reservation->booking_customer }}</div>
+                <div class="mb-2 text-sm font-semibold">Reservations</div>
+                <div class="space-y-3 ">
+                    @foreach ($booking->bookingReservations as $reservation)
+                        <x-filament::button wire:click="selectReservation({{ $reservation->id }})" color="gray" @class([
+                            'border text-left',
+                            'border-blue-600' => $selectedReservation->id == $reservation->id,
+                        ])>
+                            <div class="font-semibold ">{{ $reservation->booking_customer }}</div>
                             <div class="text-xs">
                                 <div>{{ $reservation->room->roomType->name }} - {{ $reservation->room->room_number }}
                                 </div>
-                                <div >{{ $booking->booking_number }}-{{ $loop->iteration }}</div>
+                                <div>{{ $booking->booking_number }}-{{ $loop->iteration }}</div>
                             </div>
-                        </div>
+                        </x-filament::button>
                     @endforeach
                 </div>
             </div>

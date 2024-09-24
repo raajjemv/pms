@@ -17,25 +17,52 @@
     </x-filament::tabs>
 
 
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
 
-    @switch($activeTab)
-        @case('guest-accounting')
-            {{-- @livewire('pms.reservation.guest-accounting', ['booking' => $booking]) --}}
-            <livewire:pms.reservation.guest-accounting :booking="$booking" @refresh-edit-reservation="$refresh">
-            @break
+        <x-filament::section :headerActions="[$this->addFolioAccountAction()]">
+            <x-slot name="description">
+                Folio Accounts
+            </x-slot>
+            <div class="space-y-3">
+                @foreach ($booking->bookingReservations as $reservation)
+                    <div>
+                        <button wire:key="reservation-{{ $reservation->id }}"
+                            wire:click="setSelectedFolio({{ $reservation->id }})" @class([
+                                'text-sm text-gray-700 ',
+                                'font-bold text-blue-600' => $selectedFolio->id == $reservation->id,
+                            ])>
+                            <i class="pr-2 fas fa-minus"></i> {{ $reservation->booking_customer }}
+                        </button>
+                        <div class="text-xs text-gray-600">
+                            {{ $reservation->room->roomType->name }} - {{ $reservation->room->room_number }}
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </x-filament::section>
+        <div class="col-span-4">
+            @switch($activeTab)
+                @case('guest-accounting')
+                    {{-- @livewire('pms.reservation.guest-accounting', ['booking' => $booking]) --}}
+                    <livewire:pms.reservation.guest-accounting :booking="$booking" @refresh-edit-reservation="$refresh"
+                        :selected-folio="$selectedFolio">
+                    @break
 
-            @case('booking-details')
-            @break
+                    @case('booking-details')
+                    @break
 
-            @case('guest-profile')
-                <livewire:pms.reservation.guest-profiles :booking="$booking" />
-            @break
+                    @case('guest-profile')
+                        <livewire:pms.reservation.guest-profiles :booking="$booking"  :selected-folio="$selectedFolio"/>
+                    @break
 
-            @case('room-charges')
-                <div>rc</div>
-            @break
+                    @case('room-charges')
+                        <div>rc</div>
+                    @break
 
-            @default
-        @endswitch
+                    @default
+                @endswitch
+        </div>
+    </div>
+
 
 </x-filament-panels::page>

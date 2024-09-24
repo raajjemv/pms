@@ -38,13 +38,28 @@ class CreateBooking extends CreateRecord
         $booking = $this->record;
         $nights = $booking->from->diffInDays($booking->to);
 
+        
+
+        $booking_reservation = $booking->bookingReservations()->create([
+            'tenant_id' => Filament::getTenant()->id,
+            'room_id' => $booking->room_id,
+            'adults' => $booking->adults,
+            'children' => $booking->children,
+            'rate_plan_id' => $booking->rate_plan_id,
+            'booking_customer' => $booking->booking_customer,
+            'from' => $booking->from,
+            'to' => $booking->to,
+        ]);
+
+
         for ($i = 0; $i < $nights; $i++) {
             $date = $booking->from->copy()->addDays($i);
             $booking->bookingTransactions()->create([
+                'booking_reservation_id' => $booking_reservation->id,
                 'rate' => $booking->room->roomType->base_rate,
                 'date' => $date,
                 'transaction_type' => 'room_charge',
-                'user_id' => auth()->user()->id()
+                'user_id' => auth()->id()
             ]);
         }
     }

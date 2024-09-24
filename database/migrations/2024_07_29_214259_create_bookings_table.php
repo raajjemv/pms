@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('booking_customer')->nullable();
             $table->foreignId('customer_id')->nullable()->constrained();
             $table->string('status')->default('pending');
+            // $table->string('payment_status')->default('not_paid');
             // $table->decimal('booking_rate', 10, 2);
             $table->tinyInteger('adults')->default(0);
             $table->tinyInteger('children')->default(0);

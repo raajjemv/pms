@@ -3,9 +3,9 @@
     <div class="inline-block px-2 py-0.5 rounded  bg-red-200 text-xs">
         @php
             $ss = $roomNumbers
-                ->pluck('bookings')
+                ->pluck('bookingReservations')
                 ->flatten()
-                ->unique('booking_number')
+                ->unique('booking_id')
                 ->filter(function ($b) use ($day) {
                     return $b['from'] <= $day && $b['to'] > $day;
                 })

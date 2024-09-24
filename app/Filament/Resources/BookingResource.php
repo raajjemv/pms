@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\BookingType;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
@@ -27,12 +28,7 @@ class BookingResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('booking_type')
-                    ->options([
-                        'agoda' => 'Agoda',
-                        'booking.com' => 'Booking.com',
-                        'direct' => 'Direct',
-                        'walk-in' => "Walk In"
-                    ])->required(),
+                    ->options(BookingType::class)->required(),
                 Forms\Components\TextInput::make('booking_number')
                     ->required()
                     ->formatStateUsing(fn() => strtoupper(Str::random())),
@@ -57,10 +53,7 @@ class BookingResource extends Resource
                     ->format('Y-MM-D'),
                 Forms\Components\TextInput::make('booking_customer')
                     ->required(),
-                Forms\Components\TextInput::make('status')
-                    ->required()
-                    ->maxLength(255)
-                    ->default('pending'),
+              
                 Forms\Components\TextInput::make('adults')
                     ->numeric()
                     ->default(1)
@@ -78,6 +71,7 @@ class BookingResource extends Resource
             ->columns([
 
                 Tables\Columns\TextColumn::make('booking_number')
+                    ->description(fn($record) => $record->booking_type->name)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('room.room_number')
                     ->numeric()

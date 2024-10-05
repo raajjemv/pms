@@ -18,7 +18,7 @@ class PrintEmail extends Component implements HasForms
 
     public $booking;
 
-    #[Reactive]
+    // #[Reactive]
     public $selectedFolio;
 
     public ?array $data = [];
@@ -45,12 +45,17 @@ class PrintEmail extends Component implements HasForms
     public function printInvoice()
     {
         $d = pdf()
-            ->view('pdf.reservation-invoice')
+            ->view('pdf.reservation-invoice', [
+                'booking' => $this->booking,
+                'reservation' => $this->selectedFolio
+            ])
             ->withBrowsershot(function (Browsershot $browsershot) {
                 $browsershot->setChromePath(env('CHROME_PATH'));
             })
             ->disk('public')
             ->save('reservation-invoices/invoice-2023-04-10.pdf');
+
+        $this->dispatch('open-modal', id: 'edit-user');
     }
 
     public function render()

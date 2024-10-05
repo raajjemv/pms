@@ -20,4 +20,11 @@
         </x-filament::button>
     </form>
 
+    <x-filament::modal id="edit-user" width="screen">
+        <x-slot name="heading">
+            Invoice
+        </x-slot>
+        <iframe src="{{ asset('reservation-invoices/invoice-2023-04-10.pdf') }}" frameborder="0"
+            class="h-full "></iframe>
+    </x-filament::modal>
 </x-filament::section>

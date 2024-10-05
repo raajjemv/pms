@@ -20,12 +20,8 @@ use Spatie\Permission\PermissionRegistrar;
 use function Spatie\LaravelPdf\Support\pdf;
 
 Route::get('/', function () {
-    return pdf()
-        ->view('pdf.reservation-invoice')
-        ->withBrowsershot(function (Browsershot $browsershot) {
-            $browsershot->setChromePath(env('CHROME_PATH'));
-        })
-        ->disk('s3')
-        ->save('invoice-2023-04-10.pdf');
+    $booking = Booking::first();
+    $reservation = $booking->bookingReservations->first();
+    return view('pdf.reservation-invoice', compact('booking', 'reservation'));
     return view('welcome');
 });

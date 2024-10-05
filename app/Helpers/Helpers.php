@@ -15,3 +15,11 @@ if (! function_exists('defaultRatePlan')) {
         }
     }
 }
+if (! function_exists('tenant')) {
+    function tenant()
+    {
+        if (Auth::check()) {
+            return auth()->user()->tenant;
+        }
+    }
+}

@@ -4,31 +4,31 @@
             Guest Accounting
         </x-filament::tabs.item>
 
-        <x-filament::tabs.item :active="$activeTab === 'booking-details'" wire:click="$set('activeTab', 'booking-details')">
+        <x-filament::tabs.item :active="$activeTab === 'booking-detail'" wire:click="$set('activeTab', 'booking-detail')">
             Booking Details
         </x-filament::tabs.item>
 
         <x-filament::tabs.item :active="$activeTab === 'guest-profile'" wire:click="$set('activeTab', 'guest-profile')">
             Guest Profile
         </x-filament::tabs.item>
-        <x-filament::tabs.item :active="$activeTab === 'room-charges'" wire:click="$set('activeTab', 'room-charges')">
-            Room Charges
+        <x-filament::tabs.item :active="$activeTab === 'print-email'" wire:click="$set('activeTab', 'print-email')">
+            Print / Email
         </x-filament::tabs.item>
     </x-filament::tabs>
 
 
-    <div class="grid grid-cols-1 gap-4 lg:grid-cols-5">
+    <div class="grid grid-cols-1 gap-3 lg:grid-cols-5">
 
-        <x-filament::section :headerActions="[$this->addFolioAccountAction()]">
+        <x-filament::section class="" :headerActions="[$this->addFolioAccountAction()]">
             <x-slot name="description">
                 Folio Accounts
             </x-slot>
             <div class="space-y-3">
                 @foreach ($booking->bookingReservations as $reservation)
-                    <div>
+                    <div class="flex flex-col">
                         <button wire:key="reservation-{{ $reservation->id }}"
                             wire:click="setSelectedFolio({{ $reservation->id }})" @class([
-                                'text-sm text-gray-700 ',
+                                'text-sm text-gray-700 text-left ',
                                 'font-bold text-blue-600' => $selectedFolio->id == $reservation->id,
                             ])>
                             <i class="pr-2 fas fa-minus"></i> {{ $reservation->booking_customer }}
@@ -48,15 +48,16 @@
                         :selected-folio="$selectedFolio">
                     @break
 
-                    @case('booking-details')
+                    @case('booking-detail')
+                        <livewire:pms.reservation.booking-detail :booking="$booking" :selected-folio="$selectedFolio" />
                     @break
 
                     @case('guest-profile')
-                        <livewire:pms.reservation.guest-profiles :booking="$booking"  :selected-folio="$selectedFolio"/>
+                        <livewire:pms.reservation.guest-profiles :booking="$booking" :selected-folio="$selectedFolio" />
                     @break
 
-                    @case('room-charges')
-                        <div>rc</div>
+                    @case('print-email')
+                        <livewire:pms.reservation.print-email :booking="$booking" :selected-folio="$selectedFolio" />
                     @break
 
                     @default

@@ -1,28 +1,25 @@
 <div>
-    <x-slot name="heading">
-        <div>
-            <div class="flex items-center space-x-3">
-                <x-svg-icons.location />
-                <div>
-                    <div>{{ $selectedReservation->customer->name }}</div>
-                    <div class="flex items-center space-x-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="size-4">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                        </svg>
+    <div class="mb-4">
+        <div class="flex items-center space-x-3">
+            <x-svg-icons.location />
+            <div>
+                <div class="font-bold">{{ $selectedReservation->customer->name }}</div>
+                <div class="flex items-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                        stroke="currentColor" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                    </svg>
 
-                        <div class="text-sm font-thin">{{ $selectedReservation->customer->country }}</div>
-                    </div>
+                    <div class="text-sm font-thin">{{ $selectedReservation->customer->country }}</div>
                 </div>
             </div>
-
         </div>
-    </x-slot>
+    </div>
 
     <div class="flex">
+
         <div class="flex-1 pr-3">
             <div class="flex space-x-2">
                 <x-filament::button class="flex-1"
@@ -142,10 +139,12 @@
                 <div class="mb-2 text-sm font-semibold">Reservations</div>
                 <div class="space-y-3 ">
                     @foreach ($booking->bookingReservations as $reservation)
-                        <x-filament::button wire:click="selectReservation({{ $reservation->id }})" color="gray" @class([
-                            'border text-left',
-                            'border-blue-600' => $selectedReservation->id == $reservation->id,
-                        ])>
+                        <x-filament::button wire:key="booking-reservation-{{ $reservation->id }}"
+                            wire:click="$set('reservationId', {{ $reservation->id }})" color="gray"
+                            @class([
+                                'border text-left',
+                                'border-blue-600' => $selectedReservation->id == $reservation->id,
+                            ])>
                             <div class="font-semibold ">{{ $reservation->booking_customer }}</div>
                             <div class="text-xs">
                                 <div>{{ $reservation->room->roomType->name }} - {{ $reservation->room->room_number }}

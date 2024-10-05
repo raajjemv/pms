@@ -2,11 +2,12 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\Tenant;
-use Filament\Facades\Filament;
-use Filament\Pages\Page;
-use Filament\Forms\Form;
 use Filament\Forms;
+use App\Models\Tenant;
+use Filament\Forms\Form;
+use Filament\Pages\Page;
+use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 
 class TenantConfiguration extends Page
 {
@@ -42,6 +43,8 @@ class TenantConfiguration extends Page
                         ->required(),
                     Forms\Components\TextInput::make('tin')
                         ->required(),
+                    Forms\Components\TextInput::make('website')
+                        ->nullable(),
                     Forms\Components\FileUpload::make('logo')
                         ->image()
                         ->imageEditor()
@@ -60,6 +63,11 @@ class TenantConfiguration extends Page
     public function save()
     {
         $tenant = Filament::getTenant()->update($this->form->getState());
+
+        Notification::make()
+            ->title('Updated Successfully!')
+            ->success()
+            ->send();
     }
     public static function canAccess(): bool
     {

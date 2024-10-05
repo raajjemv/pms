@@ -22,7 +22,7 @@ class EditReservation extends Page
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public $activeTab = 'guest-profile';
+    public $activeTab = 'print-email';
 
     public $booking;
 

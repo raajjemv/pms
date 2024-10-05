@@ -20,6 +20,8 @@ return new class extends Migration
             $table->date('from');
             $table->date('to');
             $table->string('booking_customer')->nullable();
+            $table->string('billing_customer')->nullable();
+            $table->string('billing_customer_email')->nullable();
             $table->foreignId('customer_id')->nullable()->constrained();
             $table->string('status')->default('pending');
             // $table->string('payment_status')->default('not_paid');

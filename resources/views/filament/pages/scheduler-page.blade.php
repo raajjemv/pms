@@ -143,7 +143,7 @@
                                         @endphp
                                         <div style="width: {{ $width }}px;left:{{ $left }}px"
                                             wire:click="viewBookingSummary('{{ $reservation->booking_id }}','{{ $reservation->id }}')"
-                                            class="absolute bg-green-500 h-full flex items-center overflow-hidden rounded  border-[0.8px] border-gray-200">
+                                            class="absolute bg-green-500 h-full flex items-center overflow-hidden rounded  border-[0.8px] border-gray-200 cursor-pointer">
                                             <div class="px-1 text-white rounded whitespace-nowrap">
                                                 {{ $reservation->customer->name }} </div>
                                         </div>

@@ -46,22 +46,22 @@ class BookingResource extends Resource
                 //     ->required(),
                 // Forms\Components\DatePicker::make('to')
                 //     ->required(),
-                DateRangePicker::make('date')
-                    ->separator(' to ')
-                    ->live()
-                    ->displayFormat('Y-MM-D')
-                    ->format('Y-MM-D'),
-                Forms\Components\TextInput::make('booking_customer')
-                    ->required(),
-              
-                Forms\Components\TextInput::make('adults')
-                    ->numeric()
-                    ->default(1)
-                    ->required(),
-                Forms\Components\TextInput::make('children')
-                    ->numeric()
-                    ->default(0)
-                    ->required(),
+                // DateRangePicker::make('date')
+                //     ->separator(' to ')
+                //     ->live()
+                //     ->displayFormat('Y-MM-D')
+                //     ->format('Y-MM-D'),
+            //     Forms\Components\TextInput::make('booking_customer')
+            //         ->required(),
+            //   
+            //     Forms\Components\TextInput::make('adults')
+            //         ->numeric()
+            //         ->default(1)
+            //         ->required(),
+            //     Forms\Components\TextInput::make('children')
+            //         ->numeric()
+            //         ->default(0)
+            //         ->required(),
             ]);
     }
 

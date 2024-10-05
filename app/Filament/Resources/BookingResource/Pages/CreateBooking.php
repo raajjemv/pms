@@ -49,6 +49,7 @@ class CreateBooking extends CreateRecord
             'booking_customer' => $booking->booking_customer,
             'from' => $booking->from,
             'to' => $booking->to,
+            'master' => true
         ]);
 
 

@@ -1,140 +1,360 @@
-<x-layouts.app>
-    <div class="p-2">
-        <div class="text-sm border border-gray-400 ">
-            @php
-                $tenant = tenant();
-            @endphp
-            <header class="py-3 space-y-2 text-center border-b border-gray-400 roboto">
-                <div class="text-xl">{{ $tenant->name }}</div>
-                <div class="">{{ $tenant->address }}</div>
-                <div>Phone: {{ $tenant->phone_number }} | Email: {{ $tenant->email }}</div>
-                <div>Website: {{ $tenant->website }}</div>
-                <div class="text-2xl font-bold pt-7">Tax Invoice</div>
-            </header>
-            <div class="flex items-start justify-between p-3">
-                <table class="text-left">
+<x-layouts.pdf>
+    <htmlpageheader name="page-header">
+        @php
+            $tenant = tenant();
+        @endphp
+        <div style="text-align:center;border:1px solid #9ca3af;padding:10px 0;">
+            <div style="font-weight:bold;margin-bottom:3px;font-size:17px;">{{ $tenant->name }}</div>
+            <div style="margin:4px 0;">{{ $tenant->address }}</div>
+            <div style="margin:4px 0;">Phone: {{ $tenant->phone_number }} | Email: {{ $tenant->email }}</div>
+            <div style="margin:4px 0;">Website: {{ $tenant->website }}</div>
+            <div style="font-weight:bold;margin-top:15px;font-size:17px;">Tax Invoice</div>
+        </div>
+
+        <table class="table-wrapper">
+            <tr>
+                <td>
+                    <table class="header-table">
+                        <tr>
+                            <th>Invoice No</th>
+                            <td>{{ str()->random(10) }}</td>
+                        </tr>
+                        <tr>
+                            <th>Folio/Res No</th>
+                            <td>{{ $booking->booking_number }}</td>
+                        </tr>
+                        <tr>
+                            <th>Guest Name</th>
+                            <td>{{ $reservation->booking_customer }}</td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table class="header-table ">
+                        <tr>
+                            <th>Date</th>
+                            <td>{{ now()->format('d/m/Y H:i') }}</td>
+                        </tr>
+                        <tr>
+                            <th>Booking Source</th>
+                            <td>{{ $booking->booking_type }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+
+
+        <table class="table-wrapper" style="">
+            <tr>
+                <td>
+                    <table class="header-table">
+                        <tr>
+                            <th>Nationality</th>
+                            <th>No of Pax</th>
+                            <th>Adult/Children</th>
+                            <th>Room</th>
+                        </tr>
+                        <tr>
+                            <td>-</td>
+                            <td>{{ $reservation->totalPax() }}</td>
+                            <td>{{ $reservation->adults . ' / ' . $reservation->children }}</td>
+                            <td>{{ $reservation->room->roomType->name . ' - ' . $reservation->room->room_number }}</td>
+                        </tr>
+                        <tr style="padding-top:10px;">
+                            <th class="border-t">Arrival Date</th>
+                            <th class="border-t">Depature Date</th>
+                            <th class="border-t">Reservation Date</th>
+                            <th class="border-t">
+                                <table class="header-table ">
+                                    <tr>
+                                        <th style="width:50%">
+                                            <div>Rate Plan</div>
+                                        </th>
+                                        <th style="text-align: right;;width:50%">
+                                            <div>Tarrif</div>
+                                        </th>
+                                    </tr>
+                                </table>
+                            </th>
+                        </tr>
+                        <tr>
+                            <td>{{ $reservation->from->format('d/m/Y') }} - {{ $reservation->check_in }}</td>
+                            <td>{{ $reservation->to->format('d/m/Y') }} - {{ $reservation->check_out }}</td>
+                            <td>{{ $reservation->created_at->format('d/m/Y H:i') }}</td>
+                            <td>
+                                <table class="header-table ">
+                                    <tr>
+                                        <td style="width:50%">
+                                            {{ $reservation->ratePlan->code }}
+                                        </td>
+                                        <td style="text-align: right;;width:50%">
+                                            {{ number_format($reservation->averageRate(), 2) }}
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+        </table>
+    </htmlpageheader>
+
+    <htmlpagefooter name="page-footer">
+        <table style="width:100%;color:#475569;border-top:1px solid #9ca3af">
+            <tr>
+                <td style="width:33.33%;padding:4px;font-size:12px;">Generated By {{ auth()->user()->name }}</td>
+                <td style="width:33.33%;padding:4px;font-size:12px;text-align:Center;">Datetime
+                    {{ now()->format('d/m/Y H:i') }}</td>
+                <td style="width:33.33%;text-align:right;padding:4px;font-size:12px;">Page {PAGENO} of {nb}</td>
+            </tr>
+        </table>
+    </htmlpagefooter>
+
+    <main>
+        @php
+            $charges = $reservation->bookingTransactions
+                ->whereNotIn('transaction_type', App\Enums\PaymentType::getAllValues())
+                ->sortBy('date');
+        @endphp
+        <div style="padding:4px 4px;">
+
+            <table class="data-table" style="">
+                <thead>
                     <tr>
-                        <th class="py-1">Invoice No </th>
-                        <td class="py-1 pl-10 uppercase">{{ str()->random(10) }}</td>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Rate</th>
+                        <th style="text-align: right">Charge</th>
                     </tr>
+                </thead>
+                @foreach ($charges as $bookingTransaction)
+                    @php
+                        $service_charge = ($bookingTransaction->rate * 10) / 100;
+                        $tgst = (($bookingTransaction->rate + $service_charge) * 16) / 100;
+                        $green_tax = $reservation->totalPax() * 3;
+                        $balance = $bookingTransaction->rate - ($service_charge + $tgst + $green_tax);
+                    @endphp
                     <tr>
-                        <th class="py-1">Folio/Res No </th>
-                        <td class="py-1 pl-10">{{ $booking->booking_number }}</td>
+                        <td style="width:20%">
+                            {{ $bookingTransaction->date->format('d/m/Y') }}
+                        </td>
+                        <td style="width:40%">
+                            <div style="font-weight: bold;text-transform: capitalize;">
+                                {{ str($bookingTransaction->transaction_type)->replace('_', ' ') }}</div>
+                            <div style="padding-left:4px; !important">
+                                <div class="text-xs">Service Charge: {{ number_format($service_charge, 2) }}
+                                </div>
+                                <div class="text-xs">T-GST: {{ number_format($tgst, 2) }}
+                                </div>
+                                <div class="text-xs">Green Tax: {{ number_format($green_tax, 2) }}
+                                </div>
+                            </div>
+                        </td>
+                        <td style="width:20%">
+                            <div style="font-weight: bold">{{ number_format($balance, 2) }}</div>
+                            <div>
+                                <div class="text-xs">{{ number_format($service_charge, 2) }}
+                                </div>
+                                <div class="text-xs">{{ number_format($tgst, 2) }}
+                                </div>
+                                <div class="text-xs">{{ number_format($green_tax, 2) }}
+                                </div>
+                            </div>
+                        </td>
+                        <td style="text-align: right;font-weight:bold;width:20%">{{ $bookingTransaction->rate }}</td>
                     </tr>
-                    <tr>
-                        <th class="py-1">Guest Name </th>
-                        <td class="py-1 pl-10">{{ $reservation->booking_customer }}</td>
-                    </tr>
-                </table>
-                <table class="text-left">
-                    <tr>
-                        <th class="py-1">Date </th>
-                        <td class="py-1 pl-10">{{ now()->format('d/m/Y H:i') }}</td>
-                    </tr>
-                    <tr>
-                        <th class="py-1">Booking Source</th>
-                        <td class="py-1 pl-10 capitalize">{{ $booking->booking_type }}</td>
-                    </tr>
-                </table>
-            </div>
-            <div class="grid grid-cols-4 border-t border-gray-400 divide-x divide-gray-400 ">
-                <div class="p-3">
-                    <div class="py-1 font-bold">Nationality</div>
-                    <div>-</div>
-                </div>
-                <div class="p-3">
-                    <div class="py-1 font-bold">No of Pax</div>
-                    <div>{{ $reservation->totalPax() }}</div>
-                </div>
-                <div class="p-3">
-                    <div class="py-1 font-bold">Adult/Children</div>
-                    <div>{{ $reservation->adults . ' / ' . $reservation->children }}</div>
-                </div>
-                <div class="p-3">
-                    <div class="py-1 font-bold">Room</div>
-                    <div>{{ $reservation->room->roomType->name . ' - ' . $reservation->room->room_number }}</div>
-                </div>
-            </div>
-            <div class="grid grid-cols-4 border-t border-gray-400 divide-x divide-gray-400 ">
-                <div class="p-3">
-                    <div class="py-1 font-bold">Arrival Date</div>
-                    <div>{{ $reservation->from->format('d/m/Y') }} - {{ $reservation->check_in }}</div>
-                </div>
-                <div class="p-3">
-                    <div class="py-1 font-bold">Departure Date</div>
-                    <div>{{ $reservation->to->format('d/m/Y') }} - {{ $reservation->check_out }}</div>
-                </div>
-                <div class="p-3">
-                    <div class="py-1 font-bold">Reservation Date</div>
-                    <div>{{ $reservation->created_at->format('d/m/Y H:i') }}</div>
-                </div>
-                <div class="grid grid-cols-2 divide-x divide-gray-400">
-                    <div class="p-3">
-                        <div class="py-1 font-bold">Rate Plan</div>
-                        <div>{{ $reservation->ratePlan->code }}</div>
-                    </div>
-                    <div class="p-3">
-                        <div class="py-1 font-bold">Tariff</div>
-                        <div>{{ $reservation->averageRate() }}</div>
-                    </div>
-                </div>
-            </div>
-            <div class="p-3 border-t border-gray-400">
-                <table class="w-full text-left ">
+                @endforeach
+
+            </table>
+
+
+            <table class="price-table" style="border-top:1px solid #9ca3af;">
+                <tr>
+                    <td style="width:20%"></td>
+                    <td style="width:40%"></td>
+                    <td style="font-weight:bold;width:20%;border:1px solid #9ca3af;">Total</td>
+                    <td style="font-weight:bold;text-align:right;width:20%;border:1px solid #9ca3af;">
+                        {{ number_format($reservation->totalCharges(), 2) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:20%"></td>
+                    <td style="width:40%"></td>
+                    <td style="font-weight:bold;width:20%;border:1px solid #9ca3af;">Total Paid</td>
+                    <td style="font-weight:bold;text-align:right;width:20%;border:1px solid #9ca3af;">
+                        {{ number_format($paid, 2) }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width:20%"></td>
+                    <td style="width:40%"></td>
+                    <td style="font-weight:bold;width:20%;border:1px solid #9ca3af;">Balance</td>
+                    <td style="font-weight:bold;text-align:right;width:20%;border:1px solid #9ca3af;">
+                        {{ number_format($reservation->totalCharges() - $paid, 2) }}
+                    </td>
+                </tr>
+            </table>
+
+            @if ($charges->count() > 4)
+                <pagebreak />
+            @endif
+
+
+            <br>
+            <div>
+                <div>Settlements</div>
+                <table class="data-table" style="margin-top:0;">
                     <thead>
                         <tr>
-                            <th class="py-1">Date</th>
-                            <th class="py-1">Description</th>
-                            <th class="py-1 text-right">Rate</th>
-                            <th class="py-1 text-right">Charge</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Rate</th>
+                            <th style="text-align: right">Charge</th>
                         </tr>
                     </thead>
-                    @foreach ($reservation->bookingTransactions->whereNotIn('transaction_type', App\Enums\PaymentType::getAllValues()) as $bookingTransaction)
-                        @php
-                            $service_charge = ($bookingTransaction->rate * 10) / 100;
-                            $tgst = (($bookingTransaction->rate + $service_charge) * 16) / 100;
-                            $green_tax = $reservation->totalPax() * 3;
-                            $balance = $bookingTransaction->rate - ($service_charge + $tgst + $green_tax);
-                        @endphp
-                        <tr>
-                            <td class="py-1 align-top">
-                                {{ $bookingTransaction->date->format('d/m/Y') }}
-                            </td>
-                            <td class="py-1 capitalize">
-                                <div>{{ str($bookingTransaction->transaction_type)->replace('_', ' ') }}</div>
-                                <div class="mt-1 indent-5">
-                                    <div class="text-xs">Service Charge: {{ number_format($service_charge, 2) }}
-                                    </div>
-                                    <div class="text-xs">Service Charge: {{ number_format($tgst, 2) }}
-                                    </div>
-                                    <div class="text-xs">Service Charge: {{ number_format($green_tax, 2) }}
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-1 text-right align-top">
-                                <div>{{ number_format($balance, 2) }}</div>
-                                <div class="mt-1">
-                                    <div class="text-xs">{{ number_format($service_charge, 2) }}
-                                    </div>
-                                    <div class="text-xs">{{ number_format($tgst, 2) }}
-                                    </div>
-                                    <div class="text-xs">{{ number_format($green_tax, 2) }}
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="py-1 text-right align-top">{{ $bookingTransaction->rate }}</td>
-                        </tr>
-                    @endforeach
-                    <tr>
-                        <td class="py-1 border-t border-gray-400"></td>
-                        <td class="py-1 border-t border-gray-400"></td>
-                        <td class="py-1 border-t border-gray-400"></td>
-                        <td class="py-1 font-bold text-right border-t border-gray-400"><span
-                                class="pr-4">Total</span>{{ number_format($reservation->totalCharges(), 2) }}</td>
-                    </tr>
+                    <tbody>
+                        @foreach ($reservation->bookingTransactions->whereIn('transaction_type', App\Enums\PaymentType::getAllValues())->sortBy('date') as $settlements)
+                            <tr>
+                                <td style="width:20%">
+                                    {{ $settlements->date->format('d/m/Y') }}
+                                </td>
+                                <td style="width:40%">
+                                    <div style="font-weight: bold;text-transform: capitalize;">
+                                        {{ str($settlements->transaction_type)->replace('_', ' ') }}</div>
+
+                                </td>
+                                <td style="width:20%">
+                                    <div style="font-weight: bold">0</div>
+
+                                </td>
+                                <td style="text-align: right;font-weight:bold;width:20%">
+                                    {{ $settlements->rate }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
                 </table>
 
             </div>
+            <br>
+
+
+            <table class="border-t border-b psignature">
+                <tr>
+                    <td>
+                        For {{ tenant()->name }} office use
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding-top: 60px;">
+                        Authorised Signature
+                    </td>
+                </tr>
+            </table>
+
+            <div class="" style="margin-top: 4px;text-align:Center">
+                Thank you for staying with us! We hope to see you again soon.
+            </div>
         </div>
-    </div>
-</x-layouts.app>
+
+
+    </main>
+
+
+
+    <style>
+        table {}
+
+        main {
+            border: 1px solid #9ca3af;
+            border-top: 0;
+            height: 100%;
+        }
+
+        .table-wrapper {
+            border-bottom: 1px solid #9ca3af;
+            border-left: 1px solid #9ca3af;
+            border-right: 1px solid #9ca3af;
+            width: 100%;
+            vertical-align: top;
+            table-layout: fixed;
+        }
+
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed;
+        }
+
+        .header-table tr th {
+            font-weight: bold
+        }
+
+        .header-table tr th,
+        td {
+            padding: 5px 2px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .border-t {
+            border-top: 1px solid #9ca3af;
+        }
+
+        .border-b {
+            border-bottom: 1px solid #9ca3af;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            vertical-align: top;
+            table-layout: fixed;
+            margin-top: 10px;
+
+        }
+
+        .data-table tr th,
+        .data-table tr td {
+            text-align: left;
+            padding: 10px 2px;
+        }
+
+
+        .price-table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+            vertical-align: top;
+            table-layout: fixed;
+        }
+
+        .price-table tr th,
+        .price-table tr td {
+            text-align: left;
+            padding: 8px 6px;
+        }
+
+        .text-xs {
+            font-size: 12px;
+        }
+
+        .psignature {
+            width: 100%;
+            border-collapse: collapse;
+            vertical-align: top;
+            table-layout: fixed;
+        }
+
+        .psignature tr th,
+        .psignature tr td {
+            padding: 0;
+
+        }
+    </style>
+
+
+
+</x-layouts.pdf>

@@ -4,7 +4,8 @@
     </x-slot>
 
     <div>
-        <x-filament::button color="success" wire:click="printInvoice" icon="heroicon-m-printer">
+        <x-filament::button color="success" target="_blank" href="{{ route('pdf.reservation-invoice',['booking_id' => encrypt($booking->id)]) }}" tag="a"
+            icon="heroicon-m-printer">
             Print
         </x-filament::button>
     </div>
@@ -20,11 +21,17 @@
         </x-filament::button>
     </form>
 
-    <x-filament::modal id="edit-user" width="screen">
+    {{-- <x-filament::modal id="reservation-invoice" width="screen">
         <x-slot name="heading">
             Invoice
         </x-slot>
-        <iframe src="{{ asset('reservation-invoices/invoice-2023-04-10.pdf') }}" frameborder="0"
-            class="h-full "></iframe>
-    </x-filament::modal>
+
+        @if ($invoiceName)
+            <iframe src="{{ Storage::disk(env('FILESYSTEM_DISK'))->url('reservation-invoices/' . $invoiceName) }}"
+                frameborder="0" class="h-full "></iframe>
+
+
+    @endif
+
+    </x-filament::modal> --}}
 </x-filament::section>

@@ -8,20 +8,21 @@ use App\Models\Customer;
 use App\Models\RatePlan;
 use App\Models\RoomType;
 use App\Enums\PaymentType;
+use App\Http\Controllers\Pdf\ReservationInvoice;
 use Faker\Factory as Faker;
 use App\Models\ChannelGroup;
 use App\Models\BusinessSource;
 use Filament\Facades\Filament;
 use Faker\Provider\en_US\Address;
 use Spatie\Browsershot\Browsershot;
+use Spatie\LaravelPdf\Enums\Format;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\PermissionRegistrar;
-use function Spatie\LaravelPdf\Support\pdf;
 
 Route::get('/', function () {
-    $booking = Booking::first();
-    $reservation = $booking->bookingReservations->first();
-    return view('pdf.reservation-invoice', compact('booking', 'reservation'));
     return view('welcome');
+});
+Route::middleware(['auth', 'auth.session'])->group(function () {
+    Route::get('/pdf/reservation-invoice/{booking_id}', ReservationInvoice::class)->name('pdf.reservation-invoice');
 });

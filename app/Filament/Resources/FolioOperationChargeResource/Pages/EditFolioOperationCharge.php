@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\FolioOperationChargeResource\Pages;
 
-use App\Filament\Resources\FolioOperationChargeResource;
 use Filament\Actions;
+use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Cache;
 use Filament\Resources\Pages\EditRecord;
+use App\Filament\Resources\FolioOperationChargeResource;
 
 class EditFolioOperationCharge extends EditRecord
 {
@@ -16,5 +18,10 @@ class EditFolioOperationCharge extends EditRecord
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        Cache::forget('folio_operation_charges_' . Filament::getTenant()->id);
     }
 }

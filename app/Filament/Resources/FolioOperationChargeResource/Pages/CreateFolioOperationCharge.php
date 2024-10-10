@@ -6,6 +6,7 @@ use Filament\Actions;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\FolioOperationChargeResource;
+use Illuminate\Support\Facades\Cache;
 
 class CreateFolioOperationCharge extends CreateRecord
 {
@@ -17,6 +18,12 @@ class CreateFolioOperationCharge extends CreateRecord
         $data['user_id'] = auth()->id();
         return $data;
     }
+
+    protected function afterCreate()
+    {
+        Cache::forget('folio_operation_charges_' . Filament::getTenant()->id);
+    }
+
 
     protected function getRedirectUrl(): string
     {

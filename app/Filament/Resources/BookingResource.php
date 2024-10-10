@@ -32,15 +32,7 @@ class BookingResource extends Resource
                 Forms\Components\TextInput::make('booking_number')
                     ->required()
                     ->formatStateUsing(fn() => strtoupper(Str::random())),
-                Forms\Components\Select::make('rate_plan_id')
-                    ->required()
-                    ->relationship('ratePlan', 'name'),
-                Forms\Components\Select::make('room_id')
-                    ->relationship(
-                        name: 'room'
-                    )
-                    ->getOptionLabelFromRecordUsing(fn($record) => "{$record->room_number}-{$record->roomType->name}")
-                    ->required(),
+             
                 // Forms\Components\DatePicker::make('from')
                 //     ->live()
                 //     ->required(),
@@ -51,17 +43,17 @@ class BookingResource extends Resource
                 //     ->live()
                 //     ->displayFormat('Y-MM-D')
                 //     ->format('Y-MM-D'),
-            //     Forms\Components\TextInput::make('booking_customer')
-            //         ->required(),
-            //   
-            //     Forms\Components\TextInput::make('adults')
-            //         ->numeric()
-            //         ->default(1)
-            //         ->required(),
-            //     Forms\Components\TextInput::make('children')
-            //         ->numeric()
-            //         ->default(0)
-            //         ->required(),
+                //     Forms\Components\TextInput::make('booking_customer')
+                //         ->required(),
+                //   
+                //     Forms\Components\TextInput::make('adults')
+                //         ->numeric()
+                //         ->default(1)
+                //         ->required(),
+                //     Forms\Components\TextInput::make('children')
+                //         ->numeric()
+                //         ->default(0)
+                //         ->required(),
             ]);
     }
 

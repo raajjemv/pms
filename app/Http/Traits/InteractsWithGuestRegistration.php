@@ -8,6 +8,8 @@ use App\Models\Country;
 use Filament\Forms\Set;
 use App\Models\Customer;
 use App\Enums\DocumentType;
+use App\Filament\Resources\BookingResource;
+use App\Models\BookingReservation;
 use Filament\Actions\Action;
 use Filament\Tables\Actions;
 use Filament\Actions\EditAction;
@@ -74,6 +76,7 @@ trait InteractsWithGuestRegistration
             ->modalWidth(MaxWidth::SevenExtraLarge)
             ->fillForm(fn($arguments): array => [
                 'name' => $arguments['booking_customer'],
+                'email' => $arguments['booking_email'],
             ])
             ->mutateFormDataUsing(function (array $data): array {
                 $user = auth()->user();
@@ -136,10 +139,17 @@ trait InteractsWithGuestRegistration
             ])
             ->action(function ($data, $arguments) {
                 $booking = Booking::find($arguments['booking']);
+                $reservation = BookingReservation::where('id', $arguments['booking_reservation_id'])
+                    ->update([
+                        'booking_customer' => $data['name']
+                    ]);
                 $customer = Customer::firstOrCreate($data);
                 $booking->customers()->attach($customer, [
                     'booking_reservation_id' => $arguments['booking_reservation_id']
                 ]);
+            })
+            ->after(function ($livewire) {
+                $livewire->dispatch('refresh-edit-reservation');
             });
     }
 

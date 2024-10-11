@@ -12,7 +12,7 @@ use Filament\Notifications\Notification;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 
-class BookingDetail extends Component implements HasForms
+class ReservationDetail extends Component implements HasForms
 {
     use InteractsWithForms;
 
@@ -46,23 +46,23 @@ class BookingDetail extends Component implements HasForms
 
             ])
             ->statePath('data')
-            ->model($this->booking);
+            ->model($this->selectedFolio);
     }
 
-    public function saveBookingDetail()
+    public function saveReservationDetail()
     {
-        $this->booking->forceFill($this->form->getState())->save();
+        $this->selectedFolio->forceFill($this->form->getState())->save();
 
         $this->form->fill([]);
 
         Notification::make()
-            ->title('Booking Details Updated!')
+            ->title('Reservation Details Updated!')
             ->success()
             ->send();
     }
 
     public function render()
     {
-        return view('livewire.pms.reservation.booking-detail');
+        return view('livewire.pms.reservation.reservation-detail');
     }
 }

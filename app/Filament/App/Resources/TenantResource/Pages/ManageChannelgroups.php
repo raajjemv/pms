@@ -4,6 +4,7 @@ namespace App\Filament\App\Resources\TenantResource\Pages;
 
 use App\Filament\App\Resources\ChannelGroupResource;
 use App\Filament\App\Resources\TenantResource;
+use App\Models\ChannelGroup;
 use Filament\Actions;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -42,6 +43,10 @@ class ManageChannelgroups extends ManageRelatedRecords
             ->recordTitleAttribute('name')
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
+                Tables\Columns\ToggleColumn::make('default')
+                    ->afterStateUpdated(fn($record) => ChannelGroup::where('id', '!=', $record->id)->update([
+                        'default' => false
+                    ]))
             ])
             ->filters([
                 //

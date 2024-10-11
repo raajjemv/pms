@@ -7,7 +7,9 @@
         <x-filament::tabs.item :active="$activeTab === 'booking-detail'" wire:click="$set('activeTab', 'booking-detail')">
             Booking Details
         </x-filament::tabs.item>
-
+        <x-filament::tabs.item :active="$activeTab === 'reservation-detail'" wire:click="$set('activeTab', 'reservation-detail')">
+            Reservation Details
+        </x-filament::tabs.item>
         <x-filament::tabs.item :active="$activeTab === 'guest-profile'" wire:click="$set('activeTab', 'guest-profile')">
             Guest Profile
         </x-filament::tabs.item>
@@ -43,13 +45,16 @@
         <div class="col-span-4">
             @switch($activeTab)
                 @case('guest-accounting')
-                    {{-- @livewire('pms.reservation.guest-accounting', ['booking' => $booking]) --}}
                     <livewire:pms.reservation.guest-accounting :booking="$booking" @refresh-edit-reservation="$refresh"
                         :selected-folio="$selectedFolio">
                     @break
 
                     @case('booking-detail')
                         <livewire:pms.reservation.booking-detail :booking="$booking" :selected-folio="$selectedFolio" />
+                    @break
+
+                    @case('reservation-detail')
+                        <livewire:pms.reservation.reservation-detail :booking="$booking" :selected-folio="$selectedFolio" />
                     @break
 
                     @case('guest-profile')

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\RatePlan;
+use App\Models\RoomType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -20,6 +21,17 @@ if (! function_exists('tenant')) {
     {
         if (Auth::check()) {
             return auth()->user()->tenant;
+        }
+    }
+}
+if (! function_exists('roomTypeBaseRate')) {
+    function roomTypeBaseRate($roomTypeId, $from)
+    {
+        if (Auth::check()) {
+            $roomType = RoomType::find($roomTypeId);
+            return $roomType->rates->where('date', $from)
+                ->where('rate_plan_id', defaultRatePlan()->id)
+                ->first()->rate ?? $roomType->base_rate;
         }
     }
 }

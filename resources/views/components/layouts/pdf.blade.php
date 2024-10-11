@@ -7,11 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 
     <style>
-        @page {
-            margin: 390px 10, 10, 10;
-            header: page-header;
-            footer: page-footer;
-        }
+       
 
         html,
         body {

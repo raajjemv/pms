@@ -6,11 +6,12 @@ use App\Models\Booking;
 use Filament\Pages\Page;
 use App\Enums\PaymentType;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
+use App\Models\BookingReservation;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Widgets\BookingTotalAmount;
 use App\Http\Traits\InteractsWithGuestRegistration;
-use App\Models\BookingReservation;
 
 class EditReservation extends Page
 {
@@ -22,7 +23,8 @@ class EditReservation extends Page
 
     protected static bool $shouldRegisterNavigation = false;
 
-    public $activeTab = 'print-email';
+    #[Url(keep: true)]
+    public $activeTab = 'guest-accounting';
 
     public $booking;
 

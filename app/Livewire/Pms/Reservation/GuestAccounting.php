@@ -201,6 +201,7 @@ class GuestAccounting extends Component implements HasForms, HasTable
             ])
             ->paginated(false)
             ->striped()
+            ->defaultSort('date', 'ASC')
             ->recordClasses(fn($record) => $record->trashed() ? '!opacity-50 line-through !py-1' : '!py-1');
     }
 

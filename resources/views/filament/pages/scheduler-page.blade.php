@@ -1,12 +1,12 @@
 <x-filament-panels::page wire:poll.60s>
     <div x-init="() => {
         var date = '{{ !request('date') ? now()->format('d') : '' }}';
-        if (date && date > '09') {
+        if (date && date >= '09') {
+            date = String(date - 2).padStart(2, '0');
             var container = document.getElementById('scheduler-wrapper');
             const targetDiv = document.getElementById('day-' + date);
             const targetOffset = targetDiv.offsetLeft;
             container.scrollTo({ left: targetOffset, behavior: 'smooth' });
-    
         }
     }" x-data="{
         scrollScheduler(type) {
@@ -31,7 +31,8 @@
         endGridDate: null,
         isSelecting: false,
     
-        selectDays() {
+        selectDays(event) {
+            const roomId = event.currentTarget.dataset.room;
             const start = parseInt(this.startGridDate);
             const end = parseInt(this.endGridDate);
             this.selectedDays = [];
@@ -39,6 +40,13 @@
             for (let i = start; i <= end; i++) {
                 this.selectedDays.push(i);
             }
+    
+            $dispatch('open-modal', {
+                id: 'new-booking',
+                from: this.startGridDate,
+                to: this.endGridDate,
+                room_id: roomId
+            })
         },
         isDateWithinRange(dateToCheck, room) {
             const checkDate = new Date(dateToCheck);
@@ -52,16 +60,13 @@
             return checkDate >= start && checkDate <= end && room == this.roomId;
         }
     }">
-        <button @click="isDateWithinRange('2024-09-05',2) ? console.log('ok') : null">ss</button>
+        {{-- <button @click="isDateWithinRange('2024-10-05',2) ? console.log('ok') : null">ss</button> --}}
 
-        <div class="absolute top-0 left-0 z-10 p-2 text-white bg-black rounded-lg">
-            <p x-text="startGridDate"></p>
-            <p x-text="endGridDate"></p>
-        </div>
+
         <div class="py-2 font-medium">
             <div class="text-center">{{ $startOfMonth->format('F, Y') }}</div>
         </div>
-        <div id="scheduler-wrapper" class="overflow-x-scroll text-sm text-black rounded-lg bg-gray-50">
+        <div id="scheduler-wrapper" class="pb-5 overflow-x-scroll text-sm text-black rounded-lg bg-gray-50">
             <div class="w-max">
                 <div class="relative flex">
                     <div
@@ -85,9 +90,9 @@
             <div class="">
                 @foreach ($rooms->groupBy('roomType.name') as $groupKey => $roomNumbers)
                     <div class=" w-max">
-                        <div class="relative flex bg-zinc-200">
+                        <div class="relative flex bg-zinc-100">
                             <div
-                                class="bg-zinc-200 sticky left-0 flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold">
+                                class="bg-zinc-100 sticky left-0 flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold">
                                 {{ $groupKey }}
                             </div>
                             <div class="flex">
@@ -111,11 +116,12 @@
                                     @foreach ($monthDays as $day)
                                         <div wire:key="selection-day-{{ $day }}" day="{{ $day }}"
                                             :class="{
-                                                'bg-gray-500': isDateWithinRange('{{ $day }}',
+                                                'bg-gray-200': isDateWithinRange('{{ $day }}',
                                                     {{ $room->id }})
                                             }"
+                                            data-room="{{ $room->id }}"
                                             @mousedown="isSelecting = true; startGridDate = $event.target.getAttribute('day');roomId = '{{ $room->id }}'"
-                                            @mouseup="isSelecting = false; endGridDate = $event.target.getAttribute('day'); selectDays($event)"
+                                            @mouseup="isSelecting = false; endGridDate = $event.target.getAttribute('day'); selectDays($event);"
                                             @mousemove="isSelecting && (endGridDate = $event.target.getAttribute('day'))"
                                             class="flex-none  flex items-center w-[90px] px-1  border-[0.8px] border-gray-200">
                                         </div>
@@ -143,8 +149,9 @@
                                         @endphp
                                         <div style="width: {{ $width }}px;left:{{ $left }}px"
                                             wire:click="viewBookingSummary('{{ $reservation->booking_id }}','{{ $reservation->id }}')"
-                                            class="absolute bg-green-500 h-full flex items-center overflow-hidden rounded  border-[0.8px] border-gray-200 cursor-pointer">
-                                            <div class="px-1 text-white rounded whitespace-nowrap">
+                                            class="absolute h-full overflow-hidden border-gray-200 cursor-pointer p-0.5">
+                                            <div
+                                                class="flex items-center w-full h-full px-1 text-white bg-green-500 rounded whitespace-nowrap">
                                                 {{ $reservation->customer->name }} </div>
                                         </div>
                                     @endforeach
@@ -159,10 +166,15 @@
     </div>
 
     <x-filament::modal closeEventName="close-reservation-modal" id="booking-summary" slide-over :width="$bookingSummary?->bookingReservations->count() > 1 ? 'xl' : 'sm'">
-        {{-- <x-booking-scheduler.booking-summary :booking="$bookingSummary" /> --}}
         @if ($bookingSummary)
             <livewire:pms.reservation.booking-summary :booking="$bookingSummary" :reservation-id="$bookingSummaryReservationId" />
-            {{-- <x-pms.reservation.booking-summary :booking="$bookingSummary" /> --}}
         @endif
+    </x-filament::modal>
+
+    <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl">
+        <x-slot name="heading">
+            New Booking
+        </x-slot>
+        <livewire:pms.reservation.new-booking />
     </x-filament::modal>
 </x-filament-panels::page>

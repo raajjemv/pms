@@ -36,6 +36,7 @@ class CreateBooking extends CreateRecord
     protected function afterCreate()
     {
         $booking = $this->record;
+        
         $nights = $booking->from->diffInDays($booking->to);
 
         

@@ -78,6 +78,7 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
                         match ($registration_type) {
                             'new_guest' => $this->replaceMountedAction('newRegistration', [
                                 'booking_customer' => $this->booking->booking_customer,
+                                'booking_email' => $this->booking->booking_email,
                                 'booking' => $this->booking->id,
                                 'booking_reservation_id' => $this->selectedFolio->id
                             ]),

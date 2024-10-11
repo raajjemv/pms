@@ -204,40 +204,44 @@
 
 
             <br>
-            <div>
-                <div>Settlements</div>
-                <table class="data-table" style="margin-top:0;">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Rate</th>
-                            <th style="text-align: right">Charge</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($reservation->bookingTransactions->whereIn('transaction_type', App\Enums\PaymentType::getAllValues())->sortBy('date') as $settlements)
+            @if ($reservation->bookingTransactions->whereIn('transaction_type', App\Enums\PaymentType::getAllValues())->count())
+
+
+                <div>
+                    <div>Settlements</div>
+                    <table class="data-table" style="margin-top:0;">
+                        <thead>
                             <tr>
-                                <td style="width:20%">
-                                    {{ $settlements->date->format('d/m/Y') }}
-                                </td>
-                                <td style="width:40%">
-                                    <div style="font-weight: bold;text-transform: capitalize;">
-                                        {{ str($settlements->transaction_type)->replace('_', ' ') }}</div>
-
-                                </td>
-                                <td style="width:20%">
-                                    <div style="font-weight: bold">0</div>
-
-                                </td>
-                                <td style="text-align: right;font-weight:bold;width:20%">
-                                    {{ $settlements->rate }}</td>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Rate</th>
+                                <th style="text-align: right">Charge</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($reservation->bookingTransactions->whereIn('transaction_type', App\Enums\PaymentType::getAllValues())->sortBy('date') as $settlements)
+                                <tr>
+                                    <td style="width:20%">
+                                        {{ $settlements->date->format('d/m/Y') }}
+                                    </td>
+                                    <td style="width:40%">
+                                        <div style="font-weight: bold;text-transform: capitalize;">
+                                            {{ str($settlements->transaction_type)->replace('_', ' ') }}</div>
 
-            </div>
+                                    </td>
+                                    <td style="width:20%">
+                                        <div style="font-weight: bold">0</div>
+
+                                    </td>
+                                    <td style="text-align: right;font-weight:bold;width:20%">
+                                        {{ $settlements->rate }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                </div>
+            @endif
             <br>
 
 
@@ -265,6 +269,12 @@
 
 
     <style>
+        @page {
+            margin: 345px 10, 10, 10;
+            header: page-header;
+            footer: page-footer;
+        }
+
         table {}
 
         main {
@@ -296,7 +306,7 @@
         td {
             padding: 5px 2px;
             text-align: left;
-            font-size: 14px;
+            font-size: 11px;
         }
 
         .border-t {
@@ -338,7 +348,7 @@
         }
 
         .text-xs {
-            font-size: 12px;
+            font-size: 9px;
         }
 
         .psignature {

@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
+    $room = Room::with('roomType')->find(1);
+    return $room->RoomType;
     return view('welcome');
 });
 Route::middleware(['auth', 'auth.session'])->group(function () {

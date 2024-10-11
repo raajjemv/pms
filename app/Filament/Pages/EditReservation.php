@@ -7,6 +7,7 @@ use Filament\Pages\Page;
 use App\Enums\PaymentType;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Url;
+use Livewire\Attributes\Computed;
 use App\Models\BookingReservation;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Htmlable;
@@ -26,11 +27,14 @@ class EditReservation extends Page
     #[Url(keep: true)]
     public $activeTab = 'guest-accounting';
 
+    #[Url(keep: true)]
+    public $reservation_id;
+
     public $booking;
 
-    public  BookingReservation $selectedFolio;
+    // public  BookingReservation $selectedFolio;
 
-    #[On('refresh-the-component')]
+    #[On('refresh-edit-reservation')]
     public function refreshComponent() {}
 
     protected function getHeaderWidgets(): array
@@ -39,21 +43,22 @@ class EditReservation extends Page
             BookingTotalAmount::make([
                 'total' => $this->booking
                     ->bookingTransactions
-                    ->where('booking_reservation_id', $this->selectedFolio->id)
+                    ->where('booking_reservation_id', $this->reservation_id)
                     ->whereNotIn('transaction_type', PaymentType::getAllValues())
                     ->sum('rate'),
                 'paid' => $this->booking
                     ->bookingTransactions
-                    ->where('booking_reservation_id', $this->selectedFolio->id)
+                    ->where('booking_reservation_id', $this->reservation_id)
                     ->whereIn('transaction_type', PaymentType::getAllValues())
                     ->sum('rate')
             ]),
         ];
     }
 
-    public function setSelectedFolio(BookingReservation $selectedFolio)
+    #[Computed]
+    public function selectedFolio()
     {
-        $this->selectedFolio = $selectedFolio;
+        return $this->booking->bookingReservations->where('id', $this->reservation_id)->first();
     }
 
     public function getHeading(): string | Htmlable
@@ -65,10 +70,8 @@ class EditReservation extends Page
 
     public function mount()
     {
-        $booking = Booking::with(['customer', 'bookingTransactions', 'customers', 'bookingReservations.room'])->findOrFail(decrypt(request('record')));
+        $booking = Booking::with(['bookingTransactions', 'customers', 'bookingReservations.room.roomType'])->findOrFail(decrypt(request('record')));
 
-        $this->selectedFolio =  $booking->bookingReservations->where('master', true)->first();
-
-        return $this->booking = $booking;
+        $this->booking = $booking;
     }
 }

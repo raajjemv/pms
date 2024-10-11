@@ -34,7 +34,7 @@ trait InteractsWithGuestRegistration
             ->color('gray')
             ->form([
                 Forms\Components\Select::make('guest')
-                    ->options(Customer::selectRaw('CONCAT(name, " - ", document_number) AS name, id')->limit(5)->pluck('name', 'id'))
+                    // ->options(Customer::selectRaw('CONCAT(name, " - ", document_number) AS name, id')->limit(5)->pluck('name', 'id'))
                     ->searchable()
                     ->getSearchResultsUsing(fn(string $search): array => Customer::where('name', 'like', "%{$search}%")->orWhere('document_number', 'like', "%{$search}%")->selectRaw('CONCAT(name, " - ", document_number) AS name, id')->limit(5)->pluck('name', 'id')->toArray())
                     ->placeholder('Search by name or document number')
@@ -51,23 +51,47 @@ trait InteractsWithGuestRegistration
 
     public static function returningGuest(): Action
     {
-
         return Action::make('existing-registration')
             ->modalWidth(MaxWidth::Small)
+            ->fillForm(function ($arguments) {
+                $reservation = BookingReservation::with('customers')->find($arguments['booking_reservation_id']);
+                if ($reservation->customers->count() < 1) {
+                    return [
+                        'master' => true
+                    ];
+                }
+            })
             ->form([
                 Forms\Components\Select::make('guest')
-                    ->options(Customer::selectRaw('CONCAT(name, " - ", document_number) AS name, id')->limit(5)->pluck('name', 'id'))
+                    // ->options(Customer::selectRaw('CONCAT(name, " - ", document_number) AS name, id')->limit(5)->pluck('name', 'id'))
                     ->searchable()
                     ->getSearchResultsUsing(fn(string $search): array => Customer::where('name', 'like', "%{$search}%")->orWhere('document_number', 'like', "%{$search}%")->selectRaw('CONCAT(name, " - ", document_number) AS name, id')->limit(5)->pluck('name', 'id')->toArray())
                     ->placeholder('Search by name or document number')
-                    ->preload(false)
+                    ->preload(false),
+
+                Forms\Components\Toggle::make('master')
 
             ])
             ->action(function ($data, $arguments) {
-                $booking = Booking::find($arguments['booking']);
-                $booking->customers()->attach($data['guest'], [
-                    'booking_reservation_id' => $arguments['booking_reservation_id']
+                $reservation = BookingReservation::with('customers')->find($arguments['booking_reservation_id']);
+
+                $customer = Customer::find($data['guest']);
+
+                if ($data['master'] == true) {
+                    $reservation->booking_customer = $customer->name;
+                    $reservation->save();
+                    $reservation->customers()->newPivotQuery()->update([
+                        'master' => false
+                    ]);
+                }
+
+                $reservation->customers()->attach($data['guest'], [
+                    'booking_id' => $arguments['booking'],
+                    'master' => $data['master']
                 ]);
+            })
+            ->after(function ($livewire) {
+                $livewire->dispatch('refresh-edit-reservation');
             });
     }
     public static function newRegistration(): Action
@@ -78,6 +102,7 @@ trait InteractsWithGuestRegistration
                 'name' => $arguments['booking_customer'],
                 'email' => $arguments['booking_email'],
             ])
+
             ->mutateFormDataUsing(function (array $data): array {
                 $user = auth()->user();
                 $data['tenant_id'] = $user->current_tenant_id;
@@ -138,14 +163,23 @@ trait InteractsWithGuestRegistration
 
             ])
             ->action(function ($data, $arguments) {
-                $booking = Booking::find($arguments['booking']);
-                $reservation = BookingReservation::where('id', $arguments['booking_reservation_id'])
-                    ->update([
-                        'booking_customer' => $data['name']
-                    ]);
+                $reservation = BookingReservation::find($arguments['booking_reservation_id']);
+
+                $customer_count = $reservation->customers->count();
+
+                $master = $customer_count < 1 ? true : false;
+
+                if ($customer_count < 1) {
+                    $reservation->booking_customer =  $data['name'];
+                    $reservation->save();
+                }
+
+
                 $customer = Customer::firstOrCreate($data);
-                $booking->customers()->attach($customer, [
-                    'booking_reservation_id' => $arguments['booking_reservation_id']
+
+                $reservation->customers()->attach($customer, [
+                    'booking_id' => $arguments['booking'],
+                    'master' => $master
                 ]);
             })
             ->after(function ($livewire) {

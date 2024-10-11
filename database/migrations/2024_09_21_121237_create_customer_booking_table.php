@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('booking_id')->constrained();
             $table->foreignId('booking_reservation_id')->constrained();
             $table->foreignId('customer_id')->constrained();
+            $table->boolean('master')->default(0);
             $table->timestamps();
         });
     }

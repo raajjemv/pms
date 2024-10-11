@@ -19,6 +19,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Traits\InteractsWithGuestRegistration;
+use App\Models\BookingReservation;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -52,10 +53,12 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
 
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('document_number'),
+                Tables\Columns\IconColumn::make('pivot.master')
+                    ->label('Master')
+                    ->boolean(),
                 Tables\Columns\TextColumn::make('pivot.created_at')
                     ->label('Registerd Date')
                     ->dateTime('M d, Y H:i')
-
             ])
             ->filters([
                 // ...
@@ -93,6 +96,27 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
 
             ])
             ->actions([
+                Actions\Action::make('Set as Master')
+                    ->icon('heroicon-m-user')
+                    ->requiresConfirmation()
+                    ->action(function ($record) {
+
+                        $reservation = BookingReservation::find($record->booking_reservation_id);
+
+                        $reservation->booking_customer = $record->name;
+                        $reservation->save();
+
+                        $reservation->customers()->newPivotQuery()->update([
+                            'master' => false
+                        ]);
+                        $reservation->customers()->updateExistingPivot($record->id, [
+                            'master' => true
+                        ]);
+                    })
+                    ->after(function ($livewire) {
+                        $this->dispatch('refresh-edit-reservation');
+                    })
+                    ->visible(fn($record) => !$record->master),
                 Actions\EditAction::make()
                     ->form([
                         Forms\Components\Fieldset::make('Profile')

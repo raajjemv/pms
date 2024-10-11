@@ -7,9 +7,7 @@
         <x-filament::tabs.item :active="$activeTab === 'booking-detail'" wire:click="$set('activeTab', 'booking-detail')">
             Booking Details
         </x-filament::tabs.item>
-        <x-filament::tabs.item :active="$activeTab === 'reservation-detail'" wire:click="$set('activeTab', 'reservation-detail')">
-            Reservation Details
-        </x-filament::tabs.item>
+
         <x-filament::tabs.item :active="$activeTab === 'guest-profile'" wire:click="$set('activeTab', 'guest-profile')">
             Guest Profile
         </x-filament::tabs.item>
@@ -29,9 +27,9 @@
                 @foreach ($booking->bookingReservations as $reservation)
                     <div class="flex flex-col">
                         <button wire:key="reservation-{{ $reservation->id }}"
-                            wire:click="setSelectedFolio({{ $reservation->id }})" @class([
+                            wire:click="$set('reservation_id',{{ $reservation->id }})" @class([
                                 'text-sm text-gray-700 text-left ',
-                                'font-bold text-blue-600' => $selectedFolio->id == $reservation->id,
+                                'font-bold text-blue-600' => $this->selectedFolio->id == $reservation->id,
                             ])>
                             <i class="pr-2 fas fa-minus"></i> {{ $reservation->booking_customer }}
                         </button>
@@ -46,23 +44,21 @@
             @switch($activeTab)
                 @case('guest-accounting')
                     <livewire:pms.reservation.guest-accounting :booking="$booking" @refresh-edit-reservation="$refresh"
-                        :selected-folio="$selectedFolio">
+                        :selected-folio="$this->selectedFolio">
                     @break
 
                     @case('booking-detail')
-                        <livewire:pms.reservation.booking-detail :booking="$booking" :selected-folio="$selectedFolio" />
+                        <livewire:pms.reservation.booking-detail :booking="$booking" :selected-folio="$this->selectedFolio" />
                     @break
 
-                    @case('reservation-detail')
-                        <livewire:pms.reservation.reservation-detail :booking="$booking" :selected-folio="$selectedFolio" />
-                    @break
+                
 
                     @case('guest-profile')
-                        <livewire:pms.reservation.guest-profiles :booking="$booking" :selected-folio="$selectedFolio" />
+                        <livewire:pms.reservation.guest-profiles :booking="$booking" :selected-folio="$this->selectedFolio" />
                     @break
 
                     @case('print-email')
-                        <livewire:pms.reservation.print-email :booking="$booking" :selected-folio="$selectedFolio" />
+                        <livewire:pms.reservation.print-email :booking="$booking" :selected-folio="$this->selectedFolio" />
                     @break
 
                     @default

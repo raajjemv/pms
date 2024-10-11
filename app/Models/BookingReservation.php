@@ -26,9 +26,9 @@ class BookingReservation extends Model
 
     public function customers()
     {
-        return $this->belongsToMany(Customer::class)
+        return $this->belongsToMany(Customer::class,'booking_customer')
             ->withTimestamps()
-            ->withPivot('booking_reservation_id');
+            ->withPivot('booking_id','master');
     }
 
     public function room()

@@ -92,11 +92,6 @@ class NewBooking extends Component implements HasForms
                                 ->required()
                                 ->searchable()
                                 ->afterStateUpdated(function ($get, $set) use ($roomTypes) {
-                                    // $selectedRoomType = $roomTypes->where('id', $get('room_type'))->first();
-                                    // $base_rate = $selectedRoomType->base_rate;
-                                    // $rate_plan = $selectedRoomType->ratePlans->where('id', $get('rate_plan'))->first()->rate;
-                                    // $nights = Carbon::parse($this->from)->diffInDays(Carbon::parse($this->to));
-                                    // $set('price', ($base_rate + $rate_plan) * $nights);
                                 })
                                 ->live(),
 
@@ -104,6 +99,7 @@ class NewBooking extends Component implements HasForms
                                 ->options(fn($get) => $get('room_type') ? $rooms->where('room_type_id', $get('room_type'))->pluck('room_number', 'id') : [])
                                 ->required()
                                 ->searchable()
+                                ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                 ->live(),
 
                             Forms\Components\TextInput::make('adults')
@@ -133,6 +129,7 @@ class NewBooking extends Component implements HasForms
                                 ->live(),
                         ])->columns(6),
                     ])
+
                     ->required()
                     ->minItems(1)
                     ->itemLabel('Rooms')
@@ -167,7 +164,7 @@ class NewBooking extends Component implements HasForms
         ]);
 
         $reservation_count = 1;
-        
+
         foreach (collect($form['bookingReservations']) as $key => $reservation) {
 
             $customer_iteration = collect($form['bookingReservations'])->count() == 1 ? NULL : ' - ' . $reservation_count;

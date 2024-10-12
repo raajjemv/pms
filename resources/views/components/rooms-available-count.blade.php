@@ -5,7 +5,7 @@
             $ss = $roomNumbers
                 ->pluck('bookingReservations')
                 ->flatten()
-                ->unique('booking_id')
+                ->unique('id')
                 ->filter(function ($b) use ($day) {
                     return $b['from'] <= $day && $b['to'] > $day;
                 })

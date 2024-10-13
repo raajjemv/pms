@@ -26,7 +26,7 @@
                 <x-filament::button class="flex-1"
                     href="{{ App\Filament\Pages\EditReservation::getUrl(['record' => encrypt($booking->id), 'reservation_id' => $selectedReservation->id]) }}"
                     tag="a">
-                    Edit
+                    Open
                 </x-filament::button>
                 <x-filament::button color="gray"
                     href="{{ App\Filament\Pages\EditReservation::getUrl(['record' => encrypt($booking->id), 'activeTab' => 'print-email']) }}"
@@ -107,8 +107,9 @@
                 </tr>
                 <tr>
                     <td class="px-2 py-3">
-                        <div class="text-xs">Room Rate (avg)</div>
-                        <div class="text-sm font-medium">USD {{ $selectedReservation->averageRate() }}</div>
+                        <div class="text-xs">Nightly Rate</div>
+                        <div class="text-sm font-medium">USD {{ number_format($selectedReservation->averageRate(), 2) }}
+                        </div>
                     </td>
                     <td class="px-2 py-3">
                         <div class="text-xs">Pax</div>

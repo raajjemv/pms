@@ -52,6 +52,8 @@ class Inventory extends Page
     {
         $this->channelGroups = Filament::getTenant()->channelGroups;
 
+        $this->selectedChannelGroup = defaultChannelGroup()->id;
+
         $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
 
         $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::now()->endOfMonth();
@@ -69,17 +71,6 @@ class Inventory extends Page
         }
 
         $this->monthDays = $monthDays;
-
-        // $this->roomTypes = RoomType::whereHas('ratePlans')->with([
-        //     'ratePlans',
-        //     'rates' => function ($query)  {
-        //         $query->where(function ($query)  {
-        //             $query->where('date', '>=', $startOfMonth)
-        //                 ->where('date', '<=', $endOfMonth)
-        //                 ->where('channel_group_id', $this->selectedChannelGroup);
-        //         });
-        //     }
-        // ])->get();
     }
 
     public function updateRoomRate($value = 0,  $plan, $roomType,  $date)
@@ -104,7 +95,16 @@ class Inventory extends Page
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('filter_date')
+                ->color('gray')
+                ->icon('heroicon-m-calendar')
+                ->modalHeading('Filter Date')
+                ->form([
+                    Forms\Components\DatePicker::make('date')
+                ])
+                ->modalWidth('sm'),
             Action::make('select_channel_group')
+                ->icon('heroicon-m-squares-2x2')
                 ->color('gray')
                 ->label($this->channelGroups->where('id', $this->selectedChannelGroup)->first()->name ?? 'Select Pool')
                 ->modalWidth(MaxWidth::Small)
@@ -125,6 +125,7 @@ class Inventory extends Page
                 }),
 
             Action::make('bulk update')
+                ->icon('heroicon-m-clipboard-document-check')
                 ->visible($this->selectedChannelGroup ? true : false)
                 ->form([
                     Forms\Components\Select::make('days')

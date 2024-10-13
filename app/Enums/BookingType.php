@@ -6,18 +6,29 @@ use Filament\Support\Contracts\HasLabel;
 
 enum BookingType: string implements HasLabel
 {
-    case Agoda = 'agoda';
-    case Booking = 'booking.com';
-    case Ctrip = 'ctrip';
-    case Trip = 'trip.com';
-    case Expedia = 'expedia';
     case Direct = 'direct';
-    case WalkIn = 'walk_in';
+    case OTA = 'ota';
+    case GDS = 'gds';
+    case Corporate = 'corporate';
+    case Complimentary = 'complimentary';
+    case Internal = 'internal';
+    case Overbooking = 'overbooking';
 
     public function getLabel(): ?string
     {
         return $this->name;
-        
+    }
+    public function getIcon(): string
+    {
+        return match ($this) {
+            self::Direct => 'heroicon-s-globe-americas',
+            self::OTA => 'heroicon-s-network-wire',
+            self::GDS => 'heroicon-s-server',
+            self::Corporate => 'heroicon-s-building-office',
+            self::Complimentary => 'heroicon-s-gift',
+            self::Internal => 'heroicon-s-clipboard-check',
+            self::Overbooking => 'heroicon-s-exclamation-circle',
+        };
     }
 
     public static function getAllValues(): array

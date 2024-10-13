@@ -31,6 +31,15 @@
         endGridDate: null,
         isSelecting: false,
     
+        getDaysBetweenDates(startDateStr, endDateStr) {
+            const startDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+            const millisecondsDifference = endDate - startDate;
+    
+            const daysDifference = millisecondsDifference / (1000 * 60 * 60 * 24);
+    
+            return daysDifference;
+        },
         selectDays(event) {
             const roomId = event.currentTarget.dataset.room;
             const start = parseInt(this.startGridDate);
@@ -41,13 +50,23 @@
                 this.selectedDays.push(i);
             }
     
-            $dispatch('open-modal', {
-                id: 'new-booking',
-                from: this.startGridDate,
-                to: this.endGridDate,
-                room_id: roomId
-            })
+            if (this.getDaysBetweenDates(this.startGridDate, this.endGridDate) > 0) {
+                $dispatch('open-modal', {
+                    id: 'new-booking',
+                    from: this.startGridDate,
+                    to: this.endGridDate,
+                    room_id: roomId
+                })
+                this.startGridDate = '';
+                this.endGridDate = '';
+                this.roomId = '';
+                this.selectedDays = [];
+            }
+    
+    
         },
+    
+    
         isDateWithinRange(dateToCheck, room) {
             const checkDate = new Date(dateToCheck);
             const start = new Date(this.startGridDate);
@@ -150,9 +169,17 @@
                                         <div style="width: {{ $width }}px;left:{{ $left }}px"
                                             wire:click="viewBookingSummary('{{ $reservation->booking_id }}','{{ $reservation->id }}')"
                                             class="absolute h-full overflow-hidden border-gray-200 cursor-pointer p-0.5">
-                                            <div
-                                                class="flex items-center w-full h-full px-1 text-white bg-green-500 rounded whitespace-nowrap">
-                                                {{ $reservation->customer->name }} </div>
+                                            <div @class([
+                                                'flex items-center w-full h-full px-1 text-sm  text-white  rounded whitespace-nowrap',
+                                                'bg-green-500' => $reservation->status->value == 'pending',
+                                                'bg-blue-600' => $reservation->status->value == 'check-in',
+                                            ])
+                                                title="{{ $reservation->customer->name }}">
+                                                <x-filament::icon
+                                                    icon="{{ $reservation->booking->booking_type->getIcon() }}"
+                                                    class="text-white size-5 dark:text-gray-400" />
+                                                <span class="pl-1"> {{ $reservation->customer->name }}</span>
+                                            </div>
                                         </div>
                                     @endforeach
                                 </div>

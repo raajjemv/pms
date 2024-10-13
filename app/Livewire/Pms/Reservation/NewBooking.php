@@ -2,20 +2,23 @@
 
 namespace App\Livewire\Pms\Reservation;
 
+use Carbon\Carbon;
+use Filament\Forms;
+use App\Models\Room;
 use App\Enums\Status;
 use App\Models\Booking;
-use App\Models\BusinessSource;
-use App\Models\RatePlan;
-use App\Models\Room;
-use App\Models\RoomType;
-use Carbon\Carbon;
-use Filament\Facades\Filament;
 use Livewire\Component;
-use Livewire\Attributes\On;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Forms;
+use App\Models\RatePlan;
+use App\Models\RoomType;
 use Filament\Forms\Form;
+use Livewire\Attributes\On;
+use App\Models\BusinessSource;
+use Filament\Facades\Filament;
+use App\Models\BookingReservation;
+use Illuminate\Support\Collection;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications\Notification;
+use Filament\Forms\Concerns\InteractsWithForms;
 
 class NewBooking extends Component implements HasForms
 {
@@ -36,8 +39,8 @@ class NewBooking extends Component implements HasForms
     {
         if ($id == 'new-booking') {
             $room = Room::with('roomType')->find($room_id);
-            $this->from = $from;
-            $this->to = $to;
+            $this->from = Carbon::parse($from)->setTime(14, 0, 0);
+            $this->to = Carbon::parse($to)->setTime(12, 0, 0);
             $this->form->fill([
                 'from' => $from,
                 'to' => $to,
@@ -54,6 +57,14 @@ class NewBooking extends Component implements HasForms
         $rooms = Room::query()->orderBy('room_number', 'ASC')->get();
         $roomTypes = RoomType::whereHas('rooms')->with('ratePlans')->get();
 
+        // 
+        //     $reservationsOnSelectedDates = BookingReservation::query()
+        //         ->whereHas('room', function ($q) {
+        //             $q->where('room_type_id', 2);
+        //         })
+        //         ->whereBetween('from', [$startOfMonth, $endOfMonth])
+        //         ->orWhereBetween('to', [$startOfMonth, $endOfMonth])
+        //         ->get();
         return $form
             ->schema([
                 Forms\Components\Group::make([
@@ -61,13 +72,13 @@ class NewBooking extends Component implements HasForms
                         ->label('Check-In')
                         ->format('d/m/Y')
                         ->live()
-                        ->afterStateUpdated(fn($state) => $this->from = $state)
+                        ->afterStateUpdated(fn($state) => $this->from = Carbon::parse($state)->setTime(14, 0, 0))
                         ->required(),
                     Forms\Components\DatePicker::make('to')
                         ->label('Check-Out')
                         ->format('d/m/Y')
                         ->live()
-                        ->afterStateUpdated(fn($state) => $this->to = $state)
+                        ->afterStateUpdated(fn($state) => $this->to = Carbon::parse($state)->setTime(12, 0, 0))
                         ->required(),
                     Forms\Components\Select::make('status')
                         ->options(Status::getAllValues())
@@ -91,14 +102,26 @@ class NewBooking extends Component implements HasForms
                                 ->options(fn($get) => $get('room_type') ? $roomTypes->where('id', $get('room_type'))->first()->ratePlans->pluck('name', 'id') : [])
                                 ->required()
                                 ->searchable()
-                                ->afterStateUpdated(function ($get, $set) use ($roomTypes) {
-                                })
+                                ->afterStateUpdated(function ($get, $set) use ($roomTypes) {})
                                 ->live(),
 
                             Forms\Components\Select::make('room')
-                                ->options(fn($get) => $get('room_type') ? $rooms->where('room_type_id', $get('room_type'))->pluck('room_number', 'id') : [])
+                                ->options(function ($get, $set) use (&$rooms): Collection {
+                                    $room_type_id = $get('room_type');
+                                    $reservations = BookingReservation::query()
+                                        ->whereHas('room', function ($q) use ($room_type_id) {
+                                            $q->where('room_type_id', $room_type_id);
+                                        })
+                                        ->whereBetween('from', [$this->from, $this->to])
+                                        ->orWhereBetween('to', [$this->from, $this->to])
+                                        ->get();
+                                    return Room::query()
+                                        ->where('room_type_id', $get('room_type'))
+                                        ->whereNotIn('id', $reservations->pluck('room_id'))
+                                        ->pluck('room_number', 'id');
+                                })
                                 ->required()
-                                ->searchable()
+                                // ->searchable()
                                 ->disableOptionsWhenSelectedInSiblingRepeaterItems()
                                 ->live(),
 
@@ -117,13 +140,17 @@ class NewBooking extends Component implements HasForms
                                     $selectedRoomType = $roomTypes->where('id', $get('room_type'))->first();
 
                                     $from = Carbon::parse($this->from);
+
                                     $to = Carbon::parse($this->to);
 
-                                    $base_rate = $selectedRoomType?->id ? roomTypeBaseRate($selectedRoomType->id, $from) : 0;
+                                    $base_rate = $selectedRoomType?->id ? roomTypeBaseRate($selectedRoomType->id, $from->format('Y-m-d')) : 0;
 
                                     $rate_plan = $selectedRoomType?->ratePlans->where('id', $get('rate_plan'))->first()?->rate;
-                                    $nights = $from->diffInDays($to);
+
+                                    $nights = totolNights($from, $to);
+
                                     $total = ($base_rate + $rate_plan) * $nights;
+
                                     return filled($total) ? number_format($total, 2) : 0;
                                 })
                                 ->live(),
@@ -153,6 +180,8 @@ class NewBooking extends Component implements HasForms
     public function createBooking()
     {
         $form = $this->form->getState();
+        $from = Carbon::createFromFormat('d/m/Y H:i:s', $form['from'] . '14:00:00');
+        $to = Carbon::createFromFormat('d/m/Y H:i:s', $form['to'] . '12:00:00');
 
         $booking = Booking::create([
             'booking_type' => 'direct',
@@ -176,8 +205,8 @@ class NewBooking extends Component implements HasForms
                 'children' => $reservation['children'],
                 'rate_plan_id' => $reservation['rate_plan'],
                 'booking_customer' => $booking->booking_customer . $customer_iteration,
-                'from' => Carbon::createFromFormat('d/m/Y', $form['from'])->format('Y-m-d'),
-                'to' => Carbon::createFromFormat('d/m/Y', $form['to'])->format('Y-m-d'),
+                'from' => $from,
+                'to' => $to,
                 'master' => $key == 0 ? true : false
             ]);
 
@@ -196,6 +225,15 @@ class NewBooking extends Component implements HasForms
                 ]);
             }
         }
+
+        Notification::make()
+            ->title('Reservation made successfully')
+            ->success()
+            ->send();
+
+        $this->dispatch('refresh-scheduler');
+
+        $this->dispatch('close-modal', id: 'new-booking');
     }
 
 

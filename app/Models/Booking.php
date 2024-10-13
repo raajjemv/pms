@@ -2,13 +2,16 @@
 
 namespace App\Models;
 
+use App\Enums\Status;
 use App\Enums\BookingType;
 use App\Enums\PaymentStatus;
-use App\Enums\Status;
+use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
+#[ScopedBy([TenantScope::class])]
 class Booking extends Model
 {
     use HasFactory, SoftDeletes;

@@ -13,6 +13,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Cache;
 
 class ManageChannelgroups extends ManageRelatedRecords
 {
@@ -44,9 +45,13 @@ class ManageChannelgroups extends ManageRelatedRecords
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\ToggleColumn::make('default')
-                    ->afterStateUpdated(fn($record) => ChannelGroup::where('id', '!=', $record->id)->update([
-                        'default' => false
-                    ]))
+                    ->disabled(fn($record) => $record->default)
+                    ->afterStateUpdated(function ($record) {
+                        ChannelGroup::where('id', '!=', $record->id)->update([
+                            'default' => false
+                        ]);
+                        Cache::forget('default_channel_group_' . $record->tenant_id);
+                    })
             ])
             ->filters([
                 //

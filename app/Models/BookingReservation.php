@@ -6,9 +6,12 @@ use App\Enums\Status;
 use App\Casts\TimeCast;
 use App\Enums\PaymentType;
 use App\Enums\PaymentStatus;
+use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+#[ScopedBy([TenantScope::class])]
 class BookingReservation extends Model
 {
     use HasFactory;
@@ -73,8 +76,8 @@ class BookingReservation extends Model
         return [
             'check_in' => TimeCast::class,
             'check_out' => TimeCast::class,
-            'from' => 'date',
-            'to' => 'date',
+            'from' => 'datetime',
+            'to' => 'datetime',
             'status' => Status::class,
             'payment_status' => PaymentStatus::class
 

@@ -1,6 +1,6 @@
 <x-filament-panels::page>
     @if (!$selectedChannelGroup)
-       <div class="font-medium"> Select a Channel Pool </div>
+        <div class="font-medium"> Select a Channel Pool </div>
     @else
         <div class="overflow-x-scroll text-sm text-black rounded-lg bg-gray-50" x-data="rateUpdater">
             <div class="flex ">
@@ -46,7 +46,7 @@
                                     {{ $ratePlan->name }}</div>
                                 <div class="relative flex">
                                     @foreach ($monthDays as $day)
-                                        <div
+                                        <div key="day-{{ $day }}"
                                             class="flex-none  flex items-center w-[90px] p-0.5  border-[0.8px] border-gray-200">
                                             @php
                                                 $rateQ = $roomType->rates

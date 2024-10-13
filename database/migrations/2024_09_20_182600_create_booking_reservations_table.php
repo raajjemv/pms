@@ -21,8 +21,8 @@ return new class extends Migration
             $table->tinyInteger('adults')->default(0);
             $table->tinyInteger('children')->default(0);
             $table->foreignId('rate_plan_id')->nullable()->constrained();
-            $table->date('from');
-            $table->date('to');
+            $table->dateTime('from');
+            $table->dateTime('to');
             $table->string('status')->default('pending');
             $table->string('payment_status')->default('pending');
             $table->boolean('master')->default(0);

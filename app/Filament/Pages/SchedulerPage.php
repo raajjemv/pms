@@ -26,6 +26,10 @@ class SchedulerPage extends Page
     public  $bookingSummary;
     public  $bookingSummaryReservationId;
 
+    #[On('refresh-scheduler')]
+    public function refreshComponent() {}
+
+
     protected function getViewData(): array
     {
         $startOfMonth = $this->startOfMonth;
@@ -36,7 +40,7 @@ class SchedulerPage extends Page
                 $qq->whereBetween('date', [$startOfMonth, $endOfMonth]);
             }]);
         }, 'bookingReservations' => function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->with('customer')->where(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->with('customer','booking')->where(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('from', '>=', $startOfMonth)
                     ->where('from', '<=', $endOfMonth);
             })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {

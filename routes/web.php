@@ -22,22 +22,8 @@ use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\PermissionRegistrar;
 
 Route::get('/', function () {
-
-    $startOfMonth = Carbon::parse('2024-10-14');
-    $endOfMonth = Carbon::parse('2024-10-15');
-    return BookingReservation::query()
-        ->whereHas('room', function ($q) {
-            $q->where('room_type_id', 2);
-        })
-        ->whereBetween('from', [$startOfMonth, $endOfMonth])
-        ->get();
-    $room = Room::query()
-        ->withCount(['bookingReservations' => function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->whereBetween('from', [$startOfMonth, $endOfMonth])
-                ->orWhereBetween('to', [$startOfMonth, $endOfMonth]);
-        }])
-        ->find(6);
-    return $room;
+    $r = RoomType::with('ratePlans')->find(2);
+    return $r;
     return view('welcome');
 });
 Route::middleware(['auth', 'auth.session'])->group(function () {

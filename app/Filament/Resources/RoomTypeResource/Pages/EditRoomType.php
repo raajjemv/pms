@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\RoomTypeResource\Pages;
 
-use App\Filament\Resources\RoomTypeResource;
 use Filament\Actions;
+use Illuminate\Support\Facades\Cache;
 use Filament\Resources\Pages\EditRecord;
+use App\Filament\Resources\RoomTypeResource;
 
 class EditRoomType extends EditRecord
 {
@@ -16,5 +17,10 @@ class EditRoomType extends EditRecord
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function afterSave()
+    {
+        Cache::forget('room_type_' . $this->record->id);
     }
 }

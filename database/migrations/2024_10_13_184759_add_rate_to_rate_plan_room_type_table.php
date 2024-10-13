@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('rate_plans', function (Blueprint $table) {
-            // $table->boolean('default')->default(0);
+        Schema::table('rate_plan_room_type', function (Blueprint $table) {
+            $table->decimal('rate', 10, 2)->nullable();
+            $table->boolean('default')->default(0);
         });
     }
 
@@ -21,8 +22,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('rate_plans', function (Blueprint $table) {
-            // $table->dropColumn('default');
+        Schema::table('rate_plan_room_type', function (Blueprint $table) {
+            $table->dropColumn(['rate', 'default']);
         });
     }
 };

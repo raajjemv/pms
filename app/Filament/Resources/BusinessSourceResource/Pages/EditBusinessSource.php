@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\BusinessSourceResource\Pages;
 
-use App\Filament\Resources\BusinessSourceResource;
 use Filament\Actions;
+use Illuminate\Support\Facades\Cache;
 use Filament\Resources\Pages\EditRecord;
+use App\Filament\Resources\BusinessSourceResource;
+use Filament\Facades\Filament;
 
 class EditBusinessSource extends EditRecord
 {
@@ -16,5 +18,11 @@ class EditBusinessSource extends EditRecord
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function afterSave()
+    {
+        $tenant = Filament::getTenant()->id;
+        Cache::forget('business_sources_' . $tenant);
     }
 }

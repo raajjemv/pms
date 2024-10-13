@@ -49,14 +49,12 @@
                                         <div key="day-{{ $day }}"
                                             class="flex-none  flex items-center w-[90px] p-0.5  border-[0.8px] border-gray-200">
                                             @php
+                                                $rate = 20;
                                                 $rateQ = $roomType->rates
                                                     ->where('rate_plan_id', $ratePlan->id)
                                                     ->where('date', $day->format('Y-m-d'))
                                                     ->first();
-                                                $rate = $rateQ
-                                                    ? $rateQ->rate
-                                                    : number_format($ratePlan->rate + $roomType->base_rate, 2);
-
+                                                $rate = $rateQ ? $rateQ->rate : $ratePlan->pivot->rate;
                                             @endphp
                                             <input
                                                 x-on:change="handleRateUpdate({

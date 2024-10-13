@@ -4,6 +4,7 @@ namespace App\Filament\Resources\BusinessSourceResource\Pages;
 
 use Filament\Actions;
 use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Cache;
 use Filament\Resources\Pages\CreateRecord;
 use App\Filament\Resources\BusinessSourceResource;
 
@@ -21,5 +22,11 @@ class CreateBusinessSource extends CreateRecord
     protected function getRedirectUrl(): string
     {
         return $this->previousUrl ?? $this->getResource()::getUrl('index');
+    }
+
+    protected function afterCreate()
+    {
+        $tenant = Filament::getTenant()->id;
+        Cache::forget('business_sources_' . $tenant);
     }
 }

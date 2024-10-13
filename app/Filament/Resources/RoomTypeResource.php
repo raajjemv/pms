@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Clusters\Configurations;
-use App\Filament\Resources\RoomTypeResource\Pages;
-use App\Filament\Resources\RoomTypeResource\RelationManagers;
-use App\Models\RoomType;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\RoomType;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
+use App\Filament\Clusters\Configurations;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\RoomTypeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\RoomTypeResource\RelationManagers;
 
 class RoomTypeResource extends Resource
 {
@@ -27,19 +27,13 @@ class RoomTypeResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Section::make([
-                    Forms\Components\Select::make('rate_plans')
-                        ->required()
-                        ->multiple()
-                        ->preload()
-                        ->relationship('ratePlans', 'name'),
+
                     Forms\Components\TextInput::make('name')
                         ->required(),
                     Forms\Components\Textarea::make('description')
                         ->required()
                         ->columnSpanFull(),
-                    Forms\Components\TextInput::make('base_rate')
-                        ->required()
-                        ->numeric(),
+
                     Forms\Components\TextInput::make('adults')
                         ->minValue(0)
                         ->numeric()
@@ -59,7 +53,7 @@ class RoomTypeResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('base_rate'),
+                // Tables\Columns\TextColumn::make('base_rate'),
                 Tables\Columns\TextColumn::make('ratePlans.name')
                     ->badge()
                     ->searchable(),
@@ -97,7 +91,7 @@ class RoomTypeResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\RatePlansRelationManager::class
         ];
     }
 

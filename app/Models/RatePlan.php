@@ -23,6 +23,7 @@ class RatePlan extends Model
 
     public function roomTypes()
     {
-        return $this->belongsToMany(RoomType::class);
+        return $this->belongsToMany(RoomType::class)
+            ->withPivot('rate', 'default');
     }
 }

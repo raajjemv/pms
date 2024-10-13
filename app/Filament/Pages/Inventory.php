@@ -77,7 +77,7 @@ class Inventory extends Page
     {
         try {
             $rate = RoomTypeRate::updateOrCreate(
-                ['room_type_id' => $roomType, 'rate_plan_id' => $plan, 'date' => $date],
+                ['room_type_id' => $roomType, 'rate_plan_id' => $plan, 'date' => $date, 'channel_group_id' => $this->selectedChannelGroup],
                 ['rate' => $value, 'tenant_id' => auth()->user()->current_tenant_id, 'user_id' => auth()->id()]
             );
             Notification::make()
@@ -176,6 +176,7 @@ class Inventory extends Page
                             ->send();
                     }
                 })
+                ->closeModalByClickingAway(false)
                 ->requiresConfirmation(),
 
         ];

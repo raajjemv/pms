@@ -34,9 +34,9 @@ class RatePlanResource extends Resource
                 Forms\Components\TextInput::make('code')
                     ->required()
                     ->maxLength(4),
-                Forms\Components\TextInput::make('rate')
-                    ->required()
-                    ->numeric(),
+                // Forms\Components\TextInput::make('rate')
+                //     ->required()
+                //     ->numeric(),
             ]);
     }
 
@@ -47,9 +47,9 @@ class RatePlanResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->description(fn($record) => $record->code)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('rate')
-                    ->numeric()
-                    ->sortable(),
+                // Tables\Columns\TextColumn::make('rate')
+                //     ->numeric()
+                //     ->sortable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
@@ -70,21 +70,21 @@ class RatePlanResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\Action::make('default')
-                    ->visible(fn($record) => !$record->default)
-                    ->icon('heroicon-m-check-circle')
-                    ->requiresConfirmation()
-                    ->action(function ($record) {
-                        foreach (RatePlan::all() as $ratePlan) {
-                            $ratePlan->default = false;
-                            $ratePlan->save();
-                        }
-
-                        $record->update([
-                            'default' => true
-                        ]);
-                        Cache::forget('default_rate_plan_' . Filament::getTenant()->id);
-                    }),
+//                 Tables\Actions\Action::make('default')
+//                     ->visible(fn($record) => !$record->default)
+//                     ->icon('heroicon-m-check-circle')
+//                     ->requiresConfirmation()
+//                     ->action(function ($record) {
+//                         foreach (RatePlan::all() as $ratePlan) {
+//                             $ratePlan->default = false;
+//                             $ratePlan->save();
+//                         }
+// 
+//                         $record->update([
+//                             'default' => true
+//                         ]);
+//                         Cache::forget('default_rate_plan_' . Filament::getTenant()->id);
+//                     }),
                 Tables\Actions\ViewAction::make()
                     ->hiddenLabel(),
                 Tables\Actions\EditAction::make()

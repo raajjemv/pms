@@ -173,12 +173,12 @@
                                                 'flex items-center w-full h-full px-1 text-sm  text-white  rounded whitespace-nowrap',
                                                 'bg-green-500' => $reservation->status->value == 'pending',
                                                 'bg-blue-600' => $reservation->status->value == 'check-in',
-                                            ])
-                                                title="{{ $reservation->customer->name }}">
-                                                <x-filament::icon
+                                            ])>
+                                                <x-filament::icon title="hello"
                                                     icon="{{ $reservation->booking->booking_type->getIcon() }}"
                                                     class="text-white size-5 dark:text-gray-400" />
-                                                <span class="pl-1"> {{ $reservation->customer->name }}</span>
+                                                <span title="{{ $reservation->customer->name }}" class="pl-1">
+                                                    {{ $reservation->customer->name }}</span>
                                             </div>
                                         </div>
                                     @endforeach

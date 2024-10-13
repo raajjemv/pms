@@ -2,6 +2,7 @@
     'alias' => null,
     'class' => '',
     'icon' => null,
+    'title' => 'hello'
 ])
 
 @php
@@ -9,11 +10,11 @@
 @endphp
 
 @if ($icon instanceof \Illuminate\Contracts\Support\Htmlable)
-    <span {{ $attributes->class($class) }}>
+    <span title="{{ $title }}" {{ $attributes->class($class) }}>
         {{ $icon }}
     </span>
 @elseif (str_contains($icon, '/'))
-    <img
+    <img title="{{ $title }}"
         {{
             $attributes
                 ->merge(['src' => $icon])
@@ -24,6 +25,6 @@
     @svg(
         $icon,
         $class,
-        array_filter($attributes->getAttributes()),
+        array_filter($attributes->merge(['title' => 'hello'])->getAttributes()),
     )
 @endif

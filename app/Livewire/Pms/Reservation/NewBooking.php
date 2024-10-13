@@ -19,6 +19,7 @@ use Illuminate\Support\Collection;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Forms\Concerns\InteractsWithForms;
+use Illuminate\Support\Facades\Cache;
 
 class NewBooking extends Component implements HasForms
 {
@@ -38,14 +39,15 @@ class NewBooking extends Component implements HasForms
     public function initNewBooking($id, $from = NULL, $to = NULL, $room_id = null)
     {
         if ($id == 'new-booking') {
-            $room = Room::with('roomType')->find($room_id);
+            $room = Room::find($room_id);
+
             $this->from = Carbon::parse($from)->setTime(14, 0, 0);
             $this->to = Carbon::parse($to)->setTime(12, 0, 0);
             $this->form->fill([
                 'from' => $from,
                 'to' => $to,
                 'bookingReservations' => [
-                    ['room_type' => $room->roomType->id, 'room' => $room_id, 'adults' => 2, 'children' => 0],
+                    ['room_type' => $room->room_type_id, 'rate_plan' => roomTypeDefaultPlan($room->room_type_id)->id, 'room' => $room_id, 'adults' => 2, 'children' => 0],
 
                 ]
             ]);
@@ -54,7 +56,6 @@ class NewBooking extends Component implements HasForms
 
     public function form(Form $form): Form
     {
-        $rooms = Room::query()->orderBy('room_number', 'ASC')->get();
         $roomTypes = RoomType::whereHas('rooms')->with('ratePlans')->get();
 
         // 
@@ -139,17 +140,19 @@ class NewBooking extends Component implements HasForms
                                 ->content(function ($get) use ($roomTypes) {
                                     $selectedRoomType = $roomTypes->where('id', $get('room_type'))->first();
 
+
                                     $from = Carbon::parse($this->from);
 
                                     $to = Carbon::parse($this->to);
 
-                                    $base_rate = $selectedRoomType?->id ? roomTypeBaseRate($selectedRoomType->id, $from->format('Y-m-d')) : 0;
 
-                                    $rate_plan = $selectedRoomType?->ratePlans->where('id', $get('rate_plan'))->first()?->rate;
+                                    $base_rate = roomTypeRate($selectedRoomType->id, $from->format('Y-m-d'), $get('rate_plan'));
+
+                                    // return $rate_plan = $selectedRoomType?->ratePlans->where('id', $get('rate_plan'))->first();
 
                                     $nights = totolNights($from, $to);
 
-                                    $total = ($base_rate + $rate_plan) * $nights;
+                                    $total = $base_rate * $nights;
 
                                     return filled($total) ? number_format($total, 2) : 0;
                                 })
@@ -218,7 +221,7 @@ class NewBooking extends Component implements HasForms
                 $date = $booking_reservation->from->copy()->addDays($i);
                 $booking->bookingTransactions()->create([
                     'booking_reservation_id' => $booking_reservation->id,
-                    'rate' => $booking_reservation->room->roomType->base_rate,
+                    'rate' => roomTypeRate($booking_reservation->room->room_type_id, $from->format('Y-m-d'), $reservation['rate_plan']),
                     'date' => $date,
                     'transaction_type' => 'room_charge',
                     'user_id' => auth()->id()

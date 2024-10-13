@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained();
             $table->foreignId('rate_plan_id')->constrained();
             $table->string('name');
-            $table->decimal('base_rate', 10, 2);
+            // $table->decimal('base_rate', 10, 2);
             $table->text('description');
             $table->tinyInteger('adults')->default(1);
             $table->tinyInteger('children')->default(0);

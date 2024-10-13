@@ -7,17 +7,7 @@ use App\Models\RoomType;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
-if (! function_exists('defaultRatePlan')) {
-    function defaultRatePlan()
-    {
-        if (Auth::check()) {
-            $tenant_id = auth()->user()->current_tenant_id;
-            return Cache::rememberForever('default_rate_plan_' . $tenant_id, function () {
-                return RatePlan::where('default', true)->first();
-            });
-        }
-    }
-}
+//default channel group for the tenant ie: common poo', agoda pool
 if (! function_exists('defaultChannelGroup')) {
     function defaultChannelGroup()
     {
@@ -29,6 +19,8 @@ if (! function_exists('defaultChannelGroup')) {
         }
     }
 }
+
+
 if (! function_exists('tenant')) {
     function tenant()
     {
@@ -37,18 +29,82 @@ if (! function_exists('tenant')) {
         }
     }
 }
+
+//default rate for the room type
 if (! function_exists('roomTypeBaseRate')) {
-    function roomTypeBaseRate($roomTypeId, $from)
+    function roomTypeBaseRate($roomTypeId, $ratePlanId = NULL)
     {
         if (Auth::check()) {
-            $roomType = RoomType::find($roomTypeId);
-            return $roomType->rates->where('date', $from)
-                ->where('rate_plan_id', defaultRatePlan()->id)
+            if ($ratePlanId) {
+                return roomTypeBaseRateByRatePlan($roomTypeId, $ratePlanId);
+            }
+            return roomType($roomTypeId)
+                ->ratePlans
+                ->where('pivot.default', true)
                 ->first()
-                ->rate ?? $roomType->base_rate;
+                ->pivot
+                ->rate;
         }
     }
 }
+
+//default rate for the room type
+if (! function_exists('roomTypeBaseRateByRatePlan')) {
+    function roomTypeBaseRateByRatePlan($roomTypeId, $ratePlanId)
+    {
+        if (Auth::check()) {
+            return roomType($roomTypeId)
+                ->ratePlans
+                ->where('id', $ratePlanId)
+                ->first()
+                ->pivot
+                ->rate;
+        }
+    }
+}
+
+//default plan for the room type
+if (! function_exists('roomTypeDefaultPlan')) {
+    function roomTypeDefaultPlan($roomTypeId)
+    {
+        if (Auth::check()) {
+            return roomType($roomTypeId)->ratePlans->where('pivot.default', true)->first();
+        }
+    }
+}
+
+//room type with ratePlans
+if (! function_exists('roomType')) {
+    function roomType($roomTypeId)
+    {
+        if (Auth::check()) {
+            return Cache::remember('room_type_' . $roomTypeId, now()->addHour(), function () use ($roomTypeId) {
+                return RoomType::with('ratePlans')->find($roomTypeId);
+            });
+        }
+    }
+}
+
+//room rate by date for the room type
+if (! function_exists('roomTypeRate')) {
+    function roomTypeRate($roomTypeId, $from, $ratePlanId = null)
+    {
+        if (Auth::check()) {
+            $roomType = roomType($roomTypeId);
+            return $roomType
+                ->rates()
+                ->where('date', $from)
+                ->where('channel_group_id', defaultChannelGroup()->id)
+                ->when($ratePlanId, function ($query) use (&$ratePlanId) {
+                    $query->where('rate_plan_id', $ratePlanId);
+                })
+                ->first()
+                ->rate ?? roomTypeBaseRate($roomTypeId, $ratePlanId);
+        }
+    }
+}
+
+//total nights for the booking period
 if (! function_exists('totolNights')) {
     function totolNights($from, $to)
     {

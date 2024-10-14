@@ -1,4 +1,5 @@
 <x-filament-panels::page>
+
     <x-filament::tabs label="Content tabs">
         <x-filament::tabs.item :active="$activeTab === 'guest-accounting'" wire:click="$set('activeTab', 'guest-accounting')">
             Guest Accounting
@@ -51,8 +52,6 @@
                         <livewire:pms.reservation.booking-detail :booking="$booking" :selected-folio="$this->selectedFolio" />
                     @break
 
-                
-
                     @case('guest-profile')
                         <livewire:pms.reservation.guest-profiles :booking="$booking" :selected-folio="$this->selectedFolio" />
                     @break
@@ -65,6 +64,10 @@
                 @endswitch
         </div>
     </div>
-
+    <style>
+        .fi-header>div {
+            width: 100%;
+        }
+    </style>
 
 </x-filament-panels::page>

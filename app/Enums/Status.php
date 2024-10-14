@@ -11,9 +11,9 @@ enum Status: string implements HasLabel
     case Confirmed = "confirmed";
     case Paid = "paid";
     case CheckIn = "check-in";
-    case CheckedOut = "checked-out";
+    case CheckOut = "check-out";
     case Cancelled = "cancelled";
-    case NoShow = "no-Show";
+    case NoShow = "no-show";
     case Overstay = "overstay";
     case Pending = "pending";
     case Disputed = "disputed";
@@ -22,6 +22,24 @@ enum Status: string implements HasLabel
     public function getLabel(): ?string
     {
         return $this->name;
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::Inquiry => "bg-zinc-200",
+            self::Hold => "bg-zinc-200",
+            self::Confirmed => "bg-green-600 text-white",
+            self::Paid => "bg-green-600 text-white",
+            self::CheckIn => "bg-green-600 text-white ",
+            self::CheckOut => "bg-blue-500 text-white",
+            self::Cancelled => "bg-red-500 text-white",
+            self::NoShow => "bg-black text-white ",
+            self::Overstay => "bg-red-500 text-white",
+            self::Pending => "bg-zinc-200",
+            self::Disputed => "bg-zinc-200",
+            self::Archived => "bg-zinc-200",
+        };
     }
 
     public static function getAllValues(): array

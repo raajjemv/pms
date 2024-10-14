@@ -43,6 +43,7 @@
         },
         selectDays(event) {
             const roomId = event.currentTarget.dataset.room;
+            const roomTypeId = event.currentTarget.dataset.type;
             const start = parseInt(this.startGridDate);
             const end = parseInt(this.endGridDate);
             this.selectedDays = [];
@@ -56,7 +57,8 @@
                     id: 'new-booking',
                     from: this.startGridDate,
                     to: this.endGridDate,
-                    room_id: roomId
+                    room_id: roomId,
+                    room_type_id: roomTypeId
                 })
                 this.startGridDate = '';
                 this.endGridDate = '';
@@ -139,7 +141,7 @@
                                                 'bg-gray-200': isDateWithinRange('{{ $day }}',
                                                     {{ $room->id }})
                                             }"
-                                            data-room="{{ $room->id }}"
+                                            data-room="{{ $room->id }}" data-type="{{ $room->room_type_id }}"
                                             @mousedown="isSelecting = true; startGridDate = $event.target.getAttribute('day');roomId = '{{ $room->id }}'"
                                             @mouseup="isSelecting = false; endGridDate = $event.target.getAttribute('day'); selectDays($event);"
                                             @mousemove="isSelecting && (endGridDate = $event.target.getAttribute('day'))"

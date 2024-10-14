@@ -67,6 +67,10 @@ class EditReservation extends Page
         return new HtmlString("{$customerName} <span class='text-lg font-normal text-gray-500'>{$this->booking->booking_number}</span>");
     }
 
+    public function getSubheading(): string | Htmlable
+    {
+        return new HtmlString(view('components.pms.reservation-summary-banner', ['reservation' => $this->selectedFolio]));
+    }
 
     public function mount()
     {

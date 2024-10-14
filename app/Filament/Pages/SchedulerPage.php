@@ -40,7 +40,7 @@ class SchedulerPage extends Page
                 $qq->whereBetween('date', [$startOfMonth, $endOfMonth]);
             }]);
         }, 'bookingReservations' => function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->with('customer','booking.businessSource')->where(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->with('customer','booking')->where(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('from', '>=', $startOfMonth)
                     ->where('from', '<=', $endOfMonth);
             })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {

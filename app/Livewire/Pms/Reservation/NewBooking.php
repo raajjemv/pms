@@ -40,10 +40,10 @@ class NewBooking extends Component implements HasForms
 
 
     #[On('open-modal')]
-    public function initNewBooking($id, $from = NULL, $to = NULL, $room_id = null)
+    public function initNewBooking($id, $from = NULL, $to = NULL, $room_id = null, $room_type_id = null)
     {
         if ($id == 'new-booking') {
-            $room = Room::find($room_id);
+            // $room = Room::find($room_id);
 
             $this->from = Carbon::parse($from)->setTime(14, 0, 0);
             $this->to = Carbon::parse($to)->setTime(12, 0, 0);
@@ -52,7 +52,7 @@ class NewBooking extends Component implements HasForms
                 'to' => $to,
                 'booking_type' => 'direct',
                 'bookingReservations' => [
-                    ['room_type' => $room->room_type_id, 'rate_plan' => roomTypeDefaultPlan($room->room_type_id)->id, 'room' => $room_id, 'adults' => 2, 'children' => 0],
+                    ['room_type' => $room_type_id, 'rate_plan' => roomTypeDefaultPlan($room_type_id)->id, 'room' => $room_id, 'adults' => 2, 'children' => 0],
 
                 ]
             ]);

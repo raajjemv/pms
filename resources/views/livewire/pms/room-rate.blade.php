@@ -10,5 +10,5 @@
         $rate = roomTypeRate($roomNumbers->first()->room_type_id, $day->format('Y-m-d'));
     @endphp
 
-    <span class="text-xs">{{ Number::currency($rate) }}</span>
+    <span class="text-xs">{{ Number::currency($rate ?? 0) }}</span>
 </div>

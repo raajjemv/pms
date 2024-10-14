@@ -6,6 +6,7 @@ use App\Models\RoomType;
 use App\Enums\PaymentType;
 use App\Models\ChannelGroup;
 use App\Models\BookingReservation;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -44,7 +45,7 @@ if (! function_exists('roomTypeBaseRate')) {
                 ->ratePlans
                 ->where('pivot.default', true)
                 ->first()
-                ->pivot
+                ?->pivot
                 ->rate;
         }
     }

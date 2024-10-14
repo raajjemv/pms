@@ -23,6 +23,14 @@ class Booking extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function businessSource()
+    {
+        return $this->belongsTo(BusinessSource::class)
+            ->withDefault([
+                'name' => '-'
+            ]);;
+    }
+
     public function customer()
     {
         return $this->belongsTo(Customer::class)

@@ -1,4 +1,5 @@
 <x-filament-panels::page wire:poll.60s>
+
     <div x-init="() => {
         var date = '{{ !request('date') ? now()->format('d') : '' }}';
         if (date && date >= '09') {
@@ -174,9 +175,7 @@
                                                 'bg-green-500' => $reservation->status->value == 'pending',
                                                 'bg-blue-600' => $reservation->status->value == 'check-in',
                                             ])>
-                                                <x-filament::icon title="hello"
-                                                    icon="{{ $reservation->booking->booking_type->getIcon() }}"
-                                                    class="text-white size-5 dark:text-gray-400" />
+                                                <x-booking-scheduler.icon :booking-type="$reservation->booking->booking_type" />
                                                 <span title="{{ $reservation->customer->name }}" class="pl-1">
                                                     {{ $reservation->customer->name }}</span>
                                             </div>

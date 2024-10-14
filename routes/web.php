@@ -20,9 +20,9 @@ use Spatie\LaravelPdf\Enums\Format;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\PermissionRegistrar;
+use App\Http\Traits\CachedQueries;
 
 Route::get('/', function () {
-    return roomType(1);
     return view('welcome');
 });
 Route::middleware(['auth', 'auth.session'])->group(function () {

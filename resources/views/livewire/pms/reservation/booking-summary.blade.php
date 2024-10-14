@@ -62,7 +62,16 @@
                         <div class="text-xs">Booking Type</div>
                         <div class="text-sm font-medium">{{ $booking->booking_type->name }}</div>
                     </td>
-
+                    <td class="px-2 py-3">
+                        <div class="text-xs">Booking Source</div>
+                        <div class="text-sm font-medium">
+                            @if ($booking->booking_type->value == 'direct')
+                                {{ $booking->booking_type_reference ?? '-' }}
+                            @else
+                                {{ $booking->businessSource->name }}
+                            @endif
+                        </div>
+                    </td>
                 </tr>
                 <tr>
                     <td class="px-2 py-3">
@@ -108,7 +117,8 @@
                 <tr>
                     <td class="px-2 py-3">
                         <div class="text-xs">Nightly Rate</div>
-                        <div class="text-sm font-medium">USD {{ number_format($selectedReservation->averageRate(), 2) }}
+                        <div class="text-sm font-medium">USD
+                            {{ number_format($selectedReservation->averageRate(), 2) }}
                         </div>
                     </td>
                     <td class="px-2 py-3">

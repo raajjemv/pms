@@ -40,7 +40,7 @@ class SchedulerPage extends Page
                 $qq->whereBetween('date', [$startOfMonth, $endOfMonth]);
             }]);
         }, 'bookingReservations' => function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->with('customer','booking')->where(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->with('customer','booking.businessSource')->where(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('from', '>=', $startOfMonth)
                     ->where('from', '<=', $endOfMonth);
             })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
@@ -63,23 +63,6 @@ class SchedulerPage extends Page
 
         $this->startOfMonth = $startOfMonth;
         $this->endOfMonth = $endOfMonth;
-
-        // $this->rooms = Room::with(['roomType' => function ($q) use ($startOfMonth, $endOfMonth) {
-        //     $q->with(['rates' => function ($qq) use ($startOfMonth, $endOfMonth) {
-        //         $qq->whereBetween('date', [$startOfMonth, $endOfMonth]);
-        //     }]);
-        // }, 'bookings' => function ($query) use ($startOfMonth, $endOfMonth) {
-        //     $query->with('customer')->where(function ($query) use ($startOfMonth, $endOfMonth) {
-        //         $query->where('from', '>=', $startOfMonth)
-        //             ->where('from', '<=', $endOfMonth);
-        //     })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
-        //         $query->where('to', '>=', $startOfMonth)
-        //             ->where('to', '<=', $endOfMonth);
-        //     })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
-        //         $query->where('from', '<', $startOfMonth)
-        //             ->where('to', '>', $endOfMonth);
-        //     });
-        // }])->get();
 
         $days = $startOfMonth->diffInDays($endOfMonth);
         $monthDays = [];

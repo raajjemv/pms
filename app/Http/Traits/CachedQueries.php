@@ -2,9 +2,10 @@
 
 namespace App\Http\Traits;
 
+use App\Models\Tenant;
+use App\Models\RoomType;
 use App\Models\BusinessSource;
 use App\Models\FolioOperationCharge;
-use App\Models\Tenant;
 use Illuminate\Support\Facades\Cache;
 
 trait CachedQueries
@@ -13,7 +14,7 @@ trait CachedQueries
     {
         $tenant = auth()->user()->current_tenant_id;
         return Cache::rememberForever('business_sources_' . $tenant, function () {
-            return BusinessSource::all();
+            return BusinessSource::orderBy('name', 'DESC')->get();
         });
     }
     public static function folioOperationCharges()
@@ -23,5 +24,11 @@ trait CachedQueries
             return FolioOperationCharge::all();
         });
     }
-   
+    public static function roomTypes()
+    {
+        $tenant = auth()->user()->current_tenant_id;
+        return Cache::remember('room_types_' . $tenant, now()->addHours(24), function () {
+            return RoomType::whereHas('rooms')->with('ratePlans')->get();
+        });
+    }
 }

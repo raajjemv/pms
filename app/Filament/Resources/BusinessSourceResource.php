@@ -36,7 +36,8 @@ class BusinessSourceResource extends Resource
                         'ota' => 'OTA',
                         'city_ledger' => 'City Ledger',
                         'local_travel_agent' => 'Local Travel Agent',
-                        'foreign_travel_agent' => 'Foreign Travel Agent'
+                        'foreign_travel_agent' => 'Foreign Travel Agent',
+                        'corporate' => 'Coporate'
                     ]),
 
             ]);
@@ -47,6 +48,7 @@ class BusinessSourceResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
+                    ->description(fn($record) => $record->locked ? 'System Use' : NULL)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('business_registration')
                     ->searchable(),
@@ -72,14 +74,17 @@ class BusinessSourceResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->visible(fn($record) => !$record->locked),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn($record) => !$record->locked),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'DESC');
     }
 
     public static function getRelations(): array
@@ -98,4 +103,6 @@ class BusinessSourceResource extends Resource
             'edit' => Pages\EditBusinessSource::route('/{record}/edit'),
         ];
     }
+
+    protected static bool $isScopedToTenant = false;
 }

@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('business_sources', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignId('tenant_id')->nullable()->constrained('tenants');
             $table->string('name');
             $table->string('business_registration')->nullable();
             $table->string('type')->nullable();
             $table->foreignId('user_id')->nullable()->constrained();
+            $table->boolean('locked')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

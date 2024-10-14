@@ -27,5 +27,7 @@ class CreateRoomType extends CreateRecord
     protected function afterCreate()
     {
         Cache::forget('room_type_' . $this->record->id);
+        Cache::forget('room_types_' . Filament::getTenant()->id);
+
     }
 }

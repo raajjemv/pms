@@ -23,6 +23,7 @@ use Spatie\Permission\PermissionRegistrar;
 use App\Http\Traits\CachedQueries;
 
 Route::get('/', function () {
+    
     return view('welcome');
 });
 Route::middleware(['auth', 'auth.session'])->group(function () {

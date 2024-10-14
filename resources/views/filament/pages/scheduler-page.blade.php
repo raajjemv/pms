@@ -92,7 +92,7 @@
             <div class="w-max">
                 <div class="relative flex">
                     <div
-                        class="sticky left-0 bg-white w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200">
+                        class="sticky left-0 bg-white w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200 z-20">
                         Rooms
                     </div>
                     @foreach ($monthDays as $day)
@@ -114,7 +114,7 @@
                     <div class=" w-max">
                         <div class="relative flex bg-zinc-100">
                             <div
-                                class="bg-zinc-100 sticky left-0 flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold">
+                                class="bg-zinc-100 sticky left-0 flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold z-20">
                                 {{ $groupKey }}
                             </div>
                             <div class="flex">
@@ -132,9 +132,9 @@
                         @foreach ($roomNumbers as $room)
                             <div class="relative flex ">
                                 <div
-                                    class="sticky left-0 z-10 bg-white flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
+                                    class="sticky left-0 z-20 bg-white flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
                                     {{ $room->room_number }}</div>
-                                <div class="relative flex overflow-hidden">
+                                <div class="relative flex overflow-hidde">
                                     @foreach ($monthDays as $day)
                                         <div wire:key="selection-day-{{ $day }}" day="{{ $day }}"
                                             :class="{
@@ -171,15 +171,17 @@
                                         @endphp
                                         <div style="width: {{ $width }}px;left:{{ $left }}px"
                                             wire:click="viewBookingSummary('{{ $reservation->booking_id }}','{{ $reservation->id }}')"
-                                            class="absolute h-full overflow-hidden border-gray-200 cursor-pointer p-0.5">
-                                            <div @class([
-                                                'flex items-center w-full h-full px-1 text-sm  text-white  rounded whitespace-nowrap',
-                                                'bg-green-500' => $reservation->status->value == 'pending',
-                                                'bg-blue-600' => $reservation->status->value == 'check-in',
-                                            ])>
+                                            class="absolute h-full overflow-hidde border-gray-200 cursor-pointer p-0.5">
+                                            <div
+                                                class="flex items-center w-full h-full px-1 text-sm  text-white  rounded whitespace-nowrap relative {{ $reservation->status->getColor() }}">
                                                 <x-booking-scheduler.icon :booking-type="$reservation->booking->booking_type" />
                                                 <span title="{{ $reservation->customer->name }}" class="pl-1">
                                                     {{ $reservation->customer->name }}</span>
+                                                @if (reservationBalance($reservation->id))
+                                                    <span title="pending payment"
+                                                        class="absolute top-0 right-0 z-10 flex items-center justify-center -mt-2 text-xs text-white bg-red-500 rounded-full size-4">$</span>
+                                                @endif
+
                                             </div>
                                         </div>
                                     @endforeach

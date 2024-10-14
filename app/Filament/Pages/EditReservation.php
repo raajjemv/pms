@@ -32,8 +32,6 @@ class EditReservation extends Page
 
     public $booking;
 
-    // public  BookingReservation $selectedFolio;
-
     #[On('refresh-edit-reservation')]
     public function refreshComponent() {}
 
@@ -77,5 +75,12 @@ class EditReservation extends Page
         $booking = Booking::with(['bookingTransactions', 'customers', 'bookingReservations.room.roomType'])->findOrFail(decrypt(request('record')));
 
         $this->booking = $booking;
+    }
+
+    public function checkInAction()
+    {
+        $this->selectedFolio->check_in = now();
+        $this->selectedFolio->status = 'check-in';
+        $this->selectedFolio->save();
     }
 }

@@ -7,6 +7,7 @@ use Filament\Support\Contracts\HasLabel;
 enum Status: string implements HasLabel
 {
     case Inquiry = "inquiry";
+    case Reserved = "reserved";
     case Hold = "hold";
     case Confirmed = "confirmed";
     case Paid = "paid";
@@ -29,14 +30,15 @@ enum Status: string implements HasLabel
         return match ($this) {
             self::Inquiry => "bg-zinc-200",
             self::Hold => "bg-zinc-200",
+            self::Reserved => "bg-green-600 text-white",
             self::Confirmed => "bg-green-600 text-white",
             self::Paid => "bg-green-600 text-white",
-            self::CheckIn => "bg-green-600 text-white ",
-            self::CheckOut => "bg-blue-500 text-white",
+            self::CheckIn => "bg-blue-600 text-white ",
+            self::CheckOut => "bg-red-500 text-white",
             self::Cancelled => "bg-red-500 text-white",
             self::NoShow => "bg-black text-white ",
             self::Overstay => "bg-red-500 text-white",
-            self::Pending => "bg-zinc-200",
+            self::Pending => "bg-green-600 text-white",
             self::Disputed => "bg-zinc-200",
             self::Archived => "bg-zinc-200",
         };

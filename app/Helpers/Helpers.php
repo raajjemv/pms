@@ -1,9 +1,11 @@
 <?php
 
-use App\Models\ChannelGroup;
 use Carbon\Carbon;
 use App\Models\RatePlan;
 use App\Models\RoomType;
+use App\Enums\PaymentType;
+use App\Models\ChannelGroup;
+use App\Models\BookingReservation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -112,6 +114,24 @@ if (! function_exists('totolNights')) {
             $total = Carbon::parse($from)->diffInDays(Carbon::parse($to));
 
             return round($total);
+        }
+    }
+}
+
+//total nights for the booking period
+if (! function_exists('reservationBalance')) {
+    function reservationBalance($reservationId)
+    {
+        if (Auth::check()) {
+            $reservation = BookingReservation::find($reservationId);
+            $total = $reservation
+                ->bookingTransactions
+                ->whereNotIn('transaction_type', PaymentType::getAllValues())
+                ->sum('rate');
+            $paid = $reservation->bookingTransactions
+                ->whereIn('transaction_type', PaymentType::getAllValues())
+                ->sum('rate');
+            return $total - $paid;
         }
     }
 }

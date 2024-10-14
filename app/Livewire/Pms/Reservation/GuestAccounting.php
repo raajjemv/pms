@@ -40,10 +40,8 @@ class GuestAccounting extends Component implements HasForms, HasTable
 
     public function table(Table $table): Table
     {
-        $query = BookingTransaction::query()
-            ->where('booking_id', $this->booking->id)
-            ->where('booking_reservation_id', $this->selectedFolio->id)
-            ->withTrashed();
+
+        $query = $this->booking->bookingTransactions()->withTrashed();
         $businessSources = static::businessSources();
         $folioOperationCharges = static::folioOperationCharges();
 

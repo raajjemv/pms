@@ -7,6 +7,7 @@ use Filament\Forms;
 use Filament\Tables;
 use Livewire\Component;
 use App\Enums\PaymentType;
+use App\Filament\Pages\ActivityLog;
 use Filament\Tables\Table;
 use Filament\Support\RawJs;
 use Filament\Tables\Actions;
@@ -111,8 +112,9 @@ class GuestAccounting extends Component implements HasForms, HasTable
                     ->action(function ($data) {
                         BookingTransaction::create($data);
                     })
-                    ->after(function () {
+                    ->after(function ($data) {
                         Cache::forget('reservationBalance_' . $this->selectedFolio->id);
+                        activity()->performedOn($this->selectedFolio)->log('Payment of ' . $data['rate'] . ' collected by ' . $data['transaction_type']);
                         $this->dispatch('refresh-edit-reservation');
                     }),
                 Actions\Action::make('Add Charge')
@@ -127,7 +129,8 @@ class GuestAccounting extends Component implements HasForms, HasTable
                     })
                     ->modalWidth(MaxWidth::Small)
                     ->form([
-                        Forms\Components\DatePicker::make('date'),
+                        Forms\Components\DatePicker::make('date')
+                            ->required(),
                         Forms\Components\Select::make('transaction_type')
                             ->label('Charge')
                             ->options($folioOperationCharges->pluck('name', 'id'))
@@ -150,8 +153,9 @@ class GuestAccounting extends Component implements HasForms, HasTable
                     ->action(function ($data) {
                         BookingTransaction::create($data);
                     })
-                    ->after(function () {
+                    ->after(function ($data) {
                         Cache::forget('reservationBalance_' . $this->selectedFolio->id);
+                        activity()->performedOn($this->selectedFolio)->log($data['rate'] . ' Charge Added');
                         $this->dispatch('refresh-edit-reservation');
                     }),
 
@@ -181,12 +185,14 @@ class GuestAccounting extends Component implements HasForms, HasTable
                                 ->update([
                                     'booking_id' => $rep_booking->id
                                 ]);
+                            activity()->performedOn($this->selectedFolio)->log('Splitted Reservation');
                             return redirect(EditReservation::getUrl(['record' => encrypt($rep_booking->id), 'reservation_id' => $this->selectedFolio->id]));
                         })
                         ->visible(fn() => $this->booking->bookingReservations->count() > 1),
                     Actions\Action::make('Change History')
                         ->icon('heroicon-m-list-bullet')
-                        ->color('gray'),
+                        ->color('gray')
+                        ->url(fn() => ActivityLog::getUrl(['reservation_id' => encrypt($this->selectedFolio->id)])),
                 ])
                     ->label('More')
                     ->icon('heroicon-m-ellipsis-vertical')

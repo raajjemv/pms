@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Casts\TimeCast;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Filament\Models\Contracts\HasCurrentTenantLabel;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Tenant extends Model implements HasCurrentTenantLabel
 {
@@ -90,7 +91,10 @@ class Tenant extends Model implements HasCurrentTenantLabel
     protected function casts(): array
     {
         return [
-            'currencies' => 'array'
+            'currencies' => 'array',
+            'check_in_time' => TimeCast::class,
+            'check_out_time' => TimeCast::class,
+            'late_check_out_time' => TimeCast::class
         ];
     }
 }

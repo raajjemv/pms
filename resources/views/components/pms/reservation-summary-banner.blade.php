@@ -3,14 +3,14 @@
     $status = $reservation->status;
 @endphp
 <div>
-    @if ($reservation->from->isToday() && $reservation->status->value !== 'check-in')
-        <div class="flex flex-row-reverse mb-1">
-            {{-- <x-filament::button icon="heroicon-m-check-circle" wire:click="checkInAction" wire:confirm="Please confirm to check-in!">
-                Check-In
-            </x-filament::button> --}}
+    <div class="flex flex-row-reverse mb-1">
+        @if ($reservation->from->lte(today()) && $reservation->status->value !== 'check-in')
             {{ $this->checkInAction }}
-        </div>
-    @endif
+        @endif
+        @if ($reservation->to->isToday() && $reservation->status->value !== 'check-out')
+            {{ $this->checkOutAction }}
+        @endif
+    </div>
     <div class="grid items-center min-w-full grid-cols-5 gap-3 p-2 text-sm rounded-lg bg-slate-100">
         <div class="space-y-2">
             <div class="font-bold ">Arrival Date</div>

@@ -45,8 +45,8 @@ class NewBooking extends Component implements HasForms
         if ($id == 'new-booking') {
             // $room = Room::find($room_id);
 
-            $this->from = Carbon::parse($from)->setTime(14, 0, 0);
-            $this->to = Carbon::parse($to)->setTime(12, 0, 0);
+            $this->from = Carbon::parse($from)->setTimeFromTimeString(tenant()->check_in_time);
+            $this->to = Carbon::parse($to)->setTimeFromTimeString(tenant()->check_out_time);
             $this->form->fill([
                 'from' => $from,
                 'to' => $to,
@@ -71,17 +71,17 @@ class NewBooking extends Component implements HasForms
                         ->label('Check-In')
                         ->format('d/m/Y')
                         ->live()
-                        ->afterStateUpdated(fn($state) => $this->from = Carbon::parse($state)->setTime(14, 0, 0))
+                        ->afterStateUpdated(fn($state) => $this->from = Carbon::parse($state)->setTimeFromTimeString(tenant()->check_in_time))
                         ->required(),
                     Forms\Components\DatePicker::make('to')
                         ->label('Check-Out')
                         ->format('d/m/Y')
                         ->live()
-                        ->afterStateUpdated(fn($state) => $this->to = Carbon::parse($state)->setTime(12, 0, 0))
+                        ->afterStateUpdated(fn($state) => $this->to = Carbon::parse($state)->setTimeFromTimeString(tenant()->check_out_time))
                         ->required(),
 
                     Forms\Components\Select::make('status')
-                        ->options(Status::getAllValues())
+                        ->options(Status::class)
                         ->required(),
 
 
@@ -203,8 +203,8 @@ class NewBooking extends Component implements HasForms
     public function createBooking()
     {
         $form = $this->form->getState();
-        $from = Carbon::createFromFormat('d/m/Y H:i:s', $form['from'] . '14:00:00');
-        $to = Carbon::createFromFormat('d/m/Y H:i:s', $form['to'] . '12:00:00');
+        $from = Carbon::createFromFormat('d/m/Y H:i', $form['from'] . ' ' . tenant()->check_in_time);
+        $to = Carbon::createFromFormat('d/m/Y H:i', $form['to'] . ' ' . tenant()->check_out_time);
 
         $booking = Booking::create([
             'booking_type' => $form['booking_type'],
@@ -232,7 +232,8 @@ class NewBooking extends Component implements HasForms
                 'booking_customer' => $booking->booking_customer . $customer_iteration,
                 'from' => $from,
                 'to' => $to,
-                'master' => $key == 0 ? true : false
+                'master' => $key == 0 ? true : false,
+                'status' => $form['status']
             ]);
 
             $reservation_count++;

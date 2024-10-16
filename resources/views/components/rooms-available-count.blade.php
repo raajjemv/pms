@@ -7,7 +7,7 @@
                 ->flatten()
                 ->unique('id')
                 ->filter(function ($b) use ($day) {
-                    return $b['from'] <= $day->setTime(14, 0, 0) && $b['to'] > $day->setTime(12, 0, 0);
+                    return $b['from'] <= $day->setTimeFromTimeString(tenant()->check_out_time) && $b['to'] > $day->setTimeFromTimeString(tenant()->check_in_time);
                 })
 
                 ->count();

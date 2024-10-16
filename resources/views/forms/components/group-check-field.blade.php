@@ -5,15 +5,25 @@
                 @php
                     $reservation = App\Models\BookingReservation::find($key);
                     $disabled = false;
-                    if (!$reservation->from->isToday()) {
+                    if (!$reservation->from->lte(today()) && $getType() == 'check-in') {
+                        $disabled = true;
+                    }
+                    if (
+                        (!$reservation->to->isToday() && $getType() == 'check-out') ||
+                        reservationTotals($reservation->id)['balance'] > 0
+                    ) {
                         $disabled = true;
                     }
                 @endphp
                 <label>
                     <x-filament::input.checkbox x-model="state" value="{{ $key }}" :disabled="$disabled" />
-                    <span @class(['text-sm px-2', 'text-red-600 opacity-50' => $disabled])>
+                    <span @class(['text-sm px-2', 'opacity-50' => $disabled])>
                         {{ $option }}
                     </span>
+                    @if (reservationTotals($reservation->id)['balance'] > 0)
+                        <span class="text-sm text-red-600">[pending payment -
+                            {{ number_format(reservationTotals($reservation->id)['balance'], 2) }}]</span>
+                    @endif
                 </label>
             </div>
         @endforeach

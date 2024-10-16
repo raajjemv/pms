@@ -13,6 +13,8 @@ class GroupCheckField extends Field
 
     protected string $view = 'forms.components.group-check-field';
 
+    protected string | Closure $type = '';
+
     public $checkIns = [];
 
     protected function setUp(): void
@@ -20,6 +22,7 @@ class GroupCheckField extends Field
         parent::setUp();
 
         $this->default([]);
+        // $this->itemLink('ok');
 
 
         $this->afterStateHydrated(static function (GroupCheckField $component, $state) {
@@ -30,8 +33,17 @@ class GroupCheckField extends Field
             $component->state([]);
         });
 
-        $this->registerActions([
-            fn($component) => $component->mediaPicker()
-        ]);
+    }
+
+    public function type(string | Closure $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getType(): string
+    {
+        return $this->evaluate($this->type) ?? '';
     }
 }

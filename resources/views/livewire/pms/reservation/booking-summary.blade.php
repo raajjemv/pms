@@ -150,7 +150,7 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>
+                    <td class="px-2 py-3">
                         <div class="text-xs">Pending Payment</div>
                         <div @class([
                             'text-sm font-medium',

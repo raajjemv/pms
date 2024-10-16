@@ -29,34 +29,55 @@ class TenantConfiguration extends Page
     {
         return $form
             ->schema([
-                Forms\Components\Section::make([
-                    Forms\Components\TextInput::make('name')
-                        ->required(),
-                    Forms\Components\TextInput::make('email')
-                        ->required(),
-                    Forms\Components\TextInput::make('phone_number')
-                        ->required(),
+                Forms\Components\Group::make([
+                    Forms\Components\Section::make('Business Information')->schema([
+                        Forms\Components\TextInput::make('name')
+                            ->required(),
+                        Forms\Components\TextInput::make('email')
+                            ->required(),
+                        Forms\Components\TextInput::make('phone_number')
+                            ->required(),
 
-                    Forms\Components\TextInput::make('bill_initials')
-                        ->required(),
-                    Forms\Components\Textarea::make('address')
-                        ->required(),
-                    Forms\Components\TextInput::make('tin')
-                        ->required(),
-                    Forms\Components\TextInput::make('website')
-                        ->nullable(),
+                        Forms\Components\TextInput::make('bill_initials')
+                            ->required(),
+                        Forms\Components\Textarea::make('address')
+                            ->columnSpanFull()
+                            ->required(),
+                        Forms\Components\TextInput::make('tin')
+                            ->required(),
+                        Forms\Components\TextInput::make('website')
+                            ->nullable(),
+
+                    ])->columns(2),
+                    Forms\Components\Section::make('Settings')
+                        ->schema([
+                            Forms\Components\TextInput::make('usd_exchange_rate')
+                                ->required(),
+                            Forms\Components\TimePicker::make('check_in_time')
+                                ->required(),
+                            Forms\Components\TimePicker::make('check_out_time')
+                                ->required(),
+                            Forms\Components\TimePicker::make('late_check_out_time')
+                                ->required(),
+                            Forms\Components\TextInput::make('late_check_out_fee')
+                                ->numeric()
+                                ->minValue(0)
+                                ->required(),
+                        ])
+                        ->columns(2)
+                ])
+                    ->columnSpan(2),
+                Forms\Components\Section::make([
                     Forms\Components\FileUpload::make('logo')
                         ->image()
                         ->imageEditor()
                         ->optimize('webp')
                         ->disk(env('FILESYSTEM_DISK'))
                         ->required(),
-                    Forms\Components\TextInput::make('usd_exchange_rate')
-                        ->required(),
-
                 ])
-                    ->columns(2)
-            ])
+                    ->columnSpan(1),
+
+            ])->columns(3)
             ->statePath('data');
     }
 

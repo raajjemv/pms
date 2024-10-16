@@ -29,9 +29,9 @@ class BookingReservation extends Model
 
     public function customers()
     {
-        return $this->belongsToMany(Customer::class,'booking_customer')
+        return $this->belongsToMany(Customer::class, 'booking_customer')
             ->withTimestamps()
-            ->withPivot('booking_id','master');
+            ->withPivot('booking_id', 'master');
     }
 
     public function room()
@@ -70,6 +70,10 @@ class BookingReservation extends Model
         return $this->adults + $this->children;
     }
 
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 
     protected function casts(): array
     {

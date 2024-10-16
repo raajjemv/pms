@@ -22,6 +22,10 @@ return new class extends Migration
             $table->string('tin')->nullable();
             $table->string('website')->nullable();
             $table->decimal('usd_exchange_rate', 10, 2)->default(10);
+            $table->time('check_in_time')->default('14:00:00');
+            $table->time('check_out_time')->default('12:00:00');
+            $table->time('late_check_out_time')->default('13:00:00');
+            $table->decimal('late_check_out_fee')->default(0);
             $table->foreignId('owner_id')->nullable()->constrained('users')->cascadeOnDelete();
             $table->foreignId('user_id')->nullable()->constrained()->cascadeOnDelete();
             $table->softDeletes();
@@ -43,6 +47,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('tenant_user');
         Schema::dropIfExists('tenants');
-        
     }
 };

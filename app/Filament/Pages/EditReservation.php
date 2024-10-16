@@ -72,34 +72,21 @@ class EditReservation extends Page
         $this->booking = $booking;
     }
 
-    // public function checkInAction()
-    // {
-    //     $this->selectedFolio->check_in = now();
-    //     $this->selectedFolio->status = 'check-in';
-    //     $this->selectedFolio->save();
-    // }
 
     public function checkInAction(): Action
     {
         return Action::make('checkIn')
             ->icon('heroicon-m-check-circle')
-            ->fillForm(function () {
-                return [
-                    // 'bookingReservations' => $this->booking->bookingReservations
-                ];
-            })
             ->form(function () {
-                // if ($this->booking->bookingReservations->count() > 1) {
                 return [
                     GroupCheckField::make('reservations')
+                        ->type('check-in')
                         ->options(fn() => $this->booking->bookingReservations->pluck('booking_customer', 'id'))
                         ->required()
                         ->validationMessages([
                             'required' => 'Select a reservation to proceed!',
                         ])
-
                 ];
-                // }
             })
             ->action(function ($data) {
                 collect($data['reservations'])->each(function ($reservation_id) {
@@ -107,6 +94,36 @@ class EditReservation extends Page
                     $reservation->check_in = now();
                     $reservation->status = 'check-in';
                     $reservation->save();
+
+                    activity()->performedOn($reservation)->log('Check-In Processed');
+                });
+            })
+            ->requiresConfirmation();
+    }
+    public function checkOutAction(): Action
+    {
+        return Action::make('checkOut')
+            ->icon('heroicon-m-arrow-right-start-on-rectangle')
+            ->color('danger')
+            ->form(function () {
+                return [
+                    GroupCheckField::make('reservations')
+                        ->type('check-out')
+                        ->options(fn() => $this->booking->bookingReservations->pluck('booking_customer', 'id'))
+                        ->required()
+                        ->validationMessages([
+                            'required' => 'Select a reservation to proceed!',
+                        ])
+                ];
+            })
+            ->action(function ($data) {
+                collect($data['reservations'])->each(function ($reservation_id) {
+                    $reservation = BookingReservation::find($reservation_id);
+                    $reservation->check_out = now();
+                    $reservation->status = 'check-out';
+                    $reservation->save();
+
+                    activity()->performedOn($reservation)->log('Check-Out Processed');
                 });
             })
             ->requiresConfirmation();

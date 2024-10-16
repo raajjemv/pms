@@ -13,6 +13,7 @@ use App\Models\BookingReservation;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Widgets\BookingTotalAmount;
+use App\Forms\Components\GroupCheckField;
 use App\Http\Traits\InteractsWithGuestRegistration;
 use Filament\Forms;
 
@@ -88,12 +89,25 @@ class EditReservation extends Page
                 ];
             })
             ->form(function () {
-                if ($this->booking->bookingReservations->count() > 1) {
-                    return [
-                        Forms\Components\CheckboxList::make('reservations')
-                            ->options($this->booking->bookingReservations->pluck('booking_customer', 'id'))
-                    ];
-                }
+                // if ($this->booking->bookingReservations->count() > 1) {
+                return [
+                    GroupCheckField::make('reservations')
+                        ->options(fn() => $this->booking->bookingReservations->pluck('booking_customer', 'id'))
+                        ->required()
+                        ->validationMessages([
+                            'required' => 'Select a reservation to proceed!',
+                        ])
+
+                ];
+                // }
+            })
+            ->action(function ($data) {
+                collect($data['reservations'])->each(function ($reservation_id) {
+                    $reservation = BookingReservation::find($reservation_id);
+                    $reservation->check_in = now();
+                    $reservation->status = 'check-in';
+                    $reservation->save();
+                });
             })
             ->requiresConfirmation();
     }

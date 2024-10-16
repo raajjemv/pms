@@ -6,6 +6,7 @@ use App\Models\Booking;
 use Filament\Pages\Page;
 use App\Enums\PaymentType;
 use Livewire\Attributes\On;
+use Filament\Actions\Action;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Computed;
 use App\Models\BookingReservation;
@@ -13,6 +14,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Htmlable;
 use App\Filament\Widgets\BookingTotalAmount;
 use App\Http\Traits\InteractsWithGuestRegistration;
+use Filament\Forms;
 
 class EditReservation extends Page
 {
@@ -39,16 +41,8 @@ class EditReservation extends Page
     {
         return [
             BookingTotalAmount::make([
-                'total' => $this->booking
-                    ->bookingTransactions
-                    ->where('booking_reservation_id', $this->reservation_id)
-                    ->whereNotIn('transaction_type', PaymentType::getAllValues())
-                    ->sum('rate'),
-                'paid' => $this->booking
-                    ->bookingTransactions
-                    ->where('booking_reservation_id', $this->reservation_id)
-                    ->whereIn('transaction_type', PaymentType::getAllValues())
-                    ->sum('rate')
+                'total' => reservationTotals($this->reservation_id)['total'],
+                'paid' => reservationTotals($this->reservation_id)['paid']
             ]),
         ];
     }
@@ -77,10 +71,30 @@ class EditReservation extends Page
         $this->booking = $booking;
     }
 
-    public function checkInAction()
+    // public function checkInAction()
+    // {
+    //     $this->selectedFolio->check_in = now();
+    //     $this->selectedFolio->status = 'check-in';
+    //     $this->selectedFolio->save();
+    // }
+
+    public function checkInAction(): Action
     {
-        $this->selectedFolio->check_in = now();
-        $this->selectedFolio->status = 'check-in';
-        $this->selectedFolio->save();
+        return Action::make('checkIn')
+            ->icon('heroicon-m-check-circle')
+            ->fillForm(function () {
+                return [
+                    // 'bookingReservations' => $this->booking->bookingReservations
+                ];
+            })
+            ->form(function () {
+                if ($this->booking->bookingReservations->count() > 1) {
+                    return [
+                        Forms\Components\CheckboxList::make('reservations')
+                            ->options($this->booking->bookingReservations->pluck('booking_customer', 'id'))
+                    ];
+                }
+            })
+            ->requiresConfirmation();
     }
 }

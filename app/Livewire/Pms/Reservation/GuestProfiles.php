@@ -118,60 +118,19 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
                     })
                     ->visible(fn($record) => !$record->master),
                 Actions\EditAction::make()
+                    ->modalWidth(MaxWidth::SevenExtraLarge)
                     ->form([
-                        Forms\Components\Fieldset::make('Profile')
-                            ->schema([
-                                Forms\Components\FileUpload::make('photo')
-                                    ->disk(env('FILESYSTEM_DISK'))
-                                    ->panelAspectRatio('2:1')
-                                    ->image()
-                                    ->optimize('webp'),
-                                Forms\Components\TextInput::make('name')
-                                    ->required(),
-                                Forms\Components\TextInput::make('phone_number'),
-                                Forms\Components\TextInput::make('email'),
-                                Forms\Components\Select::make('gender')
-                                    ->options([
-                                        'male' => 'Male',
-                                        'female' => 'Female'
-                                    ])
-                                    ->required(),
-
-                                Forms\Components\Select::make('type')
-                                    ->label('Guest Type')
-                                    ->options([
-                                        'local' => 'Local',
-                                        'tourist' => 'Tourist',
-                                        'work_permit_holder' => 'Work Permit Holder'
-                                    ]),
-
-                                Forms\Components\Select::make('country_id')
-                                    ->label('Country')
-                                    ->searchable()
-                                    ->required()
-                                    ->options(Country::pluck('name', 'id')),
-
-                                Forms\Components\TextInput::make('address')
-                                    ->columnSpan(2),
-
-                            ])
-                            ->columns(3),
-                        Forms\Components\Fieldset::make('Identity Information')
-                            ->schema([
-                                Forms\Components\FileUpload::make('document_photo')
-                                    ->disk(env('FILESYSTEM_DISK'))
-                                    ->image()
-                                    ->optimize('webp'),
-
-                                Forms\Components\Select::make('document_type')
-                                    ->options(DocumentType::class)
-                                    ->required(),
-                                Forms\Components\TextInput::make('document_number')
-                                    ->required()
-                            ])
-                            ->columns(3),
-
-                    ]),
+                        ...static::guestRegistrationFields()
+                    ])
+                    ->after(function ($record,$livewire) {
+                        if ($record->pivot->master) {
+                            $reservation = BookingReservation::where('id', $this->selectedFolio->id)
+                                ->update([
+                                    'booking_customer' => $record->name
+                                ]);
+                        };
+                        $livewire->dispatch('refresh-edit-reservation');
+                    }),
                 Actions\DetachAction::make()
                     ->label('Void')
             ])

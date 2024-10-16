@@ -168,7 +168,7 @@ class NewBooking extends Component implements HasForms
 
                                     $to = Carbon::parse($this->to);
 
-                                    $base_rate = roomTypeRate($selectedRoomType->id, $from->format('Y-m-d'), $get('rate_plan'));
+                                    $base_rate = $selectedRoomType?->id ? roomTypeRate($selectedRoomType->id, $from->format('Y-m-d'), $get('rate_plan')) : 0;
 
                                     $nights = totolNights($from, $to);
 

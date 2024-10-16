@@ -176,7 +176,7 @@
                                                 <x-booking-scheduler.icon :booking-type="$reservation->booking->booking_type" />
                                                 <span title="{{ $reservation->customer->name }}" class="pl-1">
                                                     {{ $reservation->customer->name }}</span>
-                                                @if (reservationBalance($reservation->id))
+                                                @if (reservationTotals($reservation->id)['balance'])
                                                     <span title="pending payment"
                                                         class="absolute top-0 right-0 z-10 flex items-center justify-center -mt-2 text-xs text-white bg-red-500 rounded-full size-4">$</span>
                                                 @endif

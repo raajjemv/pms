@@ -1,4 +1,7 @@
 <div>
+    @php
+        $reservationTotals = reservationTotals($selectedReservation->id);
+    @endphp
     <div class="mb-4">
         <div class="flex items-center space-x-3">
             <x-svg-icons.location />
@@ -144,6 +147,16 @@
                                 <span class="">{{ $selectedReservation->children }}</span>
                             </div>
                         </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="text-xs">Pending Payment</div>
+                        <div @class([
+                            'text-sm font-medium',
+                            'text-red-500' => $reservationTotals > 0,
+                        ])>
+                            {{ number_format($reservationTotals['balance'], 2) }}</div>
                     </td>
                 </tr>
             </table>

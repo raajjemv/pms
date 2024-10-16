@@ -69,5 +69,6 @@
             width: 100%;
         }
     </style>
+    <x-filament-actions::modals />
 
 </x-filament-panels::page>

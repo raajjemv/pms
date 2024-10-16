@@ -11,7 +11,7 @@ use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 
 class BookingTotalAmount extends BaseWidget
 {
-    protected static ?string $pollingInterval = '1s';
+    protected static ?string $pollingInterval = '10s';
 
     #[Reactive]
     public $total, $paid;
@@ -23,10 +23,10 @@ class BookingTotalAmount extends BaseWidget
         return [
             Stat::make('', Number::currency($this->total))
                 ->description('Total Payable')
-                ->color('danger'),
+                ->color('gray'),
             Stat::make('', Number::currency($this->total - $this->paid))
                 ->description('Balance')
-                ->color('success'),
+                ->color('danger'),
         ];
     }
 }

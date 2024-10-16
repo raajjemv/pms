@@ -13,7 +13,7 @@ class TenantPolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        // return true;
         return $user->allRoles()->whereName('admin')->exists() || $user->hasRole('tenant_owner|hotel_manager');
     }
 
@@ -22,7 +22,7 @@ class TenantPolicy
      */
     public function view(User $user, Tenant $tenant): bool
     {
-        return true;
+        // return true;
 
         return $user->allRoles()->whereName('admin')->exists() || $user->hasRole('tenant_owner|hotel_manager');
     }

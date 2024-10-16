@@ -14,8 +14,11 @@ use Livewire\Attributes\Url;
 use Livewire\Attributes\Reactive;
 use App\Http\Traits\CachedQueries;
 use App\Models\BookingTransaction;
+use Illuminate\Support\Facades\DB;
 use Filament\Support\Enums\MaxWidth;
+use Illuminate\Support\Facades\Cache;
 use Filament\Forms\Contracts\HasForms;
+use App\Filament\Pages\EditReservation;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -41,7 +44,7 @@ class GuestAccounting extends Component implements HasForms, HasTable
     public function table(Table $table): Table
     {
 
-        $query = $this->booking->bookingTransactions()->withTrashed();
+        $query = $this->selectedFolio->bookingTransactions()->withTrashed();
         $businessSources = static::businessSources();
         $folioOperationCharges = static::folioOperationCharges();
 
@@ -74,6 +77,9 @@ class GuestAccounting extends Component implements HasForms, HasTable
                     ->modalSubmitActionLabel('Add')
                     ->icon('heroicon-m-currency-dollar')
                     ->color('gray')
+                    ->fillForm(fn(): array => [
+                        'rate' => reservationTotals($this->selectedFolio->id)['balance']
+                    ])
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['booking_id'] = $this->booking->id;
                         $data['user_id'] = auth()->id();
@@ -106,6 +112,7 @@ class GuestAccounting extends Component implements HasForms, HasTable
                         BookingTransaction::create($data);
                     })
                     ->after(function () {
+                        Cache::forget('reservationBalance_' . $this->selectedFolio->id);
                         $this->dispatch('refresh-edit-reservation');
                     }),
                 Actions\Action::make('Add Charge')
@@ -144,12 +151,47 @@ class GuestAccounting extends Component implements HasForms, HasTable
                         BookingTransaction::create($data);
                     })
                     ->after(function () {
+                        Cache::forget('reservationBalance_' . $this->selectedFolio->id);
                         $this->dispatch('refresh-edit-reservation');
                     }),
 
-                Actions\Action::make('Change History')
-                    ->icon('heroicon-m-list-bullet')
+
+                Actions\ActionGroup::make([
+                    Actions\Action::make('Split Reservation')
+                        ->icon('heroicon-m-scissors')
+                        ->color('gray')
+                        ->requiresConfirmation()
+                        ->action(function () {
+                            $rep_booking = $this->booking->replicate()->fill([
+                                'booking_number' => strtoupper(str()->random()),
+                                'booking_customer' => $this->selectedFolio->booking_customer
+                            ]);
+
+                            $rep_booking->save();
+
+                            DB::table('booking_reservations')->where('id', $this->selectedFolio->id)
+                                ->update([
+                                    'booking_id' => $rep_booking->id
+                                ]);
+                            DB::table('booking_transactions')->where('booking_reservation_id', $this->selectedFolio->id)
+                                ->update([
+                                    'booking_id' => $rep_booking->id
+                                ]);
+                            DB::table('booking_customer')->where('booking_reservation_id', $this->selectedFolio->id)
+                                ->update([
+                                    'booking_id' => $rep_booking->id
+                                ]);
+                            return redirect(EditReservation::getUrl(['record' => encrypt($rep_booking->id), 'reservation_id' => $this->selectedFolio->id]));
+                        })
+                        ->visible(fn() => $this->booking->bookingReservations->count() > 1),
+                    Actions\Action::make('Change History')
+                        ->icon('heroicon-m-list-bullet')
+                        ->color('gray'),
+                ])
+                    ->label('More')
+                    ->icon('heroicon-m-ellipsis-vertical')
                     ->color('gray')
+                    ->button()
             ])
             ->actions([
                 Actions\ActionGroup::make([
@@ -174,6 +216,7 @@ class GuestAccounting extends Component implements HasForms, HasTable
                             ]);
                         })
                         ->after(function () {
+                            Cache::forget('reservationBalance_' . $this->selectedFolio->id);
                             $this->dispatch('refresh-edit-reservation');
                         })
                         ->modalWidth(MaxWidth::Small)
@@ -185,6 +228,7 @@ class GuestAccounting extends Component implements HasForms, HasTable
                         ->label('Void')
                         ->after(function () {
                             $this->dispatch('refresh-edit-reservation');
+                            Cache::forget('reservationBalance_' . $this->selectedFolio->id);
                         })
                         ->modalHeading('Delete record?')
                         ->visible(fn($record) => $record->transaction_type !== 'room_charge'),

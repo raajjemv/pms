@@ -120,19 +120,25 @@ if (! function_exists('totolNights')) {
 }
 
 //total nights for the booking period
-if (! function_exists('reservationBalance')) {
-    function reservationBalance($reservationId)
+if (! function_exists('reservationTotals')) {
+    function reservationTotals($reservationId)
     {
         if (Auth::check()) {
-            $reservation = BookingReservation::find($reservationId);
-            $total = $reservation
-                ->bookingTransactions
-                ->whereNotIn('transaction_type', PaymentType::getAllValues())
-                ->sum('rate');
-            $paid = $reservation->bookingTransactions
-                ->whereIn('transaction_type', PaymentType::getAllValues())
-                ->sum('rate');
-            return $total - $paid;
+            return Cache::remember('reservationBalance_' . $reservationId, now()->addHour(), function () use ($reservationId) {
+                $reservation = BookingReservation::find($reservationId);
+                $total = $reservation
+                    ->bookingTransactions
+                    ->whereNotIn('transaction_type', PaymentType::getAllValues())
+                    ->sum('rate');
+                $paid = $reservation->bookingTransactions
+                    ->whereIn('transaction_type', PaymentType::getAllValues())
+                    ->sum('rate');
+                return [
+                    'total' => $total,
+                    'paid' => $paid,
+                    'balance' => $total - $paid
+                ];
+            });
         }
     }
 }

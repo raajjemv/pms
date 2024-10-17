@@ -2,7 +2,26 @@
     @php
         $reservationTotals = reservationTotals($selectedReservation->id);
     @endphp
-    <div class="mb-4">
+        <x-slot name="heading">
+            <div class="flex items-center space-x-3">
+                <x-svg-icons.location />
+                <div>
+                    <div class="font-bold">{{ $selectedReservation->customer->name }}</div>
+                    <div class="flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                            stroke="currentColor" class="size-4">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+    
+                        <div class="text-sm font-thin">{{ $selectedReservation->customer->country }}</div>
+                    </div>
+                </div>
+            </div>
+        </x-slot>
+    {{-- <div class="mb-4">
         <div class="flex items-center space-x-3">
             <x-svg-icons.location />
             <div>
@@ -20,7 +39,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="flex">
 
@@ -83,7 +102,7 @@
                     </td>
                     <td class="px-2 py-3">
                         <div class="text-xs">Status</div>
-                        <div class="text-sm font-medium">{{ $selectedReservation->status->name }}</div>
+                        <div class="text-sm font-medium inline-flex  px-2 py-0.5 rounded {{ $selectedReservation->status->getColor() }}">{{ $selectedReservation->status->name }}</div>
                     </td>
                 </tr>
                 <tr>

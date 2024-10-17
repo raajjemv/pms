@@ -4,10 +4,13 @@
 @endphp
 <div>
     <div class="flex flex-row-reverse mb-1">
-        @if ($reservation->from->lte(today()) && $reservation->status->value !== 'check-in')
+        @if (($reservation->from->isToday() || $reservation->from->isPast()) &&
+                in_array($reservation->status->value, ['reserved', 'inquiry', 'hold', 'confirmed', 'paid']))
             {{ $this->checkInAction }}
         @endif
-        @if ($reservation->to->isToday() && $reservation->status->value !== 'check-out')
+        @if (
+            ($reservation->to->isToday() || $reservation->to->isPast()) &&
+                in_array($reservation->status->value, ['check-in', 'overstay']))
             {{ $this->checkOutAction }}
         @endif
     </div>

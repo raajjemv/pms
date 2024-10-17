@@ -167,9 +167,10 @@ trait InteractsWithGuestRegistration
 
                     Forms\Components\Select::make('country_id')
                         ->label('Country')
+                        ->options(fn() => static::countries()->pluck('name', 'id'))
                         ->searchable()
-                        ->required()
-                        ->options(Country::pluck('name', 'id')),
+                        ->optionsLimit(6)
+                        ->required(),
 
                     Forms\Components\TextInput::make('address')
                         ->columnSpan(2),

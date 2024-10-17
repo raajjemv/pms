@@ -17,13 +17,13 @@ return new class extends Migration
             $table->foreignId('booking_id')->constrained('bookings');
             $table->foreignId('room_id')->constrained('rooms');
             $table->string('booking_customer')->nullable();
-            $table->foreignId('customer_id')->nullable()->constrained();
+            // $table->foreignId('customer_id')->nullable()->constrained();
             $table->tinyInteger('adults')->default(0);
             $table->tinyInteger('children')->default(0);
             $table->foreignId('rate_plan_id')->nullable()->constrained();
             $table->dateTime('from');
             $table->dateTime('to');
-            $table->string('status')->default('pending');
+            $table->string('status')->default('reserved');
             $table->string('payment_status')->default('pending');
             $table->boolean('master')->default(0);
             $table->timestamps();

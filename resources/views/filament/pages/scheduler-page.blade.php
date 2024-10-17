@@ -194,11 +194,12 @@
         </div>
     </div>
 
-    <x-filament::modal closeEventName="close-reservation-modal" id="booking-summary" slide-over :width="$bookingSummary?->bookingReservations->count() > 1 ? 'xl' : 'sm'">
+    <x-filament::modal  :close-by-clicking-away="false"  closeEventName="close-reservation-modal" id="booking-summary" slide-over :width="$bookingSummary?->bookingReservations->count() > 1 ? 'xl' : 'sm'">
         @if ($bookingSummary)
             <livewire:pms.reservation.booking-summary :booking="$bookingSummary" :reservation-id="$bookingSummaryReservationId" />
         @endif
     </x-filament::modal>
+    
 
     <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl">
         <x-slot name="heading">

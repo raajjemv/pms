@@ -5,13 +5,7 @@
                 @php
                     $reservation = App\Models\BookingReservation::find($key);
                     $disabled = false;
-                    if (!$reservation->from->lte(today()) && $getType() == 'check-in') {
-                        $disabled = true;
-                    }
-                    if (
-                        (!$reservation->to->isToday() && $getType() == 'check-out') ||
-                        reservationTotals($reservation->id)['balance'] > 0
-                    ) {
+                    if ($getType() == 'check-out' && reservationTotals($reservation->id)['balance'] > 0) {
                         $disabled = true;
                     }
                 @endphp

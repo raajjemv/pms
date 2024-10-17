@@ -3,6 +3,7 @@
 namespace App\Http\Traits;
 
 use App\Models\Tenant;
+use App\Models\Country;
 use App\Models\RoomType;
 use App\Models\BusinessSource;
 use App\Models\FolioOperationCharge;
@@ -29,6 +30,13 @@ trait CachedQueries
         $tenant = auth()->user()->current_tenant_id;
         return Cache::remember('room_types_' . $tenant, now()->addHours(24), function () {
             return RoomType::whereHas('rooms')->with('ratePlans')->get();
+        });
+    }
+
+    public static function countries()
+    {
+        return Cache::rememberForever('countries', function () {
+            return Country::all();
         });
     }
 }

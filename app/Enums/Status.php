@@ -16,7 +16,7 @@ enum Status: string implements HasLabel
     case Cancelled = "cancelled";
     case NoShow = "no-show";
     case Overstay = "overstay";
-    case Pending = "pending";
+    // case Pending = "pending";
     case Disputed = "disputed";
     case Archived = "archived";
 
@@ -34,11 +34,11 @@ enum Status: string implements HasLabel
             self::Confirmed => "bg-green-600 text-white",
             self::Paid => "bg-green-600 text-white",
             self::CheckIn => "bg-blue-600 text-white ",
-            self::CheckOut => "bg-red-600 text-white",
+            self::CheckOut => "bg-blue-600 text-white",
             self::Cancelled => "bg-red-500 text-white",
             self::NoShow => "bg-black text-white ",
             self::Overstay => "bg-red-800 text-white",
-            self::Pending => "bg-green-600 text-white",
+            // self::Pending => "bg-green-600 text-white",
             self::Disputed => "bg-zinc-200",
             self::Archived => "bg-zinc-200",
         };

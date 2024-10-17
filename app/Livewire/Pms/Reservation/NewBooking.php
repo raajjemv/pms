@@ -50,6 +50,7 @@ class NewBooking extends Component implements HasForms
             $this->form->fill([
                 'from' => $from,
                 'to' => $to,
+                'status' => 'reserved',
                 'booking_type' => 'direct',
                 'bookingReservations' => [
                     ['room_type' => $room_type_id, 'rate_plan' => roomTypeDefaultPlan($room_type_id)->id, 'room' => $room_id, 'adults' => 2, 'children' => 0],

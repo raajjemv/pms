@@ -90,9 +90,8 @@ class TenantConfiguration extends Page
             ->success()
             ->send();
     }
-    // public static function canAccess(): bool
-    // {
-    //     $user = auth()->user();
-    //     return $user->allRoles()->whereName('admin')->exists() || $user->hasRole('tenant_owner|hotel_manager');
-    // }
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('admin|tenant_owner');
+    }
 }

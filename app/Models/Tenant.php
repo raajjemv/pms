@@ -16,7 +16,9 @@ class Tenant extends Model implements HasCurrentTenantLabel
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class)
+            ->withPivot(['tenant_id'])
+            ->withTimestamps();
     }
     public function owner()
     {
@@ -27,6 +29,7 @@ class Tenant extends Model implements HasCurrentTenantLabel
     {
         return $this->hasMany(RoomType::class);
     }
+
     public function channelGroups()
     {
         return $this->hasMany(ChannelGroup::class);

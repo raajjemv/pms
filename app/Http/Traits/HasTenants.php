@@ -8,7 +8,9 @@ trait HasTenants
 {
     public function tenants()
     {
-        return $this->belongsToMany(Tenant::class)->withTimestamps();
+        return $this->belongsToMany(Tenant::class)
+            ->withPivot(['tenant_id'])
+            ->withTimestamps();
     }
 
     public function ownedTenants()

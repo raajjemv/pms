@@ -169,7 +169,7 @@
                                                         : $to->day * 90 - 45);
                                         @endphp
                                         <div style="width: {{ $width }}px;left:{{ $left }}px"
-                                            wire:click="viewBookingSummary('{{ $reservation->booking_id }}','{{ $reservation->id }}')"
+                                            wire:click="$dispatch('booking-summary',{booking_id:{{ $reservation->booking_id }},reservation_id:{{ $reservation->id }}})"
                                             class="absolute h-full overflow-hidde border-gray-200 cursor-pointer p-0.5">
                                             <div
                                                 class="flex items-center w-full h-full px-1 text-sm  text-white  rounded whitespace-nowrap relative {{ $reservation->status->getColor() }}">
@@ -194,12 +194,7 @@
         </div>
     </div>
 
-    <x-filament::modal  :close-by-clicking-away="false"  closeEventName="close-reservation-modal" id="booking-summary" slide-over :width="$bookingSummary?->bookingReservations->count() > 1 ? 'xl' : 'sm'">
-        @if ($bookingSummary)
-            <livewire:pms.reservation.booking-summary :booking="$bookingSummary" :reservation-id="$bookingSummaryReservationId" />
-        @endif
-    </x-filament::modal>
-    
+    <livewire:pms.reservation.booking-summary />
 
     <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl">
         <x-slot name="heading">

@@ -59,6 +59,10 @@ class User extends Authenticatable  implements FilamentUser, HasTenants
 
     public function canAccessPanel(Panel $panel): bool
     {
+        if ($panel->getId() == 'app' && in_array($this->id, [1])) {
+
+            return true;
+        }
         return true;
     }
 
@@ -68,7 +72,7 @@ class User extends Authenticatable  implements FilamentUser, HasTenants
     }
     public function getTenants(Panel $panel): Collection
     {
-        return auth()->id() == 1 ? Tenant::all()->collect() : $this->tenants;
+        return $this->tenants;
     }
     public function canAccessTenant(Model $tenant): bool
     {
@@ -87,5 +91,4 @@ class User extends Authenticatable  implements FilamentUser, HasTenants
 
         return $relation;
     }
-    
 }

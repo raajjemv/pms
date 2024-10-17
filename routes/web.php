@@ -25,6 +25,7 @@ use Spatie\Permission\PermissionRegistrar;
 use App\Http\Controllers\Pdf\ReservationInvoice;
 
 Route::get('/', function () {
+   
     return redirect('/admin');
 });
 Route::middleware(['auth', 'auth.session'])->group(function () {

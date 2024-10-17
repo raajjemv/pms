@@ -34,7 +34,7 @@ enum Status: string implements HasLabel
             self::Confirmed => "bg-green-600 text-white",
             self::Paid => "bg-green-600 text-white",
             self::CheckIn => "bg-blue-600 text-white ",
-            self::CheckOut => "bg-blue-600 text-white",
+            self::CheckOut => "bg-gray-400 text-white",
             self::Cancelled => "bg-red-500 text-white",
             self::NoShow => "bg-black text-white ",
             self::Overstay => "bg-red-800 text-white",

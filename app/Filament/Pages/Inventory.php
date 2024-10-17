@@ -29,7 +29,7 @@ class Inventory extends Page
 
     public $roomTypes;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
 
     protected static string $view = 'filament.pages.inventory';
 
@@ -198,5 +198,10 @@ class Inventory extends Page
         }
 
         return $days;
+    }
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()->hasRole('admin|tenant_owner|sales_manager');
     }
 }

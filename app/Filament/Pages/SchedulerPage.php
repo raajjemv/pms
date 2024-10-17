@@ -17,14 +17,13 @@ class SchedulerPage extends Page
 
     protected static string $view = 'filament.pages.scheduler-page';
 
+    protected ?string $heading = 'Scheduler';
+
     // public $rooms;
 
     public $monthDays;
 
     public $startOfMonth, $endOfMonth;
-
-    public  $bookingSummary;
-    public  $bookingSummaryReservationId;
 
     #[On('refresh-scheduler')]
     public function refreshComponent() {}
@@ -74,17 +73,9 @@ class SchedulerPage extends Page
         $this->monthDays = $monthDays;
     }
 
-    public function viewBookingSummary($booking_id, $reservation_id)
+   
+    public static function canAccess(): bool
     {
-        $booking = Booking::with('bookingReservations.room.roomType')->find($booking_id);
-        $this->bookingSummary = $booking;
-        $this->bookingSummaryReservationId = $reservation_id;
-        $this->dispatch('open-modal', id: 'booking-summary');
-    }
-
-    #[On('close-reservation-modal')]
-    public function closeReservationModal()
-    {
-        $this->reset(['bookingSummary', 'bookingSummaryReservationId']);
+        return auth()->user()->hasRole('admin|tenant_owner|sales_manager|front_desk');
     }
 }

@@ -13,8 +13,7 @@ class TenantPolicy
      */
     public function viewAny(User $user): bool
     {
-        // return true;
-        return $user->allRoles()->whereName('admin')->exists() || $user->hasRole('tenant_owner|hotel_manager');
+        return $user->hasRole('admin');
     }
 
     /**
@@ -22,9 +21,7 @@ class TenantPolicy
      */
     public function view(User $user, Tenant $tenant): bool
     {
-        // return true;
-
-        return $user->allRoles()->whereName('admin')->exists() || $user->hasRole('tenant_owner|hotel_manager');
+        return $user->hasRole('admin');
     }
 
     /**
@@ -32,7 +29,7 @@ class TenantPolicy
      */
     public function create(User $user): bool
     {
-        return $user->allRoles()->whereName('admin')->exists();
+        return $user->hasRole('admin');
     }
 
     /**
@@ -40,8 +37,7 @@ class TenantPolicy
      */
     public function update(User $user, Tenant $tenant): bool
     {
-
-        return $user->allRoles()->whereName('admin')->exists() || $user->hasRole('tenant_owner|hotel_manager');
+        return $user->hasRole('admin');
     }
 
     /**
@@ -49,8 +45,7 @@ class TenantPolicy
      */
     public function delete(User $user, Tenant $tenant): bool
     {
-
-        return $user->allRoles()->whereName('admin')->exists() ;
+        return $user->hasRole('admin');
     }
 
     /**
@@ -58,8 +53,7 @@ class TenantPolicy
      */
     public function restore(User $user, Tenant $tenant): bool
     {
-
-        return $user->allRoles()->whereName('admin')->exists();
+        return $user->hasRole('admin');
     }
 
     /**
@@ -67,6 +61,7 @@ class TenantPolicy
      */
     public function forceDelete(User $user, Tenant $tenant): bool
     {
+        return true;
         //
     }
 }

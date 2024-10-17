@@ -2,16 +2,18 @@
 
 namespace App\Filament\App\Resources;
 
-use App\Filament\App\Resources\TenantResource\Pages;
-use App\Filament\App\Resources\TenantResource\RelationManagers;
-use App\Models\Tenant;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Tenant;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Models\App\AppTenant;
+use Filament\Resources\Resource;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\App\Resources\TenantResource\Pages;
+use App\Filament\App\Resources\TenantResource\RelationManagers;
 
 class TenantResource extends Resource
 {
@@ -58,7 +60,7 @@ class TenantResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('logo')
+                Tables\Columns\ImageColumn::make('logo')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('bill_initials')
                     ->searchable(),
@@ -67,7 +69,7 @@ class TenantResource extends Resource
                 Tables\Columns\TextColumn::make('owner.name')
                     ->numeric()
                     ->sortable(),
-                
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
@@ -98,6 +100,7 @@ class TenantResource extends Resource
     public static function getRelations(): array
     {
         return [
+            RelationManagers\UsersRelationManager::class,
         ];
     }
 
@@ -110,5 +113,70 @@ class TenantResource extends Resource
             'edit' => Pages\EditTenant::route('/{record}/edit'),
             'channel-groups' => Pages\ManageChannelgroups::route('/{record}/channel-groups')
         ];
+    }
+
+    public static function canAccess(): bool
+    {
+        return true;
+    }
+
+    public static function canViewAny(): bool
+    {
+        return true;
+    }
+
+    public static function canCreate(): bool
+    {
+        return true;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return true;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return true;
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return true;
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return true;
+    }
+
+    public static function canForceDeleteAny(): bool
+    {
+        return true;
+    }
+
+    public static function canReorder(): bool
+    {
+        return true;
+    }
+
+    public static function canReplicate(Model $record): bool
+    {
+        return true;
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return true;
+    }
+
+    public static function canRestoreAny(): bool
+    {
+        return true;
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return true;
     }
 }

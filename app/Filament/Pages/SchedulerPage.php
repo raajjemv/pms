@@ -7,7 +7,9 @@ use App\Models\Room;
 use App\Models\Booking;
 use App\Models\RoomType;
 use Filament\Pages\Page;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Url;
 
 class SchedulerPage extends Page
 {
@@ -19,20 +21,32 @@ class SchedulerPage extends Page
 
     protected ?string $heading = 'Scheduler';
 
-    // public $rooms;
+    // public $monthDays;
 
-    public $monthDays;
-
-    public $startOfMonth, $endOfMonth;
+    #[Url(keep: true, except: '')]
+    public $date;
 
     #[On('refresh-scheduler')]
     public function refreshComponent() {}
 
-
-    protected function getViewData(): array
+    #[Computed]
+    public function startOfMonth()
     {
-        $startOfMonth = $this->startOfMonth;
-        $endOfMonth = $this->endOfMonth;
+        return Carbon::parse($this->date)->startOfMonth();
+    }
+
+    #[Computed]
+    public function endOfMonth()
+    {
+        return Carbon::parse($this->date)->endOfMonth();
+    }
+
+    #[Computed]
+    public function rooms()
+    {
+        $startOfMonth = $this->startOfMonth();
+
+        $endOfMonth = $this->endOfMonth();
 
         $rooms = Room::with(['roomType' => function ($q) use ($startOfMonth, $endOfMonth) {
             $q->with(['rates' => function ($qq) use ($startOfMonth, $endOfMonth) {
@@ -51,29 +65,33 @@ class SchedulerPage extends Page
             });
         }])
             ->get();
-        return compact('rooms');
+        return $rooms;
     }
 
-    public function mount()
+    #[Computed]
+    public function monthDays()
     {
+        $this->date ?? today()->format('Y-m');
 
-        $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
+        $startOfMonth = $this->startOfMonth();
 
-        $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::now()->endOfMonth();
-
-        $this->startOfMonth = $startOfMonth;
-        $this->endOfMonth = $endOfMonth;
+        $endOfMonth = $this->endOfMonth();
 
         $days = $startOfMonth->diffInDays($endOfMonth);
         $monthDays = [];
         for ($i = 0; $i < $days; $i++) {
             $monthDays[] = $startOfMonth->copy()->addDays($i);
         }
-
-        $this->monthDays = $monthDays;
+        // sleep(2);
+        return $monthDays;
     }
 
-   
+    public function mount()
+    {
+        $this->date = $this->date ? $this->date : today()->format('Y-m');
+    }
+
+
     public static function canAccess(): bool
     {
         return auth()->user()->hasRole('admin|tenant_owner|sales_manager|front_desk');

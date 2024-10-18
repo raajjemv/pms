@@ -48,6 +48,7 @@ class EditReservation extends Page
         ];
     }
 
+   
     #[Computed]
     public function selectedFolio()
     {
@@ -57,7 +58,8 @@ class EditReservation extends Page
     public function getHeading(): string | Htmlable
     {
         $customerName = $this->selectedFolio->booking_customer;
-        return new HtmlString("{$customerName} <span class='text-lg font-normal text-gray-500'>{$this->booking->booking_number}</span>");
+        // return new HtmlString("<a href='{' class='pr-4'><i class='fa-solid fa-arrow-left-long'></i></a> {$customerName} <span class='text-lg font-normal text-gray-500'>{$this->booking->booking_number}</span>");
+        return new HtmlString(view('components.pms.reservation-summary-header', ['reservation' => $this->selectedFolio,'booking_number' =>$this->booking->booking_number ]));
     }
 
     public function getSubheading(): string | Htmlable

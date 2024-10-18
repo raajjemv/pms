@@ -1,2 +1,5 @@
 @import "/vendor/filament/filament/resources/css/theme.css";
+@import 'flatpickr';
+@import 'flatpickr/dist/plugins/monthSelect/style';
+
 @config 'tailwind.config.js';

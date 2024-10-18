@@ -1,27 +1,46 @@
 <x-filament-panels::page wire:poll.60s>
     <div x-init="() => {
-        var date = '{{ !request('date') ? now()->format('d') : '' }}';
-        if (date && date >= '09') {
-            date = String(date - 2).padStart(2, '0');
-            var container = document.getElementById('scheduler-wrapper');
-            const targetDiv = document.getElementById('day-' + date);
+        var date = '{{ $date }}';
+        var container = document.getElementById('scheduler-wrapper');
+        if (isCurrentMonthAndYear(date)) {
+            var today = new Date().getDate();
+            today = String(today - 2).padStart(2, '0');
+            const targetDiv = document.getElementById('day-' + today);
             const targetOffset = targetDiv.offsetLeft;
             container.scrollTo({ left: targetOffset, behavior: 'smooth' });
+        } else {
+            container.scrollTo({ left: 0, behavior: 'smooth' });
         }
     }" x-data="{
-        scrollScheduler(type) {
+        isCurrentMonthAndYear(dateString) {
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear();
+                const currentMonth = currentDate.getMonth() + 1;
     
-            var container = document.getElementById('scheduler-wrapper');
-            if (type == 'right') {
-                container.scrollTo({ left: container.scrollLeft + 200, behavior: 'smooth' });
-            } else {
-                container.scrollTo({ left: container.scrollLeft - 200, behavior: 'smooth' });
+                const [year,
+                    month
+                ] = dateString.split('-');
+    
+                return year == currentYear && month == currentMonth;
+            },
+            scrollScheduler(type) {
+    
+                var container = document.getElementById('scheduler-wrapper');
+                if (type == 'right') {
+                    container.scrollTo({ left: container.scrollLeft + 200, behavior: 'smooth' });
+                } else {
+                    container.scrollTo({ left: container.scrollLeft - 200, behavior: 'smooth' });
+                }
             }
-        }
     }">
-        <x-filament::button @click="scrollScheduler('left')" icon="heroicon-m-chevron-left" />
+        <div class="flex items-center space-x-2">
+            <x-filament::input.wrapper>
+                <x-form-inputs.flat-pickr-month id="selected_month" wire:model.live="date" />
+            </x-filament::input.wrapper>
+            <x-filament::button @click="scrollScheduler('left')" icon="heroicon-m-chevron-left" />
+            <x-filament::button @click="scrollScheduler('right')" icon="heroicon-m-chevron-right" />
+        </div>
 
-        <x-filament::button @click="scrollScheduler('right')" icon="heroicon-m-chevron-right" />
     </div>
 
     <div x-data="{
@@ -81,20 +100,22 @@
             return checkDate >= start && checkDate <= end && room == this.roomId;
         }
     }">
-        {{-- <button @click="isDateWithinRange('2024-10-05',2) ? console.log('ok') : null">ss</button> --}}
-
-
         <div class="py-2 font-medium">
-            <div class="text-center">{{ $startOfMonth->format('F, Y') }}</div>
+            <div wire:loading wire:target="date"
+                class="font-medium text-center transition-all duration-500 ease-in-out delay-500">Loading Data, Please
+                wait <i class="fas fa-spin fa-circle-notch"></i></div>
+            <div wire:loading.remove wire:target="date" class="text-center">{{ $this->startOfMonth->format('F, Y') }}
+            </div>
         </div>
-        <div id="scheduler-wrapper" class="pb-5 overflow-x-scroll text-sm text-black rounded-lg bg-gray-50">
+        <div wire:loading.remove wire:target="date" id="scheduler-wrapper"
+            class="pb-5 overflow-x-scroll text-sm text-black rounded-lg bg-gray-50">
             <div class="w-max">
                 <div class="relative flex">
                     <div
                         class="sticky left-0 bg-white w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200 z-20">
                         Rooms
                     </div>
-                    @foreach ($monthDays as $day)
+                    @foreach ($this->monthDays as $day)
                         <div id="day-{{ $day->format('d') }}" @class([
                             'flex-none border-[0.8px] border-gray-200 flex items-center justify-center w-[90px] px-1 py-1',
                             'bg-amber-100' => $day->isFriday() || $day->isSaturday(),
@@ -109,7 +130,7 @@
                 </div>
             </div>
             <div class="">
-                @foreach ($rooms->groupBy('roomType.name') as $groupKey => $roomNumbers)
+                @foreach ($this->rooms->groupBy('roomType.name') as $groupKey => $roomNumbers)
                     <div class=" w-max">
                         <div class="relative flex bg-zinc-100">
                             <div
@@ -117,13 +138,12 @@
                                 {{ $groupKey }}
                             </div>
                             <div class="flex">
-                                @foreach ($monthDays as $day)
+                                @foreach ($this->monthDays as $day)
                                     <div class="flex-none  w-[90px] border-[0.8px] border-gray-300">
                                         <div>
                                             <x-rooms-available-count :day="$day" :roomNumbers="$roomNumbers" />
-                                            @livewire('pms.room-rate', ['roomNumbers' => $roomNumbers, 'day' => $day], key(str()->random()))
+                                            @livewire('pms.room-rate', ['roomTypeId' => $roomNumbers->first()->room_type_id, 'day' => $day], key(str()->random()))
                                         </div>
-
                                     </div>
                                 @endforeach
                             </div>
@@ -134,7 +154,7 @@
                                     class="sticky left-0 z-20 bg-white flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
                                     {{ $room->room_number }}</div>
                                 <div class="relative flex overflow-hidde">
-                                    @foreach ($monthDays as $day)
+                                    @foreach ($this->monthDays as $day)
                                         <div wire:key="selection-day-{{ $day }}" day="{{ $day }}"
                                             :class="{
                                                 'bg-gray-200': isDateWithinRange('{{ $day }}',
@@ -157,14 +177,14 @@
                                             $left =
                                                 $from->month == $to->month
                                                     ? $dayNumber * 90 - 45
-                                                    : ($from->month == $startOfMonth->month
+                                                    : ($from->month == $this->startOfMonth->month
                                                         ? $dayNumber * 90 - 45
                                                         : 0);
 
                                             $width =
                                                 $from->month == $to->month
                                                     ? $totalDays * 90
-                                                    : ($from->month == $startOfMonth->month
+                                                    : ($from->month == $this->startOfMonth->month
                                                         ? $totalDays * 90
                                                         : $to->day * 90 - 45);
                                         @endphp
@@ -185,7 +205,6 @@
                                         </div>
                                     @endforeach
                                 </div>
-
                             </div>
                         @endforeach
                     </div>

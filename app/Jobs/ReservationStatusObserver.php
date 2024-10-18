@@ -34,7 +34,7 @@ class ReservationStatusObserver implements ShouldQueue
         $reservations = BookingReservation::query()
             ->with('tenant')
             ->withoutGlobalScopes()
-            ->whereDate('to', $today)
+            ->whereDate('to','<=', $today)
             ->where('status',  'check-in')
             ->take(100)
             ->get();
@@ -42,7 +42,8 @@ class ReservationStatusObserver implements ShouldQueue
 
         $filter = $reservations->filter(function ($reservation) use (&$today) {
             $tenant_check_out_time = Carbon::createFromFormat('H:i', $reservation->tenant->check_out_time);
-            return $today->gte($tenant_check_out_time) && $reservation->to->gte($tenant_check_out_time);
+            return $today->gte($tenant_check_out_time);
+            // return $today->gte($tenant_check_out_time) && $reservation->to->gte($tenant_check_out_time);
         });
 
         $filter->each(function ($reservation) {

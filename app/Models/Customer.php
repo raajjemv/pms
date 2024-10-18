@@ -26,6 +26,11 @@ class Customer extends Model
         return $this->belongsTo(Booking::class);
     }
 
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
+
     public function tenant()
     {
         return $this->belongsTo(Tenant::class);

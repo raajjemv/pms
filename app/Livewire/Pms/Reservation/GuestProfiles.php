@@ -9,9 +9,11 @@ use Livewire\Component;
 use App\Models\Customer;
 use Filament\Tables\Table;
 use App\Enums\DocumentType;
+use Livewire\Attributes\On;
 use Filament\Tables\Actions;
 use Filament\Facades\Filament;
 use Livewire\Attributes\Reactive;
+use App\Models\BookingReservation;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables\Contracts\HasTable;
@@ -19,7 +21,6 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Traits\InteractsWithGuestRegistration;
-use App\Models\BookingReservation;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
@@ -42,6 +43,10 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
     {
         $this->form->fill();
     }
+
+    #[On('refresh-edit-reservation')]
+    public function refreshComponent() {}
+
 
     public function table(Table $table): Table
     {

@@ -16,5 +16,5 @@
             });
         }
     }"  x-ref="input" type="text"
-        {{ $attributes->merge(['class' => 'form-input w-full rounded-md shadow-sm']) }} />
+        {{ $attributes->merge(['class' => 'border-gray-300 w-full rounded-md shadow-sm text-gray-600']) }} />
 </div>

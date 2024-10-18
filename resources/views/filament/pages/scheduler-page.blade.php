@@ -34,9 +34,7 @@
             }
     }">
         <div class="flex items-center space-x-2">
-            <x-filament::input.wrapper>
-                <x-form-inputs.flat-pickr-month id="selected_month" wire:model.live="date" />
-            </x-filament::input.wrapper>
+            <x-form-inputs.flat-pickr-month id="selected_month" wire:model.live="date" />
             <x-filament::button @click="scrollScheduler('left')" icon="heroicon-m-chevron-left" />
             <x-filament::button @click="scrollScheduler('right')" icon="heroicon-m-chevron-right" />
         </div>
@@ -100,11 +98,15 @@
             return checkDate >= start && checkDate <= end && room == this.roomId;
         }
     }">
+        <x-filament::button class="flex-1" @click="$dispatch('open-reservation',{booking_id: 92, reservation_id:74})">
+            Open </x-filament::button>
         <div class="py-2 font-medium">
             <div wire:loading wire:target="date"
-                class="font-medium text-center transition-all duration-500 ease-in-out delay-500">Loading Data, Please
+                class="font-medium text-center transition-all duration-500 ease-in-out delay-500">Loading Data,
+                Please
                 wait <i class="fas fa-spin fa-circle-notch"></i></div>
-            <div wire:loading.remove wire:target="date" class="text-center">{{ $this->startOfMonth->format('F, Y') }}
+            <div wire:loading.remove wire:target="date" class="text-center">
+                {{ $this->startOfMonth->format('F, Y') }}
             </div>
         </div>
         <div wire:loading.remove wire:target="date" id="scheduler-wrapper"
@@ -192,10 +194,12 @@
                                             wire:click="$dispatch('booking-summary',{booking_id:{{ $reservation->booking_id }},reservation_id:{{ $reservation->id }}})"
                                             class="absolute h-full overflow-hidde border-gray-200 cursor-pointer p-0.5">
                                             <div
-                                                class="flex items-center w-full h-full px-1 text-sm  text-white  rounded whitespace-nowrap relative {{ $reservation->status->getColor() }}">
-                                                <x-booking-scheduler.icon :booking-type="$reservation->booking->booking_type" />
-                                                <span title="{{ $reservation->customer->name }}" class="pl-1">
-                                                    {{ $reservation->customer->name }}</span>
+                                                class=" w-full h-full flex items-center rounded relative {{ $reservation->status->getColor() }}">
+                                                <div class="flex items-end px-1 space-x-2 overflow-hidden text-sm text-white whitespace-nowrap">
+                                                    <x-booking-scheduler.icon :booking-type="$reservation->booking->booking_type" />
+                                                    <span title="{{ $reservation->customer->name }}" class="">
+                                                        {{ $reservation->customer->name }}</span>
+                                                </div>
                                                 @if (reservationTotals($reservation->id)['balance'])
                                                     <span title="pending payment"
                                                         class="absolute top-0 right-0 z-10 flex items-center justify-center -mt-2 text-xs text-white bg-red-500 rounded-full size-4">$</span>
@@ -215,10 +219,15 @@
 
     <livewire:pms.reservation.booking-summary />
 
+    <livewire:pms.reservation.reservation />
+
     <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl">
         <x-slot name="heading">
             New Booking
         </x-slot>
         <livewire:pms.reservation.new-booking />
     </x-filament::modal>
+
+
+
 </x-filament-panels::page>

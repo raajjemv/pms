@@ -89,7 +89,7 @@ class AdminPanelProvider extends PanelProvider
                         override: true,
                     )
             ])
-            ->spa()
+          
             ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

@@ -2,8 +2,8 @@
     @php
         $reservationTotals = $this->reservation ? reservationTotals($this->reservation?->id) : 0;
     @endphp
-    <x-filament::modal :close-by-clicking-away="false" closeEventName="close-reservation-modal" id="booking-summary" slide-over
-        :width="$booking?->bookingReservations->count() > 1 ? 'xl' : 'sm'">
+    <x-filament::modal :close-by-clicking-away="false" :autofocus="false" closeEventName="close-booking-summary-modal"
+        id="booking-summary" slide-over :width="$booking?->bookingReservations->count() > 1 ? 'xl' : 'sm'">
         <x-slot name="heading">
             <div class="flex items-center space-x-3">
                 <x-svg-icons.location />
@@ -29,8 +29,9 @@
             <div class="flex-1 pr-3">
                 <div class="flex space-x-2">
                     <x-filament::button class="flex-1"
-                        href="{{ App\Filament\Pages\EditReservation::getUrl(['record' => encrypt($booking?->id), 'reservation_id' => $this->reservation?->id]) }}"
-                        tag="a">
+                        @click="$dispatch('open-reservation',{booking_id: '{{ $booking?->id }}', reservation_id:'{{ $this->reservation?->id }}' });$dispatch('close-booking-summary-modal',{id: 'booking-summary'})"
+                        {{-- href="{{ App\Filament\Pages\EditReservation::getUrl(['record' => encrypt($booking?->id), 'reservation_id' => $this->reservation?->id]) }}"
+                        tag="a" --}}>
                         Open
                     </x-filament::button>
                     <x-filament::button color="gray"
@@ -47,16 +48,39 @@
                         </x-slot>
 
                         <x-filament::dropdown.list>
-                            <x-filament::dropdown.list.item wire:click="openViewModal">
-                                View
+                            @if (
+                                ($this->reservation?->from->isToday() || $this->reservation?->from->isPast()) &&
+                                    in_array($this->reservation?->status->value, ['reserved', 'inquiry', 'hold', 'confirmed', 'paid']))
+                                <x-filament::dropdown.list.item wire:click="bookingSummaryAction('check-in')"
+                                    icon="heroicon-m-check-circle">
+                                    Check-In
+                                </x-filament::dropdown.list.item>
+                            @endif
+                            @if (
+                                ($this->reservation?->to->isToday() || $this->reservation?->to->isPast()) &&
+                                    in_array($this->reservation?->status->value, ['check-in', 'overstay']))
+                                <x-filament::dropdown.list.item wire:click="bookingSummaryAction('check-out')"
+                                    icon="heroicon-m-arrow-right-start-on-rectangle">
+                                    Check-Out
+                                </x-filament::dropdown.list.item>
+                            @endif
+                            <x-filament::dropdown.list.item wire:click="openViewModal"
+                                icon="heroicon-m-currency-dollar">
+                                Add Payment
+                            </x-filament::dropdown.list.item>
+                            <x-filament::dropdown.list.item wire:click="openViewModal" icon="heroicon-m-pencil-square">
+                                Amend Stay
+                            </x-filament::dropdown.list.item>
+                            <x-filament::dropdown.list.item wire:click="openViewModal"
+                                icon="heroicon-m-arrows-right-left">
+                                Move Room
+                            </x-filament::dropdown.list.item>
+                            <x-filament::dropdown.list.item wire:click="openEditModal" icon="heroicon-m-x-mark">
+                                Cancel
                             </x-filament::dropdown.list.item>
 
-                            <x-filament::dropdown.list.item wire:click="openEditModal">
-                                Edit
-                            </x-filament::dropdown.list.item>
-
-                            <x-filament::dropdown.list.item wire:click="openDeleteModal">
-                                Delete
+                            <x-filament::dropdown.list.item wire:click="openDeleteModal" icon="heroicon-m-x-circle">
+                                Void
                             </x-filament::dropdown.list.item>
                         </x-filament::dropdown.list>
                     </x-filament::dropdown>
@@ -173,9 +197,9 @@
                     <div class="space-y-3 ">
                         @foreach ($booking?->bookingReservations as $bookingReservations)
                             <x-filament::button wire:key="booking-reservation-{{ $bookingReservations->id }}"
-                                wire:click="$set('reservationId', {{ $bookingReservations->id }})" color="gray"
+                                wire:click="$set('reservation_id', {{ $bookingReservations->id }})" color="gray"
                                 @class([
-                                    'border text-left',
+                                    'border text-left w-full',
                                     'border-blue-600' => $bookingReservations->id == $this->reservation->id,
                                 ])>
                                 <div class="font-semibold ">{{ $bookingReservations->booking_customer }}</div>
@@ -192,4 +216,7 @@
             @endif
         </div>
     </x-filament::modal>
+
+    <x-filament-actions::modals />
+
 </div>

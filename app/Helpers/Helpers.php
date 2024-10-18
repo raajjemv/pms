@@ -123,7 +123,7 @@ if (! function_exists('totolNights')) {
 if (! function_exists('reservationTotals')) {
     function reservationTotals($reservationId)
     {
-        if (Auth::check()) {
+        if (Auth::check() && $reservationId) {
             return Cache::remember('reservationBalance_' . $reservationId, now()->addHour(), function () use ($reservationId) {
                 $reservation = BookingReservation::find($reservationId);
                 $total = $reservation
@@ -140,5 +140,6 @@ if (! function_exists('reservationTotals')) {
                 ];
             });
         }
+        return 0;
     }
 }

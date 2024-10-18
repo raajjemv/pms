@@ -11,6 +11,7 @@ use App\Enums\DocumentType;
 use App\Filament\Resources\BookingResource;
 use App\Models\BookingReservation;
 use Filament\Actions\Action;
+use Filament\Actions\CreateAction;
 use Filament\Tables\Actions;
 use Filament\Actions\EditAction;
 use Filament\Support\Enums\MaxWidth;
@@ -96,7 +97,8 @@ trait InteractsWithGuestRegistration
     }
     public static function newRegistration(): Action
     {
-        return Action::make('new-registration')
+        return CreateAction::make('new-registration')
+            ->model(Customer::class)
             ->modalWidth(MaxWidth::SevenExtraLarge)
             ->fillForm(fn($arguments): array => [
                 'name' => $arguments['booking_customer'],
@@ -112,7 +114,7 @@ trait InteractsWithGuestRegistration
             ->form([
                 ...self::guestRegistrationFields()
             ])
-            ->action(function ($data, $arguments) {
+            ->using(function ($data, $arguments,$model) {
                 $reservation = BookingReservation::find($arguments['booking_reservation_id']);
 
                 $customer_count = $reservation->customers->count();
@@ -125,7 +127,7 @@ trait InteractsWithGuestRegistration
                 }
 
 
-                $customer = Customer::firstOrCreate($data);
+                $customer = $model::firstOrCreate($data);
 
                 $reservation->customers()->attach($customer, [
                     'booking_id' => $arguments['booking'],
@@ -166,11 +168,12 @@ trait InteractsWithGuestRegistration
                         ]),
 
                     Forms\Components\Select::make('country_id')
-                        ->label('Country')
-                        ->options(fn() => static::countries()->pluck('name', 'id'))
+                        ->relationship('country','name')
+                        // ->options(fn() => static::countries()->pluck('name', 'id'))
                         ->searchable()
-                        ->optionsLimit(6)
-                        ->required(),
+                        ->preload()
+                        ->required()
+                        ->optionsLimit(5),
 
                     Forms\Components\TextInput::make('address')
                         ->columnSpan(2),

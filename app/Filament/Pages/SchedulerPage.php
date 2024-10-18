@@ -86,6 +86,7 @@ class SchedulerPage extends Page
         return $monthDays;
     }
 
+
     public function mount()
     {
         $this->date = $this->date ? $this->date : today()->format('Y-m');

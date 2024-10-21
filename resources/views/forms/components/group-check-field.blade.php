@@ -5,7 +5,11 @@
                 @php
                     $reservation = App\Models\BookingReservation::find($key);
                     $disabled = false;
-                    if ($getType() == 'check-out' && reservationTotals($reservation->id)['balance'] > 0) {
+                    if (
+                        (in_array($getType(), ['check-out', 'early-check-out']) &&
+                            reservationTotals($reservation->id)['balance'] > 0) ||
+                        $reservation->status->value == 'check-out'
+                    ) {
                         $disabled = true;
                     }
                 @endphp
@@ -18,7 +22,16 @@
                         <span class="text-sm text-red-600">[pending payment -
                             {{ number_format(reservationTotals($reservation->id)['balance'], 2) }}]</span>
                     @endif
+                    @if ($reservation->status->value == 'check-out')
+                        <span class="text-sm text-red-600">Checked-Out</span>
+                    @endif
                 </label>
+                @if ($reservation->status->value == 'check-in' && $getType() == 'early-check-out')
+                    <div class="mt-1 text-sm text-gray-500 pl-7">
+                        [ {{ implode(', ', totolNightsByDates(now(), $reservation->to)->map(fn($date) => $date->format('d/m/Y'))->toArray()) }}] - night(s) to adjust
+                    </div>
+                @endif
+
             </div>
         @endforeach
     </div>

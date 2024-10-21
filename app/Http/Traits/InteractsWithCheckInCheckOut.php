@@ -75,4 +75,6 @@ trait InteractsWithCheckInCheckOut
             })
             ->requiresConfirmation();
     }
+    
+    
 }

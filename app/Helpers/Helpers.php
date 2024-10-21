@@ -1,12 +1,13 @@
 <?php
 
 use Carbon\Carbon;
+use App\Models\Room;
 use App\Models\RatePlan;
 use App\Models\RoomType;
 use App\Enums\PaymentType;
 use App\Models\ChannelGroup;
-use App\Models\BookingReservation;
 use Filament\Facades\Filament;
+use App\Models\BookingReservation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
@@ -112,12 +113,30 @@ if (! function_exists('totolNights')) {
     function totolNights($from, $to)
     {
         if (Auth::check()) {
-            $total = Carbon::parse($from)->diffInDays(Carbon::parse($to));
+            $total = Carbon::parse($from)->diffInDays(Carbon::parse($to)->setTime(0, 0, 0));
 
             return round($total);
         }
     }
 }
+
+
+//total nights by date
+if (! function_exists('totolNightsByDates')) {
+    function totolNightsByDates($from, $to)
+    {
+        if (Auth::check()) {
+            $dates = [];
+            $totalNightsLeft = totolNights($from, $to);
+            for ($i = 0; $i < $totalNightsLeft; $i++) {
+                $future_date = now()->copy()->addDays($i);
+                $dates[] = $future_date;
+            }
+            return collect($dates);
+        }
+    }
+}
+
 
 //total nights for the booking period
 if (! function_exists('reservationTotals')) {
@@ -141,5 +160,22 @@ if (! function_exists('reservationTotals')) {
             });
         }
         return 0;
+    }
+}
+//total nights for the booking period
+if (! function_exists('roomReservationsByMonth')) {
+    function roomReservationsByMonth($roomId, $from, $to)
+    {
+        $startOfMonth = Carbon::parse($from)->format('Y-m-d');
+        $endOfMonth = Carbon::parse($to)->format('Y-m-d');
+
+        $roomReservationDates =  Room::with(['bookingTransactions' => function ($q) use ($startOfMonth, $endOfMonth) {
+            return $q->where('transaction_type', 'room_charge')->whereBetween('date', [$startOfMonth, $endOfMonth]);
+        }])
+            ->find($roomId)
+            ->bookingTransactions
+            ->pluck('date');
+
+        return collect($roomReservationDates)->map(fn($date) => Carbon::parse($date)->format('Y-m-d'));
     }
 }

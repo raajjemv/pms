@@ -2,4 +2,7 @@
     <div>
         {{ $this->table }}
     </div>
+
+
+
 </div>

@@ -12,3 +12,6 @@
     font-weight: 500;
     font-style: normal;
 }
+[x-cloak] {
+    display: none !important;
+}

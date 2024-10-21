@@ -3,3 +3,7 @@
 @import 'flatpickr/dist/plugins/monthSelect/style';
 
 @config 'tailwind.config.js';
+
+[x-cloak] {
+    display: none !important;
+}

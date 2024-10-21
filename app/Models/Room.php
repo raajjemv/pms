@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 #[ScopedBy([TenantScope::class])]
 class Room extends Model
@@ -60,6 +61,10 @@ class Room extends Model
         return $this->hasMany(BookingReservation::class);
     }
 
+    public function bookingTransactions(): HasManyThrough
+    {
+        return $this->hasManyThrough(BookingTransaction::class, BookingReservation::class);
+    }
 
     protected function casts(): array
     {

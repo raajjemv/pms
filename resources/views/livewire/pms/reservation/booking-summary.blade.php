@@ -150,7 +150,7 @@
                     <tr>
                         <td class="px-2 py-3">
                             <div class="text-xs">Nightly Rate</div>
-                            <div class="text-sm font-medium">USD
+                            <div class="text-sm font-medium">
                                 {{ number_format($this->reservation?->averageRate(), 2) }}
                             </div>
                         </td>
@@ -199,7 +199,7 @@
                             <x-filament::button wire:key="booking-reservation-{{ $bookingReservations->id }}"
                                 wire:click="$set('reservation_id', {{ $bookingReservations->id }})" color="gray"
                                 @class([
-                                    'border text-left w-full',
+                                    'border w-full !flex-col !items-start !justify-start text-left',
                                     'border-blue-600' => $bookingReservations->id == $this->reservation->id,
                                 ])>
                                 <div class="font-semibold ">{{ $bookingReservations->booking_customer }}</div>

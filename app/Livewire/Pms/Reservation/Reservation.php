@@ -60,6 +60,8 @@ class Reservation extends Component implements HasForms, HasActions
     public function closeReservationModal()
     {
         $this->reset(['booking', 'reservation_id', 'activeTab']);
+        $this->dispatch('refresh-scheduler');
+
     }
 
 

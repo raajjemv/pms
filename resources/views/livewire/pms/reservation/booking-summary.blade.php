@@ -64,14 +64,11 @@
                                     Check-Out
                                 </x-filament::dropdown.list.item>
                             @endif
-                            <x-filament::dropdown.list.item wire:click="openViewModal"
+                            <x-filament::dropdown.list.item wire:click="bookingSummaryAction('add-payment')"
                                 icon="heroicon-m-currency-dollar">
                                 Add Payment
                             </x-filament::dropdown.list.item>
-                            <x-filament::dropdown.list.item wire:click="openViewModal" icon="heroicon-m-pencil-square">
-                                Amend Stay
-                            </x-filament::dropdown.list.item>
-                            <x-filament::dropdown.list.item wire:click="openViewModal"
+                            <x-filament::dropdown.list.item wire:click="bookingSummaryAction('move-room')"
                                 icon="heroicon-m-arrows-right-left">
                                 Move Room
                             </x-filament::dropdown.list.item>

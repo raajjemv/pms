@@ -10,7 +10,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Filament\Forms\Contracts\HasForms;
 use App\Forms\Components\GroupCheckField;
-use App\Http\Traits\InteractsWithCheckInCheckOut;
+use App\Http\Traits\InteractsWithReservationActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -19,7 +19,7 @@ class BookingSummary extends Component implements HasForms, HasActions
 {
     use InteractsWithActions;
     use InteractsWithForms;
-    use InteractsWithCheckInCheckOut;
+    use InteractsWithReservationActions;
 
     public $booking;
 
@@ -53,8 +53,9 @@ class BookingSummary extends Component implements HasForms, HasActions
     public function bookingSummaryAction($action)
     {
         return match ($action) {
-            'check-in' => $this->replaceMountedAction('checkIn'),
-            'check-out' => $this->replaceMountedAction('checkOut'),
+            'check-in' => $this->replaceMountedAction('checkInAction'),
+            'check-out' => $this->replaceMountedAction('checkOutAction'),
+            'add-payment' => $this->replaceMountedAction('addPaymentAction')
         };
     }
 

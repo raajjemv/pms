@@ -105,12 +105,6 @@ class NewBooking extends Component implements HasForms
                         ])
                         ->visible(fn($get) => $get('booking_type') == 'direct'),
 
-
-
-
-
-
-
                 ])->columns(5),
 
                 Forms\Components\Repeater::make('bookingReservations')

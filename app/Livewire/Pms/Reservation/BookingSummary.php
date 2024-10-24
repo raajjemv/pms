@@ -2,6 +2,8 @@
 
 namespace App\Livewire\Pms\Reservation;
 
+use App\Filament\ActionsExtended\ChargeAction\ChargeAction;
+use App\Filament\ActionsExtended\PaymentAction\PaymentAction;
 use App\Models\Booking;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -45,7 +47,7 @@ class BookingSummary extends Component implements HasForms, HasActions
 
 
     #[Computed]
-    public function reservation()
+    public function selectedFolio()
     {
         return $this->booking?->bookingReservations->where('id', $this->reservation_id)->first();
     }
@@ -55,11 +57,21 @@ class BookingSummary extends Component implements HasForms, HasActions
         return match ($action) {
             'check-in' => $this->replaceMountedAction('checkInAction'),
             'check-out' => $this->replaceMountedAction('checkOutAction'),
-            'add-payment' => $this->replaceMountedAction('addPaymentAction')
+            'add-payment' => $this->replaceMountedAction('addPaymentAction'),
+            'add-charge' => $this->replaceMountedAction('addChargeAction')
         };
     }
 
+    public function addPaymentAction()
+    {
+        return PaymentAction::make('add-payment');
+    }
 
+
+    public function addChargeAction()
+    {
+        return ChargeAction::make('add-charge');
+    }
 
     public function render()
     {

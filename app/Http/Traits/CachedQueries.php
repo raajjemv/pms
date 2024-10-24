@@ -7,6 +7,7 @@ use App\Models\Country;
 use App\Models\RoomType;
 use App\Models\BusinessSource;
 use App\Models\FolioOperationCharge;
+use App\Models\Room;
 use Illuminate\Support\Facades\Cache;
 
 trait CachedQueries
@@ -30,6 +31,13 @@ trait CachedQueries
         $tenant = auth()->user()->current_tenant_id;
         return Cache::remember('room_types_' . $tenant, now()->addHours(24), function () {
             return RoomType::whereHas('rooms')->with('ratePlans')->get();
+        });
+    }
+    public static function rooms()
+    {
+        $tenant = auth()->user()->current_tenant_id;
+        return Cache::remember('rooms_' . $tenant, now()->addHours(24), function () {
+            return Room::query()->with('roomType')->get();
         });
     }
 

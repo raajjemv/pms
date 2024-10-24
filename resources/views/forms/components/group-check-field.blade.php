@@ -12,10 +12,21 @@
                     ) {
                         $disabled = true;
                     }
+                    if (
+                        $reservation->status->value == 'check-in' &&
+                        $getType() == 'early-check-out' &&
+                        $reservation->to->lt(now())
+                    ) {
+                        $disabled = true;
+                    }
                 @endphp
                 <label>
                     <x-filament::input.checkbox x-model="state" value="{{ $key }}" :disabled="$disabled" />
-                    <span @class(['text-sm px-2', 'opacity-50' => $disabled])>
+                    <span @class([
+                        'text-sm px-2',
+                        'opacity-50' => $disabled,
+                        'line-through' => $reservation->status->value == 'check-out',
+                    ])>
                         {{ $option }}
                     </span>
                     @if (reservationTotals($reservation->id)['balance'] > 0)
@@ -26,9 +37,11 @@
                         <span class="text-sm text-red-600">Checked-Out</span>
                     @endif
                 </label>
-                @if ($reservation->status->value == 'check-in' && $getType() == 'early-check-out')
+                @if ($reservation->status->value == 'check-in' && $getType() == 'early-check-out' && $reservation->to->gt(now()))
                     <div class="mt-1 text-sm text-gray-500 pl-7">
-                        [ {{ implode(', ', totolNightsByDates(now(), $reservation->to)->map(fn($date) => $date->format('d/m/Y'))->toArray()) }}] - night(s) to adjust
+                        [
+                        {{ implode(', ',totolNightsByDates(now(), $reservation->to)->map(fn($date) => $date->format('d/m/Y'))->toArray()) }}]
+                        - night(s) to adjust
                     </div>
                 @endif
 

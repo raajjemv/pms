@@ -73,9 +73,18 @@ trait MoveRoomActionTrait
 
         $this->action(function ($data, $livewire): void {
             $reservation = BookingReservation::find($livewire->selectedFolio->id);
+            if (isset($data['adjust_rate'])) {
+                $rate = roomTypeRate($data['room_type'], $reservation->from->format('Y-m-d'), $reservation->rate_plan_id);
+                $reservation->bookingTransactions()->where('transaction_type', 'room_charge')
+                    ->where('date', '>=', now()->format('Y-m-d'))
+                    ->update([
+                        'rate' => $rate
+                    ]);
+            }
             $old_room = $reservation->room->room_number;
             $reservation->room_id = $data['room'];
             $reservation->save();
+            $reservation->refresh();
 
             $livewire->dispatch('refresh-scheduler');
             $livewire->dispatch('refresh-edit-reservation');

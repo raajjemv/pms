@@ -83,9 +83,17 @@ trait ExtendStayActionTrait
                         ->afterStateUpdated(function ($state, $set, $livewire) {
                             $date = $livewire->selectedFolio->to->copy()->addDays(intval($state));
                             $set('to', $date->format('Y-m-d'));
+
+                            $reservation = BookingReservation::find($livewire->selectedFolio->id);
+                            $rate = roomTypeRate($reservation->room->room_type_id, $livewire->selectedFolio->to->format('Y-m-d'), $reservation->rate_plan_id);
+                            $set('rate', $rate);
                         })
                         ->minValue(1)
                         ->formatStateUsing(fn($livewire, $get) => totolNights($livewire->selectedFolio->to->format('Y-m-d'), $get('to'))),
+
+                    Forms\Components\TextInput::make('rate')
+                        ->numeric()
+                        ->required(),
 
                 ];
             })
@@ -103,7 +111,7 @@ trait ExtendStayActionTrait
                 $date = $reservation->to->copy()->addDays($i);
                 $reservation->bookingTransactions()->create([
                     'booking_id' => $reservation->booking_id,
-                    'rate' => roomTypeRate($reservation->room->room_type_id, $from->format('Y-m-d'), $reservation->rate_plan_id),
+                    'rate' => $data['rate'],
                     'date' => $date,
                     'transaction_type' => 'room_charge',
                     'user_id' => auth()->id()

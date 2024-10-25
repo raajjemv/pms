@@ -3,6 +3,7 @@
 namespace App\Livewire\Pms\Reservation;
 
 use App\Filament\ActionsExtended\ChargeAction\ChargeAction;
+use App\Filament\ActionsExtended\MoveRoomAction\MoveRoomAction;
 use App\Filament\ActionsExtended\PaymentAction\PaymentAction;
 use App\Models\Booking;
 use Livewire\Component;
@@ -58,7 +59,8 @@ class BookingSummary extends Component implements HasForms, HasActions
             'check-in' => $this->replaceMountedAction('checkInAction'),
             'check-out' => $this->replaceMountedAction('checkOutAction'),
             'add-payment' => $this->replaceMountedAction('addPaymentAction'),
-            'add-charge' => $this->replaceMountedAction('addChargeAction')
+            'add-charge' => $this->replaceMountedAction('addChargeAction'),
+            'move-room' => $this->replaceMountedAction('moveRoomAction')
         };
     }
 
@@ -67,6 +69,10 @@ class BookingSummary extends Component implements HasForms, HasActions
         return PaymentAction::make('add-payment');
     }
 
+    public function moveRoomAction()
+    {
+        return MoveRoomAction::make('move-room');
+    }
 
     public function addChargeAction()
     {

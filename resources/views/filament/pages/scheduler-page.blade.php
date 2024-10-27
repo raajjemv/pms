@@ -69,13 +69,21 @@
             }
     
             if (this.getDaysBetweenDates(this.startGridDate, this.endGridDate) > 0) {
-                $dispatch('open-modal', {
+                {{-- $dispatch('open-modal', {
+                    id: 'new-booking',
+                    from: this.startGridDate,
+                    to: this.endGridDate,
+                    room_id: roomId,
+                    room_type_id: roomTypeId
+                }) --}}
+                $wire.mountAction('quickReservationActions', {
                     id: 'new-booking',
                     from: this.startGridDate,
                     to: this.endGridDate,
                     room_id: roomId,
                     room_type_id: roomTypeId
                 })
+    
                 this.startGridDate = '';
                 this.endGridDate = '';
                 this.roomId = '';

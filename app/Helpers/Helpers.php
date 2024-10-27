@@ -170,7 +170,10 @@ if (! function_exists('roomReservationsByMonth')) {
         $endOfMonth = Carbon::parse($to)->format('Y-m-d');
 
         $roomReservationDates =  Room::with(['bookingTransactions' => function ($q) use ($startOfMonth, $endOfMonth) {
-            return $q->where('transaction_type', 'room_charge')->whereBetween('date', [$startOfMonth, $endOfMonth]);
+            return $q
+                ->where('transaction_type', 'room_charge')
+                ->where('maintenance', false)
+                ->whereBetween('date', [$startOfMonth, $endOfMonth]);
         }])
             ->find($roomId)
             ->bookingTransactions

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pms;
 
+use Livewire\Attributes\Isolate;
 use Livewire\Component;
 use Livewire\Attributes\Lazy;
 

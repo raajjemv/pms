@@ -13,6 +13,7 @@ enum BookingType: string implements HasLabel
     case Complimentary = 'complimentary';
     case Internal = 'internal';
     case Overbooking = 'overbooking';
+    case Maintenance = 'maintenance';
 
     public function getLabel(): ?string
     {
@@ -28,6 +29,7 @@ enum BookingType: string implements HasLabel
             self::Complimentary => 'heroicon-s-gift',
             self::Internal => 'heroicon-s-clipboard-check',
             self::Overbooking => 'heroicon-s-exclamation-circle',
+            self::Maintenance => 'heroicon-s-exclamation-triangle',
         };
     }
 

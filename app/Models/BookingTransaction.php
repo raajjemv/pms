@@ -33,7 +33,8 @@ class BookingTransaction extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'datetime:Y-m-d'
+            'date' => 'datetime:Y-m-d',
+            'maintenance' => 'boolean'
         ];
     }
 }

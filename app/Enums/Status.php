@@ -19,6 +19,7 @@ enum Status: string implements HasLabel
     // case Pending = "pending";
     case Disputed = "disputed";
     case Archived = "archived";
+    case Maintenance = "maintenance";
 
     public function getLabel(): ?string
     {
@@ -41,6 +42,7 @@ enum Status: string implements HasLabel
             // self::Pending => "bg-green-600 text-white",
             self::Disputed => "bg-zinc-200",
             self::Archived => "bg-zinc-200",
+            self::Maintenance => "bg-black text-white",
         };
     }
 

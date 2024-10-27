@@ -88,12 +88,14 @@ class NewBooking extends Component implements HasForms
 
                     Forms\Components\Select::make('booking_type')
                         ->options(BookingType::class)
+                        ->required()
                         ->live(),
 
                     Forms\Components\Select::make('business_source')
                         ->options(static::businessSources()->pluck('name', 'id'))
                         ->searchable()
                         ->preload()
+                        ->required()
                         ->visible(fn($get) => $get('booking_type') !== 'direct'),
 
                     Forms\Components\Select::make('booking_type_reference')

@@ -1,6 +1,5 @@
 <div>
     @php
-
         $from = \Carbon\Carbon::parse($this->from);
         $to = \Carbon\Carbon::parse($this->to);
     @endphp

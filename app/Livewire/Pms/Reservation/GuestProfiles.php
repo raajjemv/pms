@@ -51,6 +51,7 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
     public function table(Table $table): Table
     {
 
+        $reservationGuestCount = $this->booking->customers()->wherePivot('booking_reservation_id', $this->selectedFolio->id)->count();
 
         return $table
             ->relationship(fn(): BelongsToMany => $this->booking->customers()->wherePivot('booking_reservation_id', $this->selectedFolio->id))
@@ -70,7 +71,8 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
             ])
             ->headerActions([
                 Actions\Action::make('Initiate Guest')
-                    ->label($this->booking->customers()->wherePivot('booking_reservation_id', $this->selectedFolio->id)->count() ? 'Add Sharer' : 'Initiate Guest')
+                    ->disabled(fn() => $this->selectedFolio->totalPax() == $reservationGuestCount)
+                    ->label(fn() => $reservationGuestCount ? 'Add Sharer' : 'Initiate Guest')
                     ->modalWidth(MaxWidth::Small)
                     ->form([
                         Forms\Components\Radio::make('registration_type')
@@ -127,7 +129,7 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
                     ->form([
                         ...static::guestRegistrationFields()
                     ])
-                    ->after(function ($record,$livewire) {
+                    ->after(function ($record, $livewire) {
                         if ($record->pivot->master) {
                             $reservation = BookingReservation::where('id', $this->selectedFolio->id)
                                 ->update([
@@ -137,7 +139,7 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
                         $livewire->dispatch('refresh-edit-reservation');
                     }),
                 Actions\DetachAction::make()
-                    ->label('Void')
+                    ->label('Remove')
             ])
             ->bulkActions([
                 // ...

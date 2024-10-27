@@ -165,7 +165,8 @@ trait InteractsWithGuestRegistration
                             'local' => 'Local',
                             'tourist' => 'Tourist',
                             'work_permit_holder' => 'Work Permit Holder'
-                        ]),
+                        ])
+                        ->required(),
 
                     Forms\Components\Select::make('country_id')
                         ->relationship('country','name')

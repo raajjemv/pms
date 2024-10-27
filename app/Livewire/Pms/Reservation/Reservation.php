@@ -41,11 +41,12 @@ class Reservation extends Component implements HasForms, HasActions
     {
         $this->activeTab = 'guest-accounting';
 
-        $booking = Booking::with('bookingReservations.room.roomType')->find($booking_id);
+        $booking = Booking::with(['bookingReservations.room.roomType','bookingReservations.ratePlan'])->find($booking_id);
 
         $this->booking = $booking;
 
         $this->reservation_id = $reservation_id;
+
 
         $this->dispatch('open-modal', id: 'reservation-modal');
     }

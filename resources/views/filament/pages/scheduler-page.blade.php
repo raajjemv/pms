@@ -81,7 +81,7 @@
                 this.roomId = '';
                 this.selectedDays = [];
             }
-        },    
+        },
         isDateWithinRange(dateToCheck, room) {
             const checkDate = new Date(dateToCheck);
             const start = new Date(this.startGridDate);
@@ -223,9 +223,14 @@
 
     <livewire:pms.reservation.reservation />
 
-    <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl">
+    <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl" :autofocus="false">
         <x-slot name="heading">
-            New Booking
+            <div class="flex items-center justify-between">
+                <div>New Booking</div>
+                <button>
+                    Maintenance Block
+                </button>
+            </div>
         </x-slot>
         <livewire:pms.reservation.new-booking />
     </x-filament::modal>

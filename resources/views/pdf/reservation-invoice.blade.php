@@ -134,7 +134,8 @@
                     @php
                         $service_charge = ($bookingTransaction->rate * 10) / 100;
                         $tgst = (($bookingTransaction->rate + $service_charge) * 16) / 100;
-                        $green_tax = $reservation->totalPax() * 3;
+                        $green_tax =
+                            $bookingTransaction->transaction_type == 'room_charge' ? $reservation->totalPax() * 3 : 0;
                         $balance = $bookingTransaction->rate - ($service_charge + $tgst + $green_tax);
                     @endphp
                     <tr>
@@ -149,8 +150,11 @@
                                 </div>
                                 <div class="text-xs">T-GST: {{ number_format($tgst, 2) }}
                                 </div>
-                                <div class="text-xs">Green Tax: {{ number_format($green_tax, 2) }}
-                                </div>
+                                @if ($bookingTransaction->transaction_type == 'room_charge')
+                                    <div class="text-xs">Green Tax: {{ number_format($green_tax, 2) }}
+                                    </div>
+                                @endif
+
                             </div>
                         </td>
                         <td style="width:20%">
@@ -160,8 +164,10 @@
                                 </div>
                                 <div class="text-xs">{{ number_format($tgst, 2) }}
                                 </div>
-                                <div class="text-xs">{{ number_format($green_tax, 2) }}
-                                </div>
+                                @if ($bookingTransaction->transaction_type == 'room_charge')
+                                    <div class="text-xs">{{ number_format($green_tax, 2) }}
+                                    </div>
+                                @endif
                             </div>
                         </td>
                         <td style="text-align: right;font-weight:bold;width:20%">{{ $bookingTransaction->rate }}</td>

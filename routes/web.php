@@ -18,6 +18,8 @@ use App\Models\BookingReservation;
 use Illuminate\Support\Facades\DB;
 use Spatie\Browsershot\Browsershot;
 use Spatie\LaravelPdf\Enums\Format;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Route;
 use App\Jobs\ReservationStatusObserver;
 use Illuminate\Support\Facades\Storage;

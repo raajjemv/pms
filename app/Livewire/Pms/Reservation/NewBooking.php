@@ -247,7 +247,11 @@ class NewBooking extends Component implements HasForms
                     'user_id' => auth()->id()
                 ]);
             }
+
+            clearSchedulerCache($booking_reservation->from, $booking_reservation->to);
+
         }
+
 
         Notification::make()
             ->title('Reservation made successfully')

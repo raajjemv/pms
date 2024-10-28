@@ -1,16 +1,19 @@
 <x-filament-panels::page wire:poll.60s>
     <div x-init="() => {
-        var date = '{{ $date }}';
-        var container = document.getElementById('scheduler-wrapper');
-        if (isCurrentMonthAndYear(date)) {
-            var today = new Date().getDate();
-            today = String(today - 2).padStart(2, '0');
-            const targetDiv = document.getElementById('day-' + today);
-            const targetOffset = targetDiv.offsetLeft;
-            container.scrollTo({ left: targetOffset, behavior: 'smooth' });
-        } else {
-            container.scrollTo({ left: 0, behavior: 'smooth' });
-        }
+        setTimeout(() => {
+            var date = '{{ $date }}';
+            var container = document.getElementById('scheduler-wrapper');
+            if (isCurrentMonthAndYear(date)) {
+                var today = new Date().getDate();
+                {{-- today = String(today - 2).padStart(2, '0'); --}}
+                const targetDiv = document.getElementById('day-' + today);
+                const targetOffset = targetDiv.offsetLeft - 200;
+                container.scrollTo({ left: targetOffset, behavior: 'smooth' });
+            } else {
+                container.scrollTo({ left: 0, behavior: 'smooth' });
+            }
+        }, 0)
+    
     }" x-data="{
         isCurrentMonthAndYear(dateString) {
                 const currentDate = new Date();
@@ -69,13 +72,7 @@
             }
     
             if (this.getDaysBetweenDates(this.startGridDate, this.endGridDate) > 0) {
-                {{-- $dispatch('open-modal', {
-                    id: 'new-booking',
-                    from: this.startGridDate,
-                    to: this.endGridDate,
-                    room_id: roomId,
-                    room_type_id: roomTypeId
-                }) --}}
+    
                 $wire.mountAction('quickReservationActions', {
                     id: 'new-booking',
                     from: this.startGridDate,
@@ -120,109 +117,119 @@
         </div>
         <div wire:loading.remove wire:target="date" id="scheduler-wrapper"
             class="pb-5 overflow-x-scroll text-sm text-black rounded-lg bg-gray-50">
-            <div class="w-max">
-                <div class="relative flex">
-                    <div
-                        class="sticky left-0 bg-white w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200 z-20">
-                        Rooms
-                    </div>
-                    @foreach ($this->monthDays as $day)
-                        <div id="day-{{ $day->format('d') }}" @class([
-                            'flex-none border-[0.8px] border-gray-200 flex items-center justify-center w-[90px] px-1 py-1',
-                            'bg-amber-100' => $day->isFriday() || $day->isSaturday(),
-                        ])>
-                            <div class="text-center">
-                                <div>{{ $day->format('D') }}</div>
-                                <div class="font-semibold">{{ $day->format('d') }}</div>
-                                <div>{{ $day->format('M') }}</div>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
             <div class="">
-                @foreach ($this->rooms->groupBy('roomType.name') as $groupKey => $roomNumbers)
-                    <div class=" w-max">
-                        <div class="relative flex bg-zinc-100">
-                            <div
-                                class="bg-zinc-100 sticky left-0 flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold z-20">
-                                {{ $groupKey }}
-                            </div>
-                            <div class="flex">
-                                @foreach ($this->monthDays as $day)
-                                    <div class="flex-none  w-[90px] border-[0.8px] border-gray-300">
-                                        <div>
-                                            <x-rooms-available-count :day="$day" :roomNumbers="$roomNumbers" />
-                                            @livewire('pms.room-rate', ['roomTypeId' => $roomNumbers->first()->room_type_id, 'day' => $day], key(str()->random()))
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
+                <div class="w-max">
+                    <div class="relative flex">
+                        <div
+                            class="sticky left-0 bg-white w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200 z-20">
+                            Rooms
                         </div>
-                        @foreach ($roomNumbers as $room)
-                            <div class="relative flex ">
+                        @foreach ($this->monthDays as $day)
+                            <div id="day-{{ $day->format('d') }}" @class([
+                                'flex-none border-[0.8px] border-gray-200 flex items-center justify-center w-[90px] px-1 py-1',
+                                'bg-amber-100' => $day->isFriday() || $day->isSaturday(),
+                            ])>
+                                <div class="text-center">
+                                    <div>{{ $day->format('D') }}</div>
+                                    <div class="font-semibold">{{ $day->format('d') }}</div>
+                                    <div>{{ $day->format('M') }}</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+                <div class="">
+                    @foreach ($this->rooms->groupBy('roomType.name') as $groupKey => $roomNumbers)
+                        <div class=" w-max">
+                            <div class="relative flex bg-zinc-100">
                                 <div
-                                    class="sticky left-0 z-20 bg-white flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
-                                    {{ $room->room_number }}</div>
-                                <div class="relative flex overflow-hidde">
+                                    class="bg-zinc-100 sticky left-0 flex-none w-[200px] px-2 flex items-center border-[0.8px] border-gray-300 font-semibold z-20">
+                                    {{ $groupKey }}
+                                </div>
+                                <div class="flex">
                                     @foreach ($this->monthDays as $day)
-                                        <div wire:key="selection-day-{{ $day }}" day="{{ $day }}"
-                                            :class="{
-                                                'bg-gray-200': isDateWithinRange('{{ $day }}',
-                                                    {{ $room->id }})
-                                            }"
-                                            data-room="{{ $room->id }}" data-type="{{ $room->room_type_id }}"
-                                            @mousedown="isSelecting = true; startGridDate = $event.target.getAttribute('day');roomId = '{{ $room->id }}'"
-                                            @mouseup="isSelecting = false; endGridDate = $event.target.getAttribute('day'); selectDays($event);"
-                                            @mousemove="isSelecting && (endGridDate = $event.target.getAttribute('day'))"
-                                            class="flex-none  flex items-center w-[90px] px-1  border-[0.8px] border-gray-200">
-                                        </div>
-                                    @endforeach
-
-                                    @foreach ($room->bookingReservations as $reservation)
-                                        @php
-                                            $from = $reservation->from;
-                                            $to = $reservation->to;
-                                            $totalDays = $from->diffInDays($to);
-                                            $dayNumber = $reservation->from->day;
-                                            $left =
-                                                $from->month == $to->month
-                                                    ? $dayNumber * 90 - 45
-                                                    : ($from->month == $this->startOfMonth->month
-                                                        ? $dayNumber * 90 - 45
-                                                        : 0);
-
-                                            $width =
-                                                $from->month == $to->month
-                                                    ? $totalDays * 90
-                                                    : ($from->month == $this->startOfMonth->month
-                                                        ? $totalDays * 90
-                                                        : $to->day * 90 - 45);
-                                        @endphp
-                                        <div style="width: {{ $width }}px;left:{{ $left }}px"
-                                            wire:click="$dispatch('booking-summary',{booking_id:{{ $reservation->booking_id }},reservation_id:{{ $reservation->id }}})"
-                                            class="absolute h-full overflow-hidde border-gray-200 cursor-pointer py-0.5">
-                                            <div
-                                                class=" w-full h-full flex items-center rounded relative {{ $reservation->status->getColor() }}">
-                                                <div
-                                                    class="flex items-end px-1 space-x-1 overflow-hidden text-sm text-white whitespace-nowrap">
-                                                    <x-booking-scheduler.icon :booking-type="$reservation->booking->booking_type" />
-                                                    <span title="{{ $reservation->customer->name }}" class="">
-                                                        {{ $reservation->customer->name }}</span>
-                                                </div>
-                                                @if (reservationTotals($reservation->id)['balance'])
-                                                    <span title="pending payment"
-                                                        class="absolute top-0 right-0 z-10 flex items-center justify-center -mt-2 text-xs text-white bg-red-500 rounded-full size-4">$</span>
-                                                @endif
-
+                                        <div class="flex-none  w-[90px] border-[0.8px] border-gray-300">
+                                            <div>
+                                                <x-rooms-available-count :day="$day" :roomNumbers="$roomNumbers" />
+                                                @livewire('pms.room-rate', ['roomType' => $roomNumbers->first()->roomType, 'day' => $day], key(str()->random()))
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
-                @endforeach
+                            @foreach ($roomNumbers as $room)
+                                <div class="relative flex ">
+                                    <div
+                                        class="sticky left-0 z-20 bg-white flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
+                                        {{ $room->room_number }}</div>
+                                    <div class="relative flex overflow-hidde">
+                                        @foreach ($this->monthDays as $day)
+                                            <div wire:key="selection-day-{{ $day }}" day="{{ $day }}"
+                                                :class="{
+                                                    'bg-gray-200': isDateWithinRange('{{ $day }}',
+                                                        {{ $room->id }})
+                                                }"
+                                                data-room="{{ $room->id }}" data-type="{{ $room->room_type_id }}"
+                                                @mousedown="isSelecting = true; startGridDate = $event.target.getAttribute('day');roomId = '{{ $room->id }}'"
+                                                @mouseup="isSelecting = false; endGridDate = $event.target.getAttribute('day'); selectDays($event);"
+                                                @mousemove="isSelecting && (endGridDate = $event.target.getAttribute('day'))"
+                                                class="flex-none  flex items-center w-[90px] px-1  border-[0.8px] border-gray-200">
+                                            </div>
+                                        @endforeach
+
+                                        @foreach ($room->bookingReservations as $reservation)
+                                            @php
+                                                $from = $reservation->from;
+                                                $to = $reservation->to;
+                                                $totalDays = $from->diffInDays($to);
+                                                $dayNumber = $reservation->from->day;
+                                                $left =
+                                                    $from->month == $to->month
+                                                        ? $dayNumber * 90 - 45
+                                                        : ($from->month == $this->startOfMonth->month
+                                                            ? $dayNumber * 90 - 45
+                                                            : 0);
+                                                $width =
+                                                    $from->month == $to->month
+                                                        ? $totalDays * 90
+                                                        : ($from->month == $this->startOfMonth->month
+                                                            ? $totalDays * 90
+                                                            : $to->day * 90 - 45);
+                                                $exceeding = 0;
+                                                if ($to->gt($this->startOfMonth->endOfMonth())) {
+                                                    $exceeding = $this->endOfMonth->diffInDays($to) * 90;
+                                                    // $exceeding =
+                                                    //     round($to->diffInDays($this->startOfMonth->endOfMonth()->format('Y-m-d')));
+                                                    $width = $width - $exceeding + 7;
+                                                }
+                                            @endphp
+                                            <div style="width: {{ $width }}px;left:{{ $left }}px"
+                                                wire:click="$dispatch('booking-summary',{booking_id:{{ $reservation->booking_id }},reservation_id:{{ $reservation->id }}})"
+                                                class="absolute h-full overflow-hidde border-gray-200 cursor-pointer py-0.5">
+                                                <div
+                                                    class=" w-full h-full flex items-center rounded relative {{ $reservation->status->getColor() }}">
+                                                    <div
+                                                        class="flex items-end px-1 space-x-1 overflow-hidden text-sm text-white whitespace-nowrap">
+                                                        <x-booking-scheduler.icon :booking-type="$reservation->booking->booking_type" />
+                                                        <span title="{{ $reservation->customer->name }}"
+                                                            class="">
+                                                            {{ $reservation->customer->name }}
+                                                        </span>
+                                                    </div>
+                                                    @if (reservationTotals($reservation->id)['balance'])
+                                                        <span title="pending payment"
+                                                            class="absolute top-0 right-0 z-10 flex items-center justify-center -mt-2 text-xs text-white bg-red-500 rounded-full size-4">$</span>
+                                                    @endif
+
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endforeach
+                </div>
             </div>
         </div>
     </div>

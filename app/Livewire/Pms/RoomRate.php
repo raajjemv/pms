@@ -9,7 +9,7 @@ use Livewire\Attributes\Lazy;
 #[Lazy]
 class RoomRate extends Component
 {
-    public $day, $roomTypeId;
+    public $day, $roomType;
 
     public function placeholder()
     {

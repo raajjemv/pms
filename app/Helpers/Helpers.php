@@ -182,3 +182,15 @@ if (! function_exists('roomReservationsByMonth')) {
         return collect($roomReservationDates)->map(fn($date) => Carbon::parse($date)->format('Y-m-d'));
     }
 }
+
+//clear scheduler cache
+if (! function_exists('clearSchedulerCache')) {
+    function clearSchedulerCache($from, $to)
+    {
+        $startOfMonth = Carbon::parse($from)->format('Y-m');
+        $endOfMonth = Carbon::parse($to)->format('Y-m');
+
+        Cache::forget('scheduler_' . $startOfMonth);
+        Cache::forget('scheduler_' . $endOfMonth);
+    }
+}

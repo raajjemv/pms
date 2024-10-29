@@ -2,17 +2,18 @@
 
 namespace App\Filament\Resources\RoomTypeResource\RelationManagers;
 
-use App\Models\RatePlan;
 use Filament\Forms;
 use Filament\Tables;
+use App\Models\RatePlan;
 use App\Models\RoomType;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Cache;
 use Filament\Tables\Actions\AttachAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Resources\RelationManagers\RelationManager;
-use Illuminate\Support\Facades\Cache;
 
 class RatePlansRelationManager extends RelationManager
 {
@@ -76,7 +77,7 @@ class RatePlansRelationManager extends RelationManager
                     })
                     ->after(function ($data) {
                         Cache::forget('room_type_' . $this->getOwnerRecord()->id);
-
+                        Cache::forget('room_types_' . Filament::getTenant()->id);
 
                         if ($data['default'] == true) {
                             // RoomType::find($this->getOwnerRecord()->id)->ratePlans()->wherePivot('rate_plan_id', '!=', $record->id)->newPivotQuery()->update(['default' => false]);
@@ -90,10 +91,15 @@ class RatePlansRelationManager extends RelationManager
                         if ($record->pivot->default) {
                             RoomType::find($this->getOwnerRecord()->id)->ratePlans()->wherePivot('rate_plan_id', '!=', $record->id)->newPivotQuery()->update(['default' => false]);
                             Cache::forget('room_type_' . $this->getOwnerRecord()->id);
+                            Cache::forget('room_types_' . Filament::getTenant()->id);
                         }
                     })
                     ->modalWidth('sm'),
-                Tables\Actions\DetachAction::make(),
+                Tables\Actions\DetachAction::make()
+                    ->after(function () {
+                        Cache::forget('room_type_' . $this->getOwnerRecord()->id);
+                        Cache::forget('room_types_' . Filament::getTenant()->id);
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

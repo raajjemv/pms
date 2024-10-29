@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             UserSeeder::class,
             RoomStatusSeeder::class,
-            BusinessSourceSeeder::class
+            BusinessSourceSeeder::class,
+            CountrySeeder::class
         ]);
     }
 }

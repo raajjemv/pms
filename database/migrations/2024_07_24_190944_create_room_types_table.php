@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('room_types', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained();
-            $table->foreignId('rate_plan_id')->constrained();
+            // $table->foreignId('rate_plan_id')->constrained();
             $table->string('name');
             // $table->decimal('base_rate', 10, 2);
             $table->text('description');

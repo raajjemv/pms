@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('transaction_type')->nullable();
             $table->foreignId('user_id')->nullable()->constrained();
             $table->string('comments')->nullable();
+            $table->boolean('maintenance')->default(0);
             $table->softDeletes();
             $table->timestamps();
         });

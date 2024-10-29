@@ -69,7 +69,7 @@ class CustomerResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone_number')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('country')
+                Tables\Columns\TextColumn::make('country.name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->sortable(),

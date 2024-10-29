@@ -38,7 +38,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->tenant(Tenant::class)
-            ->tenantRegistration(TenantRegistration::class)
+            // ->tenantRegistration(TenantRegistration::class)
             ->path('admin')
             ->login()
             ->colors([

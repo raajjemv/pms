@@ -36,8 +36,12 @@ class TenantResource extends Resource
                     ->tel()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('logo')
-                    ->maxLength(255),
+                Forms\Components\FileUpload::make('logo')
+                    ->image()
+                    ->imageEditor()
+                    ->optimize('webp')
+                    ->disk(env('FILESYSTEM_DISK'))
+                    ->required(),
                 Forms\Components\TextInput::make('bill_initials')
                     ->maxLength(255),
                 Forms\Components\Textarea::make('address')

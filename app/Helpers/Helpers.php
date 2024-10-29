@@ -61,7 +61,7 @@ if (! function_exists('roomTypeBaseRateByRatePlan')) {
                 ->ratePlans
                 ->where('id', $ratePlanId)
                 ->first()
-                ->pivot
+                ?->pivot
                 ->rate;
         }
     }

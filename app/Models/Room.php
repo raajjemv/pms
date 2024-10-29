@@ -70,6 +70,7 @@ class Room extends Model
     {
         return [
             'smoking' => 'boolean',
+            'family_room' => 'boolean',
             'amenities' => 'array'
         ];
     }

@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Pms\Reservation;
 
-use App\Enums\BookingType;
 use Carbon\Carbon;
 use Filament\Forms;
 use App\Models\Room;
@@ -12,13 +11,17 @@ use Livewire\Component;
 use App\Models\RatePlan;
 use App\Models\RoomType;
 use Filament\Forms\Form;
+use App\Enums\BookingType;
 use Livewire\Attributes\On;
 use App\Models\BusinessSource;
 use Filament\Facades\Filament;
+use App\Services\BookingService;
 use Livewire\Attributes\Computed;
 use App\Http\Traits\CachedQueries;
 use App\Models\BookingReservation;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
+use App\Services\ReservationService;
 use Illuminate\Support\Facades\Cache;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
@@ -199,59 +202,41 @@ class NewBooking extends Component implements HasForms
 
     public function createBooking()
     {
-        $form = $this->form->getState();
-        $from = Carbon::createFromFormat('d/m/Y H:i', $form['from'] . ' ' . tenant()->check_in_time);
-        $to = Carbon::createFromFormat('d/m/Y H:i', $form['to'] . ' ' . tenant()->check_out_time);
+        $data = $this->form->getState();
 
-        $booking = Booking::create([
-            'booking_type' => $form['booking_type'],
-            'booking_type_reference' => $form['booking_type_reference'] ?? NULL,
-            'business_source_id' => $form['business_source'] ?? NULL,
-            'tenant_id' => Filament::getTenant()->id,
-            'booking_number' =>  strtoupper(str()->random()),
-            'booking_customer' => $form['guest_name'],
-            'booking_email' => $form['email'],
-            'user_id' => auth()->id()
-        ]);
 
-        $reservation_count = 1;
 
-        foreach (collect($form['bookingReservations']) as $key => $reservation) {
+        DB::transaction(function () use ($data) {
+            $bookingService = new BookingService;
+            $reservationService = new ReservationService;
 
-            $customer_iteration = collect($form['bookingReservations'])->count() == 1 ? NULL : ' - ' . $reservation_count;
 
-            $booking_reservation = $booking->bookingReservations()->create([
-                'tenant_id' => Filament::getTenant()->id,
-                'room_id' => $reservation['room'],
-                'adults' => $reservation['adults'],
-                'children' => $reservation['children'],
-                'rate_plan_id' => $reservation['rate_plan'],
-                'booking_customer' => $booking->booking_customer . $customer_iteration,
-                'from' => $from,
-                'to' => $to,
-                'master' => $key == 0 ? true : false,
-                'status' => $form['status']
-            ]);
+            $booking = $bookingService->create($data);
 
-            $reservation_count++;
 
-            $nights = $booking_reservation->from->diffInDays($booking_reservation->to);
+            $reservation_count = 1;
 
-            for ($i = 0; $i < $nights; $i++) {
-                $date = $booking_reservation->from->copy()->addDays($i);
-                $booking->bookingTransactions()->create([
-                    'booking_reservation_id' => $booking_reservation->id,
-                    'rate' => roomTypeRate($booking_reservation->room->room_type_id, $from->format('Y-m-d'), $reservation['rate_plan']),
-                    'date' => $date,
-                    'transaction_type' => 'room_charge',
-                    'user_id' => auth()->id()
-                ]);
+            $from = Carbon::createFromFormat('d/m/Y H:i', $data['from'] . ' ' . tenant()->check_in_time);
+            $to = Carbon::createFromFormat('d/m/Y H:i', $data['to'] . ' ' . tenant()->check_out_time);
+
+            foreach (collect($data['bookingReservations']) as $key => $reservation) {
+
+                $customer_iteration = collect($data['bookingReservations'])->count() == 1 ? NULL : ' - ' . $reservation_count;
+
+                $reservation['master'] = $key == 0 ? true : false;
+                $reservation['from'] = $from;
+                $reservation['to'] = $to;
+                $reservation['guest_name'] = $data['guest_name'] . $customer_iteration;
+                $reservation['status'] = $data['status'];
+
+                $booking_reservation = $reservationService->create($booking, $reservation);
+
+                $blockConnectingRooms = $reservationService->blockConnectingRooms($booking_reservation);
+
+
+                $reservation_count++;
             }
-
-            clearSchedulerCache($booking_reservation->from, $booking_reservation->to);
-
-        }
-
+        });
 
         Notification::make()
             ->title('Reservation made successfully')

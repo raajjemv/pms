@@ -91,6 +91,6 @@ class BusinessSourceSeeder extends Seeder
         ];
 
         // Insert records
-        BusinessSource::insert($businessSources);
+        BusinessSource::withoutGlobalScopes()->insert($businessSources);
     }
 }

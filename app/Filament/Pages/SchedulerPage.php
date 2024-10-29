@@ -8,6 +8,8 @@ use Filament\Forms;
 use App\Models\Room;
 use App\Models\Booking;
 use App\Models\RoomType;
+use App\Services\BookingService;
+use App\Services\ReservationService;
 use Filament\Pages\Page;
 use Livewire\Attributes\On;
 use Filament\Actions\Action;
@@ -164,6 +166,7 @@ class SchedulerPage extends Page
 
                     Forms\Components\TextInput::make('remarks')
                         ->visible(fn($get) => $get('action') == 'maintenance')
+                        ->formatStateUsing(fn($state) =>  $state ?? 'Maintenance')
                         ->required()
                 ];
             })
@@ -179,44 +182,24 @@ class SchedulerPage extends Page
                     );
                     return;
                 }
-                $booking = Booking::create([
-                    'booking_type' => 'maintenance',
-                    'tenant_id' => Filament::getTenant()->id,
-                    'booking_number' =>  strtoupper(str()->random()),
-                    'booking_customer' => $data['remarks'],
-                    'user_id' => auth()->id()
-                ]);
+                $bookingService = new BookingService;
+                $reservationService = new ReservationService;
 
+                $data['booking_type'] = 'maintenance';
+                $data['guest_name'] = $data['remarks'];
+                $data['status'] = 'maintenance';
 
-                $from = Carbon::parse($arguments['from'])->setTimeFromTimeString(tenant()->check_in_time);
-                $to = Carbon::parse($data['to'])->setTimeFromTimeString(tenant()->check_out_time);
+                $booking = $bookingService->create($data);
 
-                $booking_reservation = $booking->bookingReservations()->create([
-                    'tenant_id' => Filament::getTenant()->id,
-                    'room_id' => $arguments['room_id'],
-                    'adults' => 0,
-                    'children' => 0,
-                    'rate_plan_id' => 1,
-                    'booking_customer' => $data['remarks'],
-                    'from' => $from,
-                    'to' => $to,
-                    'master' => true,
-                    'status' => 'maintenance'
-                ]);
+                $data['from'] = $arguments['from'];
+                $data['to'] = $arguments['to'];
+                $data['room_id'] = $arguments['room_id'];
+                $data['room'] = $data['room_id'];
 
-                $nights = $booking_reservation->from->diffInDays($booking_reservation->to);
+                $reservation = $reservationService->create($booking, $data);
 
-                for ($i = 0; $i < $nights; $i++) {
-                    $date = $booking_reservation->from->copy()->addDays($i);
-                    $booking->bookingTransactions()->create([
-                        'booking_reservation_id' => $booking_reservation->id,
-                        'rate' => 0,
-                        'date' => $date,
-                        'transaction_type' => 'room_charge',
-                        'user_id' => auth()->id(),
-                        'maintenance' => true
-                    ]);
-                }
+                $blockConnectingRooms = $reservationService->blockConnectingRooms($reservation);
+
             });
     }
 

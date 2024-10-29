@@ -151,7 +151,8 @@
                                         <div class="flex-none  w-[90px] border-[0.8px] border-gray-300">
                                             <div>
                                                 <x-rooms-available-count :day="$day" :roomNumbers="$roomNumbers" />
-                                                @livewire('pms.room-rate', ['roomType' => $roomNumbers->first()->roomType, 'day' => $day], key(str()->random()))
+                                                @livewire('pms.room-rate', ['roomType' => $roomNumbers->first()->roomType, 'day' => $day], key('rates' . $day . '-' . $roomNumbers->first()->room_type_id))
+                                               
                                             </div>
                                         </div>
                                     @endforeach
@@ -240,12 +241,9 @@
 
     <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl" :autofocus="false">
         <x-slot name="heading">
-            <div class="flex items-center justify-between">
-                <div>New Booking</div>
-                <button>
-                    Maintenance Block
-                </button>
-            </div>
+            <div>New Booking</div>
+
+
         </x-slot>
         <livewire:pms.reservation.new-booking />
     </x-filament::modal>

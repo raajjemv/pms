@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('tenant_id')->constrained();
             $table->string('name');
             $table->string('code');
-            $table->decimal('rate', 10, 2);
+            // $table->decimal('rate', 10, 2);
             $table->foreignId('user_id')->constrained();
             $table->softDeletes();
             $table->timestamps();

@@ -28,7 +28,11 @@ class RoomResource extends Resource
             ->schema([
                 Forms\Components\Section::make([
                     Forms\Components\Select::make('room_type_id')
-                        ->relationship(name: 'roomType', titleAttribute: 'name')
+                        ->relationship(
+                            name: 'roomType',
+                            titleAttribute: 'name',
+                            modifyQueryUsing: fn($query) => $query->whereHas('ratePlans')
+                        )
                         ->required(),
                     Forms\Components\Select::make('room_class_id')
                         ->relationship(name: 'roomClass', titleAttribute: 'name')
@@ -64,14 +68,15 @@ class RoomResource extends Resource
                         ->options(Amenity::pluck('name', 'id')),
                     Forms\Components\Toggle::make('smoking')
                         ->required(),
+                    Forms\Components\Toggle::make('family_room'),
                     Forms\Components\TextInput::make('floor_number')
                         ->maxLength(255),
                     Forms\Components\Textarea::make('room_description')
                         ->required()
                         ->columnSpanFull(),
-                  
+
                 ])
-                ->columns(3)
+                    ->columns(3)
 
 
             ]);
@@ -115,6 +120,12 @@ class RoomResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ReplicateAction::make()
+                    ->mutateRecordDataUsing(function (array $data): array {
+                        $data['room_number'] = auth()->id();
+
+                        return $data;
+                    }),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
             ])
@@ -122,7 +133,8 @@ class RoomResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->defaultSort('created_at', 'DESC');
     }
 
     public static function getRelations(): array

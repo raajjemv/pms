@@ -28,6 +28,8 @@ return new class extends Migration
             $table->string('floor_number')->nullable();
             $table->foreignId('room_status_id')->constrained();
             $table->text('room_description');
+            $table->boolean('family_room')->default(0);
+            $table->string('family_room_id')->nullable();
             $table->foreignId('user_id')->constrained();
             $table->softDeletes();
             $table->timestamps();

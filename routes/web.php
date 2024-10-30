@@ -3,7 +3,6 @@
 use Carbon\Carbon;
 use App\Models\Room;
 use App\Models\User;
-use App\Enums\Status;
 use App\Models\Booking;
 use App\Models\Customer;
 use App\Models\RatePlan;
@@ -29,7 +28,6 @@ use Spatie\Permission\PermissionRegistrar;
 use App\Http\Controllers\Pdf\ReservationInvoice;
 
 Route::get('/', function () {
-  
     return redirect('/admin');
 });
 Route::middleware(['auth', 'auth.session'])->group(function () {

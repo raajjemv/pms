@@ -2,9 +2,6 @@
 
 namespace App\Livewire\Pms\Reservation;
 
-use App\Filament\ActionsExtended\ChargeAction\ChargeAction;
-use App\Filament\ActionsExtended\MoveRoomAction\MoveRoomAction;
-use App\Filament\ActionsExtended\PaymentAction\PaymentAction;
 use App\Models\Booking;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -13,10 +10,14 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\Reactive;
 use Filament\Forms\Contracts\HasForms;
 use App\Forms\Components\GroupCheckField;
-use App\Http\Traits\InteractsWithReservationActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Actions\Concerns\InteractsWithActions;
+use App\Http\Traits\InteractsWithReservationActions;
+use App\Filament\ActionsExtended\VoidAction\VoidAction;
+use App\Filament\ActionsExtended\ChargeAction\ChargeAction;
+use App\Filament\ActionsExtended\PaymentAction\PaymentAction;
+use App\Filament\ActionsExtended\MoveRoomAction\MoveRoomAction;
 
 class BookingSummary extends Component implements HasForms, HasActions
 {
@@ -60,7 +61,8 @@ class BookingSummary extends Component implements HasForms, HasActions
             'check-out' => $this->replaceMountedAction('checkOutAction'),
             'add-payment' => $this->replaceMountedAction('addPaymentAction'),
             'add-charge' => $this->replaceMountedAction('addChargeAction'),
-            'move-room' => $this->replaceMountedAction('moveRoomAction')
+            'move-room' => $this->replaceMountedAction('moveRoomAction'),
+            'void' => $this->replaceMountedAction('voidReservation')
         };
     }
 
@@ -77,6 +79,11 @@ class BookingSummary extends Component implements HasForms, HasActions
     public function addChargeAction()
     {
         return ChargeAction::make('add-charge');
+    }
+
+    public function voidReservation()
+    {
+        return VoidAction::make('void-reservation');
     }
 
     public function render()

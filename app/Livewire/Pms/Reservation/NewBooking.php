@@ -231,7 +231,7 @@ class NewBooking extends Component implements HasForms
 
                 $booking_reservation = $reservationService->create($booking, $reservation);
 
-                $blockConnectingRooms = $reservationService->blockConnectingRooms($booking_reservation);
+                $blockConnectingRooms = $reservationService->blockConnectingRooms($booking, $booking_reservation);
 
 
                 $reservation_count++;

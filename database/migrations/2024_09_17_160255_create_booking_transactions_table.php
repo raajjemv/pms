@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('booking_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('booking_id')->constrained();
+            $table->foreignId('booking_id')->constrained()->cascadeOnDelete();
             $table->date('date');
             $table->decimal('rate', 10, 2);
             $table->string('transaction_type')->nullable();

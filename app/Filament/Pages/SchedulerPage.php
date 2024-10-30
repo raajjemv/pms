@@ -198,8 +198,7 @@ class SchedulerPage extends Page
 
                 $reservation = $reservationService->create($booking, $data);
 
-                $blockConnectingRooms = $reservationService->blockConnectingRooms($reservation);
-
+                $blockConnectingRooms = $reservationService->blockConnectingRooms($booking,$reservation);
             });
     }
 
@@ -207,5 +206,14 @@ class SchedulerPage extends Page
     public static function canAccess(): bool
     {
         return auth()->user()->hasRole('admin|tenant_owner|sales_manager|front_desk');
+    }
+
+    public function floatingReservationAction($status, $booking_id, $reservation_id)
+    {
+        if ($status == 'maintenance') {
+            $this->dispatch('maintenance-booking-summary', booking_id: $booking_id, reservation_id: $reservation_id);
+            return;
+        }
+        $this->dispatch('booking-summary', booking_id: $booking_id, reservation_id: $reservation_id);
     }
 }

@@ -41,7 +41,7 @@ class ReservationService
                 'date' => $date,
                 'transaction_type' => 'room_charge',
                 'user_id' => auth()->id(),
-                'maintenance' => true
+                'maintenance' => $data['status'] == 'maintenance' ? true : false
             ]);
         }
 
@@ -50,7 +50,7 @@ class ReservationService
         return $booking_reservation;
     }
 
-    public function blockConnectingRooms(BookingReservation $booking_reservation)
+    public function blockConnectingRooms(Booking $booking, BookingReservation $booking_reservation)
     {
         $bookingRoom = Room::find($booking_reservation->room_id);
 
@@ -73,9 +73,6 @@ class ReservationService
                 $data['booking_type'] = 'maintenance';
                 $data['guest_name'] = $bookingRoom->roomType->name . ': ' . $bookingRoom->room_number;
                 $data['status'] = 'maintenance';
-                
-                $bookingService = new BookingService;
-                $booking = $bookingService->create($data);
 
                 $data['from'] = $booking_reservation->from;
                 $data['to'] = $booking_reservation->to;

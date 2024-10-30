@@ -10,11 +10,12 @@ use App\Models\Scopes\TenantScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ScopedBy([TenantScope::class])]
 class BookingReservation extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $guarded = [];
 
@@ -62,7 +63,10 @@ class BookingReservation extends Model
 
     public function ratePlan()
     {
-        return $this->belongsTo(RatePlan::class);
+        return $this->belongsTo(RatePlan::class)
+            ->withDefault([
+                'code' => '-'
+            ]);
     }
 
     public function totalPax()

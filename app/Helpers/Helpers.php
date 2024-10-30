@@ -172,7 +172,7 @@ if (! function_exists('roomReservationsByMonth')) {
         $roomReservationDates =  Room::with(['bookingTransactions' => function ($q) use ($startOfMonth, $endOfMonth) {
             return $q
                 ->where('transaction_type', 'room_charge')
-                ->where('maintenance', false)
+                // ->where('maintenance', false)
                 ->whereBetween('date', [$startOfMonth, $endOfMonth]);
         }])
             ->find($roomId)

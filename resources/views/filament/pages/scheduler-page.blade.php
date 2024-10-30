@@ -152,7 +152,7 @@
                                             <div>
                                                 <x-rooms-available-count :day="$day" :roomNumbers="$roomNumbers" />
                                                 @livewire('pms.room-rate', ['roomType' => $roomNumbers->first()->roomType, 'day' => $day], key('rates' . $day . '-' . $roomNumbers->first()->room_type_id))
-                                               
+
                                             </div>
                                         </div>
                                     @endforeach
@@ -199,13 +199,11 @@
                                                 $exceeding = 0;
                                                 if ($to->gt($this->startOfMonth->endOfMonth())) {
                                                     $exceeding = $this->endOfMonth->diffInDays($to) * 90;
-                                                    // $exceeding =
-                                                    //     round($to->diffInDays($this->startOfMonth->endOfMonth()->format('Y-m-d')));
                                                     $width = $width - $exceeding + 7;
                                                 }
                                             @endphp
                                             <div style="width: {{ $width }}px;left:{{ $left }}px"
-                                                wire:click="$dispatch('booking-summary',{booking_id:{{ $reservation->booking_id }},reservation_id:{{ $reservation->id }}})"
+                                                wire:click="floatingReservationAction('{{ $reservation->status }}','{{ $reservation->booking_id }}','{{ $reservation->id }}')"
                                                 class="absolute h-full overflow-hidde border-gray-200 cursor-pointer py-0.5">
                                                 <div
                                                     class=" w-full h-full flex items-center rounded relative {{ $reservation->status->getColor() }}">
@@ -236,14 +234,14 @@
     </div>
 
     <livewire:pms.reservation.booking-summary />
+    
+    <livewire:pms.reservation.maintenance-booking-summary />
 
     <livewire:pms.reservation.reservation />
 
     <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl" :autofocus="false">
         <x-slot name="heading">
             <div>New Booking</div>
-
-
         </x-slot>
         <livewire:pms.reservation.new-booking />
     </x-filament::modal>

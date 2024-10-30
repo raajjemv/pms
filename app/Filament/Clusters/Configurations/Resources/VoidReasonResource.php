@@ -1,44 +1,35 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Clusters\Configurations\Resources;
 
-use Filament\Forms;
-use Filament\Tables;
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use App\Models\BusinessSource;
-use Filament\Resources\Resource;
 use App\Filament\Clusters\Configurations;
+use App\Filament\Clusters\Configurations\Resources\VoidReasonResource\Pages;
+use App\Filament\Clusters\Configurations\Resources\VoidReasonResource\RelationManagers;
+use App\Models\VoidReason;
+use Filament\Forms;
+use Filament\Forms\Form;
+use Filament\Resources\Resource;
+use Filament\Tables;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\BusinessSourceResource\Pages;
-use App\Filament\Resources\BusinessSourceResource\RelationManagers;
 
-class BusinessSourceResource extends Resource
+class VoidReasonResource extends Resource
 {
-    protected static ?string $model = BusinessSource::class;
-
-    protected static ?string $cluster = Configurations::class;
+    protected static ?string $model = VoidReason::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $cluster = Configurations::class;
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
+
+                Forms\Components\TextInput::make('reason')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('business_registration')
-                    ->maxLength(255),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'ota' => 'OTA',
-                        'city_ledger' => 'City Ledger',
-                        'local_travel_agent' => 'Local Travel Agent',
-                        'foreign_travel_agent' => 'Foreign Travel Agent',
-                        'corporate' => 'Coporate'
-                    ]),
 
             ]);
     }
@@ -47,16 +38,13 @@ class BusinessSourceResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                Tables\Columns\TextColumn::make('reason')
                     ->description(fn($record) => $record->locked ? 'System Use' : NULL)
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('business_registration')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('type')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
                     ->numeric()
                     ->sortable(),
+
                 Tables\Columns\TextColumn::make('deleted_at')
                     ->dateTime()
                     ->sortable()
@@ -76,13 +64,14 @@ class BusinessSourceResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make()
                     ->visible(fn($record) => !$record->locked),
+
                 Tables\Actions\EditAction::make()
                     ->visible(fn($record) => !$record->locked),
+
             ])
             ->bulkActions([
                
-            ])
-            ->defaultSort('created_at', 'DESC');
+            ]);
     }
 
     public static function getRelations(): array
@@ -95,12 +84,13 @@ class BusinessSourceResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListBusinessSources::route('/'),
-            'create' => Pages\CreateBusinessSource::route('/create'),
-            'view' => Pages\ViewBusinessSource::route('/{record}'),
-            'edit' => Pages\EditBusinessSource::route('/{record}/edit'),
+            'index' => Pages\ListVoidReasons::route('/'),
+            'create' => Pages\CreateVoidReason::route('/create'),
+            'view' => Pages\ViewVoidReason::route('/{record}'),
+            'edit' => Pages\EditVoidReason::route('/{record}/edit'),
         ];
     }
 
     protected static bool $isScopedToTenant = false;
+
 }

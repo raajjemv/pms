@@ -2,11 +2,13 @@
 
 namespace App\Filament\Resources\RoomResource\Pages;
 
-use App\Filament\Resources\RoomResource;
-use App\Http\Traits\CachedQueries;
+use Filament\Forms;
 use App\Models\Room;
 use Filament\Actions;
-use Filament\Forms;
+use Filament\Facades\Filament;
+use App\Http\Traits\CachedQueries;
+use Illuminate\Support\Facades\Cache;
+use App\Filament\Resources\RoomResource;
 use Filament\Resources\Pages\EditRecord;
 
 class EditRoom extends EditRecord
@@ -52,5 +54,10 @@ class EditRoom extends EditRecord
             Actions\ViewAction::make(),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    protected function afterSave()
+    {
+        Cache::forget('room_types_' . Filament::getTenant()->id);
     }
 }

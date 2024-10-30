@@ -35,7 +35,7 @@ trait HasTenants
     {
 
         $this->forceFill([
-            'current_tenant_id' => $tenant->id ?? 1000,
+            'current_tenant_id' => $tenant->id,
         ])->save();
 
         $this->setRelation('currentTenant', $tenant);

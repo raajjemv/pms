@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('booking_reservations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('tenant_id')->constrained('tenants');
-            $table->foreignId('booking_id')->constrained('bookings');
+            $table->foreignId('booking_id')->constrained('bookings')->cascadeOnDelete();
             $table->foreignId('room_id')->constrained('rooms');
             $table->string('booking_customer')->nullable();
             // $table->foreignId('customer_id')->nullable()->constrained();
@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('status')->default('reserved');
             $table->string('payment_status')->default('pending');
             $table->boolean('master')->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

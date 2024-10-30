@@ -18,7 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             RoomStatusSeeder::class,
             BusinessSourceSeeder::class,
-            CountrySeeder::class
+            CountrySeeder::class,
+            VoidReasonSeeder::class
         ]);
     }
 }

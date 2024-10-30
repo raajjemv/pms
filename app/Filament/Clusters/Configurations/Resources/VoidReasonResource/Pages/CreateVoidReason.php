@@ -1,22 +1,21 @@
 <?php
 
-namespace App\Filament\Resources\RoomResource\Pages;
+namespace App\Filament\Clusters\Configurations\Resources\VoidReasonResource\Pages;
 
 use Filament\Actions;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Cache;
-use App\Filament\Resources\RoomResource;
 use Filament\Resources\Pages\CreateRecord;
+use App\Filament\Clusters\Configurations\Resources\VoidReasonResource;
 
-class CreateRoom extends CreateRecord
+class CreateVoidReason extends CreateRecord
 {
-    protected static string $resource = RoomResource::class;
+    protected static string $resource = VoidReasonResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['tenant_id'] = Filament::getTenant()->id;
         $data['user_id'] = auth()->id();
-        $data['room_status_id'] = 1;
         return $data;
     }
 
@@ -24,8 +23,9 @@ class CreateRoom extends CreateRecord
     {
         return $this->previousUrl ?? $this->getResource()::getUrl('index');
     }
+
     protected function afterCreate()
     {
-        Cache::forget('room_types_' . Filament::getTenant()->id);
+        $tenant = Filament::getTenant()->id;
     }
 }

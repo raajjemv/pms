@@ -16,7 +16,8 @@ class EditBusinessSource extends EditRecord
     {
         return [
             Actions\ViewAction::make(),
-            Actions\DeleteAction::make(),
+            Actions\DeleteAction::make()
+                ->visible(fn($record) => !$record->locked),
         ];
     }
 

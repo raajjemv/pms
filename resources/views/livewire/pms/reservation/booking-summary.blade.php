@@ -3,7 +3,7 @@
         $reservationTotals = $this->selectedFolio ? reservationTotals($this->selectedFolio?->id) : 0;
     @endphp
     <x-filament::modal :close-by-clicking-away="false" :autofocus="false" closeEventName="close-booking-summary-modal"
-        id="booking-summary" slide-over :width="$booking?->bookingReservations->count() > 1 ? 'xl' : 'sm'">
+        id="booking-summary" slide-over :width="$booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance)->count() > 1 ? 'xl' : 'sm'">
         <x-slot name="heading">
             <div class="flex items-center space-x-3">
                 <x-svg-icons.location />
@@ -80,7 +80,7 @@
                                 Cancel
                             </x-filament::dropdown.list.item>
 
-                            <x-filament::dropdown.list.item wire:click="openDeleteModal" icon="heroicon-m-x-circle">
+                            <x-filament::dropdown.list.item wire:click="bookingSummaryAction('void')" icon="heroicon-m-x-circle">
                                 Void
                             </x-filament::dropdown.list.item>
                         </x-filament::dropdown.list>
@@ -192,11 +192,12 @@
                     </tr>
                 </table>
             </div>
-            @if ($booking?->bookingReservations->count() > 1)
+            @if ($booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance)->count() > 1)
                 <div class="w-2/5 px-3 border-l">
-                    <div class="mb-2 text-sm font-semibold">Reservations</div>
+                    {{ $booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance)->count() }}
+                    {{-- <div class="mb-2 text-sm font-semibold">Reservations</div>
                     <div class="space-y-3 ">
-                        @foreach ($booking?->bookingReservations as $bookingReservations)
+                        @foreach ($booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance) as $bookingReservations)
                             <x-filament::button wire:key="booking-reservation-{{ $bookingReservations->id }}"
                                 wire:click="$set('reservation_id', {{ $bookingReservations->id }})" color="gray"
                                 @class([
@@ -212,7 +213,7 @@
                                 </div>
                             </x-filament::button>
                         @endforeach
-                    </div>
+                    </div> --}}
                 </div>
             @endif
         </div>

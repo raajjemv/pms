@@ -1,5 +1,4 @@
-<x-filament::modal :close-by-clicking-away="false" closeEventName="close-reservation-modal" id="reservation-modal" 
-    width="screen">
+<x-filament::modal :close-by-clicking-away="false" closeEventName="close-reservation-modal" id="reservation-modal" width="screen">
     <x-slot name="heading">
         <div class="flex flex-wrap items-center justify-between space-y-3 lg:space-y-0">
 
@@ -32,7 +31,7 @@
     </x-slot>
 
     <div class="max-h-full overflow-scroll ">
-     
+
         <x-filament::tabs label="Content tabs">
             <x-filament::tabs.item :active="$activeTab === 'guest-accounting'" wire:click="$set('activeTab', 'guest-accounting')">
                 Guest Accounting
@@ -56,7 +55,7 @@
                 <x-slot name="description">
                     Folio Accounts
                 </x-slot>
-                @if ($this->reservation)
+                @if ($booking?->bookingReservations)
                     <div class="space-y-3">
                         @foreach ($booking->bookingReservations as $reservation)
                             <div class="flex flex-col">
@@ -84,7 +83,7 @@
                     @switch($activeTab)
                         @case('guest-accounting')
                             <livewire:pms.reservation.guest-accounting :booking="$booking" @refresh-edit-reservation="$refresh"
-                                :selected-folio="$this->reservation">
+                                :selected-folio="$this->reservation" wire:key="ga-{{ $booking->id }}">
                             @break
 
                             @case('booking-detail')
@@ -111,10 +110,10 @@
         .fi-modal-header>div:nth-child(2) {
             width: 100%;
         }
-        .fi-modal-content{
+
+        .fi-modal-content {
             overflow: scroll;
         }
-        
     </style>
-        <x-filament-actions::modals />
+    <x-filament-actions::modals />
 </x-filament::modal>

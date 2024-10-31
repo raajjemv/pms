@@ -44,6 +44,7 @@ class SchedulerPage extends Page
     #[Computed]
     public function endOfMonth()
     {
+
         return Carbon::parse($this->date)->endOfMonth();
     }
 
@@ -59,7 +60,7 @@ class SchedulerPage extends Page
                 $qq->whereBetween('date', [$startOfMonth, $endOfMonth]);
             }]);
         }, 'bookingReservations' => function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->with('customer', 'booking')->where(function ($query) use ($startOfMonth, $endOfMonth) {
+            $query->with(['customer', 'booking' => fn($q) => $q->withTrashed()])->where(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('from', '>=', $startOfMonth)
                     ->where('from', '<=', $endOfMonth);
             })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
@@ -68,7 +69,8 @@ class SchedulerPage extends Page
             })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('from', '<', $startOfMonth)
                     ->where('to', '>', $endOfMonth);
-            });
+            })
+                ->withTrashed();
         }])
             ->get();
         return $rooms;
@@ -198,7 +200,7 @@ class SchedulerPage extends Page
 
                 $reservation = $reservationService->create($booking, $data);
 
-                $blockConnectingRooms = $reservationService->blockConnectingRooms($booking,$reservation);
+                $blockConnectingRooms = $reservationService->blockConnectingRooms($booking, $reservation);
             });
     }
 

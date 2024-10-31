@@ -5,6 +5,7 @@ namespace App\Http\Traits;
 use Closure;
 use Carbon\Carbon;
 use Filament\Forms;
+use App\Enums\Status;
 use App\Enums\PaymentType;
 use Filament\Actions\Action;
 use App\Models\BookingReservation;
@@ -27,7 +28,7 @@ trait InteractsWithReservationActions
                 return [
                     GroupCheckField::make('reservations')
                         ->type('check-in')
-                        ->options(fn() => $this->booking->bookingReservations->pluck('booking_customer', 'id'))
+                        ->options(fn() => $this->booking->bookingReservations->where('status', '!=', Status::Maintenance)->pluck('booking_customer', 'id'))
                         ->required()
                         ->validationMessages([
                             'required' => 'Select a reservation to proceed!',
@@ -61,7 +62,7 @@ trait InteractsWithReservationActions
                 return [
                     GroupCheckField::make('reservations')
                         ->type('check-out')
-                        ->options(fn() => $this->booking->bookingReservations->pluck('booking_customer', 'id'))
+                        ->options(fn() => $this->booking->bookingReservations->where('status', '!=', Status::Maintenance)->pluck('booking_customer', 'id'))
                         ->required()
                         ->validationMessages([
                             'required' => 'Select a reservation to proceed!',

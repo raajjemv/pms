@@ -8,6 +8,7 @@ use App\Models\Country;
 use Filament\Forms\Set;
 use App\Models\Customer;
 use App\Enums\DocumentType;
+use App\Enums\Status;
 use App\Filament\Resources\BookingResource;
 use App\Models\BookingReservation;
 use Filament\Actions\Action;
@@ -114,8 +115,8 @@ trait InteractsWithGuestRegistration
             ->form([
                 ...self::guestRegistrationFields()
             ])
-            ->using(function ($data, $arguments,$model) {
-                $reservation = BookingReservation::find($arguments['booking_reservation_id']);
+            ->using(function ($data, $arguments, $model) {
+                $reservation = BookingReservation::with('customers')->find($arguments['booking_reservation_id']);
 
                 $customer_count = $reservation->customers->count();
 
@@ -169,7 +170,7 @@ trait InteractsWithGuestRegistration
                         ->required(),
 
                     Forms\Components\Select::make('country_id')
-                        ->relationship('country','name')
+                        ->relationship('country', 'name')
                         // ->options(fn() => static::countries()->pluck('name', 'id'))
                         ->searchable()
                         ->preload()

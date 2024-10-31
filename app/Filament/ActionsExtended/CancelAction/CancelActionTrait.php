@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Filament\ActionsExtended\VoidAction;
+namespace App\Filament\ActionsExtended\CancelAction;
 
 use App\Enums\Status;
 use Filament\Forms;
 use App\Http\Traits\CachedQueries;
 use App\Models\BookingReservation;
 use App\Models\BookingTransaction;
-use App\Models\VoidReason;
+use App\Models\CancelReason;
 use Filament\Facades\Filament;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Cache;
@@ -15,13 +15,13 @@ use Filament\Notifications\Notification;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
-trait VoidActionTrait
+trait CancelActionTrait
 {
     use CachedQueries;
 
     public static function getDefaultName(): ?string
     {
-        return 'void-reservation';
+        return 'cancel-reservation';
     }
 
     protected function setUp(): void
@@ -29,7 +29,7 @@ trait VoidActionTrait
 
         parent::setUp();
 
-        $reasons = VoidReason::pluck('reason', 'id');
+        $reasons = CancelReason::pluck('reason', 'id');
 
         $this
             ->icon('heroicon-m-plus-circle')
@@ -37,40 +37,56 @@ trait VoidActionTrait
             ->requiresconfirmation()
             ->modalWidth(MaxWidth::Small)
             ->form([
-                Forms\Components\Select::make('void_reason')
+                Forms\Components\Select::make('cancel_reason')
                     ->options(fn() => $reasons)
                     ->required()
                     ->suffixAction(
-                        Action::make('create-void-reason')
+                        Action::make('create-cancel-reason')
                             ->icon('heroicon-m-plus-circle')
                             ->form([
                                 Forms\Components\TextInput::make('reason')
                                     ->required()
                             ])
                             ->action(function ($data, $state, $set) {
-                                $reason = VoidReason::create([
+                                $reason = CancelReason::create([
                                     'reason' => $data['reason'],
                                     'tenant_id' => Filament::getTenant()->id,
                                     'user_id' => auth()->id()
                                 ]);
-                                $set('void_reason', $reason->id);
+                                $set('reason', $reason->id);
                             })
-                    )
+                    ),
+                Forms\Components\TextInput::make('cancellation_charge')
+                    ->required()
+                    ->minValue(0)
+                    ->numeric()
+                    ->default(0)
             ]);
 
 
         $this->action(function ($data, $livewire): void {
-            // void reservation
+            // Cancel reservation
             $livewire->selectedFolio->update([
-                'void_reason_id' => $data['void_reason'],
-                'status' => Status::Void
+                'cancel_reason_id' => $data['cancel_reason'],
+                'status' => Status::Cancelled
             ]);
+
+            $cancellation_charge_transaction_id = NULL;
+            if (filled($data['cancellation_charge']) && $data['cancellation_charge'] > 0) {
+                $cancellation_charge_transaction_id = $livewire->selectedFolio->bookingTransactions()->create([
+                    'booking_id' => $livewire->booking->id,
+                    'transaction_type' => 'Cancellation Charge',
+                    'user_id' => auth()->id(),
+                    'date' => now(),
+                    'rate' => $data['cancellation_charge']
+                ]);
+            }
 
             $livewire->selectedFolio->delete();
 
-            $this->deleteBookingTransactions($livewire->selectedFolio->id);
+            $this->deleteBookingTransactions($livewire->selectedFolio->id, $cancellation_charge_transaction_id);
 
-            activity()->performedOn($livewire->selectedFolio)->log('Reservation voided by: ' . auth()->user()->name);
+            activity()->performedOn($livewire->selectedFolio)->log('Reservation Canceled by: ' . auth()->user()->name);
 
             $livewire->booking->refresh();
 
@@ -87,8 +103,8 @@ trait VoidActionTrait
             if (!$livewire->booking->bookingReservations->count()) {
 
                 $livewire->booking->update([
-                    'void_reason_id' => $data['void_reason'],
-                    'status' => Status::Void
+                    'Cancel_reason_id' => $data['cancel_reason'],
+                    'status' => Status::Cancelled
 
                 ]);
 
@@ -102,7 +118,7 @@ trait VoidActionTrait
             $livewire->dispatch('close-booking-summary-modal', id: 'booking-summary');
 
             Notification::make()
-                ->title('Reservation Voided successfull!')
+                ->title('Reservation Canceled successfull!')
                 ->success()
                 ->send();
         });
@@ -112,9 +128,13 @@ trait VoidActionTrait
         });
     }
 
-    protected function deleteBookingTransactions($reservation_id): void
+    protected function deleteBookingTransactions($reservation_id, $cancellation_charge_transaction_id = NULL): void
     {
-        $reservation = BookingTransaction::where('booking_reservation_id', $reservation_id)
-            ->delete();
+
+        $reservation = BookingTransaction::where('booking_reservation_id', $reservation_id);
+        if ($cancellation_charge_transaction_id !== NULL) {
+            $reservation->where('id', '!=', $cancellation_charge_transaction_id->id);
+        }
+        $reservation->delete();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Pms\Reservation;
 
+use App\Filament\ActionsExtended\CancelAction\CancelAction;
 use App\Models\Booking;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -25,6 +26,7 @@ class BookingSummary extends Component implements HasForms, HasActions
     use InteractsWithForms;
     use InteractsWithReservationActions;
 
+    
     public $booking;
 
     public $reservation_id;
@@ -32,7 +34,12 @@ class BookingSummary extends Component implements HasForms, HasActions
     #[On('booking-summary')]
     public function loadBookingSummary($booking_id, $reservation_id)
     {
-        $booking = Booking::with('bookingReservations.room.roomType')->find($booking_id);
+        $booking = Booking::with(['bookingReservations' => function ($q) {
+            return $q->with('room.roomType')
+                ->withTrashed();
+        }])
+            ->withTrashed()
+            ->find($booking_id);
 
         $this->booking = $booking;
 
@@ -62,7 +69,8 @@ class BookingSummary extends Component implements HasForms, HasActions
             'add-payment' => $this->replaceMountedAction('addPaymentAction'),
             'add-charge' => $this->replaceMountedAction('addChargeAction'),
             'move-room' => $this->replaceMountedAction('moveRoomAction'),
-            'void' => $this->replaceMountedAction('voidReservation')
+            'void' => $this->replaceMountedAction('voidReservation'),
+            'cancel' => $this->replaceMountedAction('cancelReservation')
         };
     }
 
@@ -84,6 +92,11 @@ class BookingSummary extends Component implements HasForms, HasActions
     public function voidReservation()
     {
         return VoidAction::make('void-reservation');
+    }
+
+    public function cancelReservation()
+    {
+        return CancelAction::make('cancel-reservation');
     }
 
     public function render()

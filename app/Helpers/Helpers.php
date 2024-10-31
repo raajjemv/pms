@@ -144,7 +144,7 @@ if (! function_exists('reservationTotals')) {
     {
         if (Auth::check() && $reservationId) {
             return Cache::remember('reservationBalance_' . $reservationId, now()->addHour(), function () use ($reservationId) {
-                $reservation = BookingReservation::find($reservationId);
+                $reservation = BookingReservation::withTrashed()->find($reservationId);
                 $total = $reservation
                     ->bookingTransactions
                     ->whereNotIn('transaction_type', PaymentType::getAllValues())

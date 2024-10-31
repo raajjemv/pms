@@ -71,7 +71,7 @@
                 this.selectedDays.push(i);
             }
     
-            if (this.getDaysBetweenDates(this.startGridDate, this.endGridDate) > 0) {
+            {{-- if (this.getDaysBetweenDates(this.startGridDate, this.endGridDate) > 0) { --}}
     
                 $wire.mountAction('quickReservationActions', {
                     id: 'new-booking',
@@ -85,7 +85,7 @@
                 this.endGridDate = '';
                 this.roomId = '';
                 this.selectedDays = [];
-            }
+            {{-- } --}}
         },
         isDateWithinRange(dateToCheck, room) {
             const checkDate = new Date(dateToCheck);
@@ -233,10 +233,10 @@
         </div>
     </div>
 
+   
+    <livewire:pms.reservation.maintenance-booking-summary />
     <livewire:pms.reservation.booking-summary />
     
-    <livewire:pms.reservation.maintenance-booking-summary />
-
     <livewire:pms.reservation.reservation />
 
     <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl" :autofocus="false">

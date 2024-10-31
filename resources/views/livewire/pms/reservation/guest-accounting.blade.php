@@ -1,8 +1,3 @@
 <div>
-    <div>
-        {{ $this->table }}
-    </div>
-
-
-
+    {{ $this->table }}
 </div>

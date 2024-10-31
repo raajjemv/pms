@@ -90,6 +90,10 @@ class Tenant extends Model implements HasCurrentTenantLabel
     {
         return $this->hasMany(VoidReason::class);
     }
+    public function cancelReasons()
+    {
+        return $this->hasMany(CancelReason::class);
+    }
     public function getCurrentTenantLabel(): string
     {
         return 'Current Tenant';

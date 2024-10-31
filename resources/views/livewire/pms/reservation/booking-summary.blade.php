@@ -39,53 +39,65 @@
                         tag="a">
                         Print / E-Mail
                     </x-filament::button>
-                    <x-filament::dropdown>
-                        <x-slot name="trigger">
-                            <x-filament::button color="gray" icon="heroicon-m-ellipsis-vertical"
-                                icon-position="after">
-                                More
-                            </x-filament::button>
-                        </x-slot>
+                    @if (
+                        !in_array($this->selectedFolio?->status, [
+                            App\Enums\Status::Archived,
+                            App\Enums\Status::Cancelled,
+                            App\Enums\Status::Void,
+                            App\Enums\Status::Disputed,
+                            App\Enums\Status::NoShow,
+                        ]))
 
-                        <x-filament::dropdown.list>
-                            @if (
-                                ($this->selectedFolio?->from->isToday() || $this->selectedFolio?->from->isPast()) &&
-                                    in_array($this->selectedFolio?->status->value, ['reserved', 'inquiry', 'hold', 'confirmed', 'paid']))
-                                <x-filament::dropdown.list.item wire:click="bookingSummaryAction('check-in')"
-                                    icon="heroicon-m-check-circle">
-                                    Check-In
+
+                        <x-filament::dropdown>
+                            <x-slot name="trigger">
+                                <x-filament::button color="gray" icon="heroicon-m-ellipsis-vertical"
+                                    icon-position="after">
+                                    More
+                                </x-filament::button>
+                            </x-slot>
+
+                            <x-filament::dropdown.list>
+                                @if (
+                                    ($this->selectedFolio?->from->isToday() || $this->selectedFolio?->from->isPast()) &&
+                                        in_array($this->selectedFolio?->status->value, ['reserved', 'inquiry', 'hold', 'confirmed', 'paid']))
+                                    <x-filament::dropdown.list.item wire:click="bookingSummaryAction('check-in')"
+                                        icon="heroicon-m-check-circle">
+                                        Check-In
+                                    </x-filament::dropdown.list.item>
+                                @endif
+                                @if (
+                                    ($this->selectedFolio?->to->isToday() || $this->selectedFolio?->to->isPast()) &&
+                                        in_array($this->selectedFolio?->status->value, ['check-in', 'overstay']))
+                                    <x-filament::dropdown.list.item wire:click="bookingSummaryAction('check-out')"
+                                        icon="heroicon-m-arrow-right-start-on-rectangle">
+                                        Check-Out
+                                    </x-filament::dropdown.list.item>
+                                @endif
+                                <x-filament::dropdown.list.item wire:click="bookingSummaryAction('add-payment')"
+                                    icon="heroicon-m-currency-dollar">
+                                    Add Payment
                                 </x-filament::dropdown.list.item>
-                            @endif
-                            @if (
-                                ($this->selectedFolio?->to->isToday() || $this->selectedFolio?->to->isPast()) &&
-                                    in_array($this->selectedFolio?->status->value, ['check-in', 'overstay']))
-                                <x-filament::dropdown.list.item wire:click="bookingSummaryAction('check-out')"
-                                    icon="heroicon-m-arrow-right-start-on-rectangle">
-                                    Check-Out
+                                <x-filament::dropdown.list.item wire:click="bookingSummaryAction('add-charge')"
+                                    icon="heroicon-m-plus-circle">
+                                    Add Charge
                                 </x-filament::dropdown.list.item>
-                            @endif
-                            <x-filament::dropdown.list.item wire:click="bookingSummaryAction('add-payment')"
-                                icon="heroicon-m-currency-dollar">
-                                Add Payment
-                            </x-filament::dropdown.list.item>
-                            <x-filament::dropdown.list.item wire:click="bookingSummaryAction('add-charge')"
-                                icon="heroicon-m-plus-circle">
-                                Add Charge
-                            </x-filament::dropdown.list.item>
-                            <x-filament::dropdown.list.item wire:click="bookingSummaryAction('move-room')"
-                                icon="heroicon-m-arrows-right-left">
-                                Move Room
-                            </x-filament::dropdown.list.item>
-                            <x-filament::dropdown.list.item wire:click="openEditModal" icon="heroicon-m-x-mark">
-                                Cancel
-                            </x-filament::dropdown.list.item>
+                                <x-filament::dropdown.list.item wire:click="bookingSummaryAction('move-room')"
+                                    icon="heroicon-m-arrows-right-left">
+                                    Move Room
+                                </x-filament::dropdown.list.item>
+                                <x-filament::dropdown.list.item wire:click="bookingSummaryAction('cancel')"
+                                    icon="heroicon-m-x-mark">
+                                    Cancel
+                                </x-filament::dropdown.list.item>
 
-                            <x-filament::dropdown.list.item wire:click="bookingSummaryAction('void')" icon="heroicon-m-x-circle">
-                                Void
-                            </x-filament::dropdown.list.item>
-                        </x-filament::dropdown.list>
-                    </x-filament::dropdown>
-
+                                <x-filament::dropdown.list.item wire:click="bookingSummaryAction('void')"
+                                    icon="heroicon-m-x-circle">
+                                    Void
+                                </x-filament::dropdown.list.item>
+                            </x-filament::dropdown.list>
+                        </x-filament::dropdown>
+                    @endif
                 </div>
                 <table class="w-full">
                     <tr>
@@ -194,10 +206,16 @@
             </div>
             @if ($booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance)->count() > 1)
                 <div class="w-2/5 px-3 border-l">
-                    {{ $booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance)->count() }}
-                    {{-- <div class="mb-2 text-sm font-semibold">Reservations</div>
+                    <div class="mb-2 text-sm font-semibold">Reservations</div>
                     <div class="space-y-3 ">
-                        @foreach ($booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance) as $bookingReservations)
+                        @php
+                            $bookingOtherReservations = $booking?->bookingReservations->where(
+                                'status',
+                                '!=',
+                                App\Enums\Status::Maintenance,
+                            );
+                        @endphp
+                        @foreach ($bookingOtherReservations as $bookingReservations)
                             <x-filament::button wire:key="booking-reservation-{{ $bookingReservations->id }}"
                                 wire:click="$set('reservation_id', {{ $bookingReservations->id }})" color="gray"
                                 @class([
@@ -213,7 +231,7 @@
                                 </div>
                             </x-filament::button>
                         @endforeach
-                    </div> --}}
+                    </div>
                 </div>
             @endif
         </div>

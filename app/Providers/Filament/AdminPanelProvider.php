@@ -18,6 +18,7 @@ use App\Http\Middleware\TenantsPermission;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Navigation\NavigationBuilder;
 use Filament\Pages\Tenancy\RegisterTenant;
+use App\Filament\Pages\TenantConfiguration;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use App\Filament\Pages\Tenancy\TenantRegistration;
@@ -89,7 +90,16 @@ class AdminPanelProvider extends PanelProvider
                         override: true,
                     )
             ])
-          
+            ->globalSearch(true)
+            ->globalSearchKeyBindings(['command+x', 'ctrl+k'])
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('Tenant Configirations')
+                    ->url(fn(): string => TenantConfiguration::getUrl())
+                    ->icon('heroicon-o-cog-6-tooth')
+                    ->visible(fn() => auth()->user()->hasRole('admin|tenant_owner')),
+                // ...
+            ])
             ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

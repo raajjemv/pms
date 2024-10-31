@@ -22,7 +22,7 @@ enum BookingType: string implements HasLabel
     public function getIcon(): string
     {
         return match ($this) {
-            self::Direct => 'heroicon-s-home',
+            self::Direct => 'heroicon-s-building-office',
             self::OTA => 'heroicon-s-home',
             self::GDS => 'heroicon-s-server',
             self::Corporate => 'heroicon-s-building-office',

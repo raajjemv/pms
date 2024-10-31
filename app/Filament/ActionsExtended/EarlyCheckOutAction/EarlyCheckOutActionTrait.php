@@ -5,6 +5,7 @@ namespace App\Filament\ActionsExtended\EarlyCheckOutAction;
 use Closure;
 use Carbon\Carbon;
 use Filament\Forms;
+use App\Enums\Status;
 use App\Http\Traits\CachedQueries;
 use App\Models\BookingReservation;
 use Illuminate\Support\Facades\Cache;
@@ -32,7 +33,7 @@ trait EarlyCheckOutActionTrait
                 return [
                     GroupCheckField::make('reservations')
                         ->type('early-check-out')
-                        ->options(fn($livewire) => $livewire->booking->bookingReservations->pluck('booking_customer', 'id'))
+                        ->options(fn($livewire) => $livewire->booking->bookingReservations->where('status', '!=', Status::Maintenance)->pluck('booking_customer', 'id'))
                         ->required()
                         ->validationMessages([
                             'required' => 'Select a reservation to proceed!',

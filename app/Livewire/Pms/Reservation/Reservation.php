@@ -2,11 +2,14 @@
 
 namespace App\Livewire\Pms\Reservation;
 
+use App\Enums\Status;
 use App\Models\Booking;
 use Livewire\Component;
+use App\Models\Customer;
 use Livewire\Attributes\On;
 use Filament\Actions\Action;
 use Livewire\Attributes\Url;
+use Livewire\Attributes\Lazy;
 use Livewire\Attributes\Computed;
 use App\Models\BookingReservation;
 use Filament\Forms\Contracts\HasForms;
@@ -15,15 +18,16 @@ use App\Forms\Components\GroupCheckField;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use App\Http\Traits\InteractsWithGuestRegistration;
-use App\Models\Customer;
 use Filament\Actions\Concerns\InteractsWithActions;
+use Livewire\Attributes\Isolate;
+use Livewire\Attributes\Locked;
 
+#[Isolate]
 class Reservation extends Component implements HasForms, HasActions
 {
     use InteractsWithActions;
     use InteractsWithForms;
     use InteractsWithGuestRegistration;
-
 
     public $booking;
 
@@ -41,7 +45,13 @@ class Reservation extends Component implements HasForms, HasActions
     {
         $this->activeTab = 'guest-accounting';
 
-        $booking = Booking::with(['bookingReservations.room.roomType','bookingReservations.ratePlan'])->find($booking_id);
+        $booking = Booking::with(['bookingReservations' => function ($q) {
+            $q->with('room.roomType')->withTrashed();
+        }, 'bookingReservations' => function ($q) {
+            $q->with('ratePlan')->withTrashed();
+        }])
+            ->withTrashed()
+            ->find($booking_id);
 
         $this->booking = $booking;
 
@@ -51,9 +61,10 @@ class Reservation extends Component implements HasForms, HasActions
         $this->dispatch('open-modal', id: 'reservation-modal');
     }
 
-    #[Computed]
+    #[Computed(persist: true)]
     public function reservation()
     {
+        // return BookingReservation::with('bookingTransactions')->find($this->reservation_id);
         return $this->booking?->bookingReservations->where('id', $this->reservation_id)->first();
     }
 
@@ -62,7 +73,6 @@ class Reservation extends Component implements HasForms, HasActions
     {
         $this->reset(['booking', 'reservation_id', 'activeTab']);
         $this->dispatch('refresh-scheduler');
-
     }
 
 
@@ -74,7 +84,7 @@ class Reservation extends Component implements HasForms, HasActions
                 return [
                     GroupCheckField::make('reservations')
                         ->type('check-in')
-                        ->options(fn() => $this->booking->bookingReservations->pluck('booking_customer', 'id'))
+                        ->options(fn() => $this->booking->bookingReservations->where('status', '!=', Status::Maintenance)->pluck('booking_customer', 'id'))
                         ->required()
                         ->validationMessages([
                             'required' => 'Select a reservation to proceed!',
@@ -91,6 +101,8 @@ class Reservation extends Component implements HasForms, HasActions
                     activity()->performedOn($reservation)->log('Check-In Processed');
                 });
                 $this->dispatch('refresh-scheduler');
+                unset($this->reservation); 
+
                 Notification::make()
                     ->title('Check-In Successfull!')
                     ->success()
@@ -107,7 +119,7 @@ class Reservation extends Component implements HasForms, HasActions
                 return [
                     GroupCheckField::make('reservations')
                         ->type('check-out')
-                        ->options(fn() => $this->booking->bookingReservations->pluck('booking_customer', 'id'))
+                        ->options(fn() => $this->booking->bookingReservations->where('status', '!=', Status::Maintenance)->pluck('booking_customer', 'id'))
                         ->required()
                         ->validationMessages([
                             'required' => 'Select a reservation to proceed!',
@@ -124,6 +136,8 @@ class Reservation extends Component implements HasForms, HasActions
                     activity()->performedOn($reservation)->log('Check-Out Processed');
                 });
                 $this->dispatch('refresh-scheduler');
+                unset($this->reservation); 
+                
                 Notification::make()
                     ->title('Check-Out Successfull!')
                     ->success()

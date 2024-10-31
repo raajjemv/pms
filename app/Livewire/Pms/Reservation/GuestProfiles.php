@@ -4,6 +4,7 @@ namespace App\Livewire\Pms\Reservation;
 
 use Filament\Forms;
 use Filament\Tables;
+use App\Enums\Status;
 use App\Models\Country;
 use Livewire\Component;
 use App\Models\Customer;
@@ -74,6 +75,7 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
                     ->disabled(fn() => $this->selectedFolio->totalPax() == $reservationGuestCount)
                     ->label(fn() => $reservationGuestCount ? 'Add Sharer' : 'Initiate Guest')
                     ->modalWidth(MaxWidth::Small)
+                    ->visible(fn() => !in_array($this->selectedFolio->status, [Status::Archived, Status::Cancelled, Status::Void, Status::Disputed, Status::NoShow]))
                     ->form([
                         Forms\Components\Radio::make('registration_type')
                             ->options([

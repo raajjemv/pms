@@ -12,6 +12,8 @@ use Filament\Notifications\Notification;
 class TenantConfiguration extends Page
 {
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $navigationIcon = 'heroicon-o-cog-8-tooth';
 
     protected static string $view = 'filament.pages.tenant-configuration';

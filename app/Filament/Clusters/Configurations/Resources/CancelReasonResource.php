@@ -3,9 +3,9 @@
 namespace App\Filament\Clusters\Configurations\Resources;
 
 use App\Filament\Clusters\Configurations;
-use App\Filament\Clusters\Configurations\Resources\VoidReasonResource\Pages;
-use App\Filament\Clusters\Configurations\Resources\VoidReasonResource\RelationManagers;
-use App\Models\VoidReason;
+use App\Filament\Clusters\Configurations\Resources\CancelReasonResource\Pages;
+use App\Filament\Clusters\Configurations\Resources\CancelReasonResource\RelationManagers;
+use App\Models\CancelReason;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,9 +14,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class VoidReasonResource extends Resource
+class CancelReasonResource extends Resource
 {
-    protected static ?string $model = VoidReason::class;
+    protected static ?string $model = CancelReason::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -26,7 +26,6 @@ class VoidReasonResource extends Resource
     {
         return $form
             ->schema([
-
                 Forms\Components\TextInput::make('reason')
                     ->required()
                     ->maxLength(255),
@@ -67,10 +66,8 @@ class VoidReasonResource extends Resource
 
                 Tables\Actions\EditAction::make()
                     ->visible(fn($record) => !$record->locked),
-
             ])
-            ->bulkActions([])
-            ->defaultSort('created_at', 'DESC');
+            ->bulkActions([])->defaultSort('created_at', 'DESC');
     }
 
     public static function getRelations(): array
@@ -83,10 +80,10 @@ class VoidReasonResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVoidReasons::route('/'),
-            'create' => Pages\CreateVoidReason::route('/create'),
-            'view' => Pages\ViewVoidReason::route('/{record}'),
-            'edit' => Pages\EditVoidReason::route('/{record}/edit'),
+            'index' => Pages\ListCancelReasons::route('/'),
+            'create' => Pages\CreateCancelReason::route('/create'),
+            'view' => Pages\ViewCancelReason::route('/{record}'),
+            'edit' => Pages\EditCancelReason::route('/{record}/edit'),
         ];
     }
 

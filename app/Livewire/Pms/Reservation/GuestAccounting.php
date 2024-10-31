@@ -6,6 +6,7 @@ use Closure;
 use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Tables;
+use App\Enums\Status;
 use Livewire\Component;
 use App\Enums\PaymentType;
 use Filament\Tables\Table;
@@ -29,10 +30,10 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Traits\InteractsWithReservationActions;
 use App\Filament\ActionsExtended\ChargeAction\ChargeTableAction;
-use App\Filament\ActionsExtended\EarlyCheckOutAction\EarlyCheckOutTableAction;
-use App\Filament\ActionsExtended\ExtendStayAction\ExtendStayTableAction;
-use App\Filament\ActionsExtended\MoveRoomAction\MoveRoomTableAction;
 use App\Filament\ActionsExtended\PaymentAction\PaymentTableAction;
+use App\Filament\ActionsExtended\MoveRoomAction\MoveRoomTableAction;
+use App\Filament\ActionsExtended\ExtendStayAction\ExtendStayTableAction;
+use App\Filament\ActionsExtended\EarlyCheckOutAction\EarlyCheckOutTableAction;
 
 class GuestAccounting extends Component implements HasForms, HasTable
 {
@@ -131,6 +132,8 @@ class GuestAccounting extends Component implements HasForms, HasTable
                     ->icon('heroicon-m-ellipsis-vertical')
                     ->color('gray')
                     ->button()
+                    ->visible(fn() => !in_array($this->selectedFolio->status, [Status::Archived, Status::Cancelled, Status::Void, Status::Disputed, Status::NoShow]))
+
             ])
             ->actions([
                 Actions\ActionGroup::make([

@@ -1,4 +1,4 @@
-<x-filament-panels::page>
+<x-filament-panels::page wire:poll.60s>
     <div class="flex items-center justify-between">
         <div>
             <x-filament::tabs label="Reservation tabs">

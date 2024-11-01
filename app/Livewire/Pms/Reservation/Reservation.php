@@ -73,6 +73,7 @@ class Reservation extends Component implements HasForms, HasActions
     {
         $this->reset(['booking', 'reservation_id', 'activeTab']);
         $this->dispatch('refresh-scheduler');
+        unset($this->reservation); 
     }
 
 

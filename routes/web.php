@@ -28,6 +28,32 @@ use Spatie\Permission\PermissionRegistrar;
 use App\Http\Controllers\Pdf\ReservationInvoice;
 
 Route::get('/', function () {
+
+    return RoomType::with('ratePlans')->latest()->first();
+    $selection =  ["1_1", "1_2", "2_1"];
+
+    $roomTypeSlc = [];
+    foreach ($selection as $roomTypeSelection) {
+        $roomTypeId = explode('_', $roomTypeSelection)[0];
+        $roomTypeSlc[][$roomTypeId] = explode('_', $roomTypeSelection)[1];
+    }
+
+    return $result = collect($roomTypeSlc)
+        ->groupBy(function ($item) {
+            return key($item);
+        })
+        ->map(function ($items) {
+            return RoomType::with(['ratePlans' => function ($q) use ($items) {
+                return $q->wherePivotIn('rate_plan_id', $items->pluck(key($items[0])));
+            }])->find(key($items[0]));
+            return $items
+                ->pluck(key($items[0]))
+                ->flatten()
+                ->unique()
+                ->values();
+        })
+        ->flatten();
+
     return redirect('/admin');
 });
 Route::middleware(['auth', 'auth.session'])->group(function () {

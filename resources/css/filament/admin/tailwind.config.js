@@ -12,5 +12,6 @@ export default {
         './resources/views/livewire/pms/**/*.blade.php',
         './resources/views/components/**/*.blade.php',
         './vendor/filament/**/*.blade.php',
+        
     ],
 }

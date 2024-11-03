@@ -7,6 +7,7 @@
     "require": {
         "php": "^8.2",
         "carlos-meneses/laravel-mpdf": "*",
+        "coolsam/flatpickr": "*",
         "filament/filament": "^3.2",
         "hasnayeen/themes": "^3.0",
         "joshembling/image-optimizer": "^1.4",

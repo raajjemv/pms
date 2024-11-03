@@ -3,12 +3,12 @@
         <div class="font-medium"> Select a Channel Pool </div>
     @else
         <div class="overflow-x-scroll text-sm text-black rounded-lg bg-gray-50" x-data="rateUpdater">
-            <div class="flex ">
+            <div class="flex w-max">
                 <div
                     class="bg-gray-50 sticky top-0 left-0 w-[200px] flex items-center font-semibold flex-none  px-1 border-[0.8px] border-gray-200">
                     Rooms
                 </div>
-                @foreach ($monthDays as $day)
+                @foreach ($this->monthDays as $day)
                     <div @class([
                         'flex-none border-[0.8px] border-gray-200 flex items-center justify-center w-[90px] px-1 py-1',
                         'bg-amber-100' => $day->isFriday() || $day->isSaturday(),
@@ -22,7 +22,7 @@
                 @endforeach
             </div>
             <div class="">
-                @foreach ($this->roomTypes() as $roomTypeKey => $roomType)
+                @foreach ($this->roomTypes as $roomTypeKey => $roomType)
                     <div class=" w-max">
                         <div class="relative flex bg-zinc-200">
                             <div
@@ -30,7 +30,7 @@
                                 {{ $roomType->name }}
                             </div>
                             <div class="flex">
-                                @foreach ($monthDays as $day)
+                                @foreach ($this->monthDays as $day)
                                     <div class="flex-none  w-[90px] border-[0.8px] border-gray-300">
                                         <div class="p-3">
                                         </div>
@@ -45,7 +45,7 @@
                                     class="sticky top-0 left-0 z-20 bg-gray-50 flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
                                     {{ $ratePlan->name }}</div>
                                 <div class="relative flex">
-                                    @foreach ($monthDays as $day)
+                                    @foreach ($this->monthDays as $day)
                                         <div key="day-{{ $day }}"
                                             class="flex-none  flex items-center w-[90px] p-0.5  border-[0.8px] border-gray-200">
                                             @php
@@ -79,24 +79,7 @@
 
         </div>
     @endif
-    {{-- <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('rateUpdater', () => ({
-                loading: false,
-                handleRateUpdate(event) {
-                    @this.updateRoomRate(
-                        event.event.target.value,
-                        event.ratePlan,
-                        event.roomType,
-                        event.date,
-                    );
-                    this.$wire.$refresh
-
-                },
-
-            }))
-        })
-    </script> --}}
+  
 </x-filament-panels::page>
 @script
     <script>

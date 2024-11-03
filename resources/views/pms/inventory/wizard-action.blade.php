@@ -1,0 +1,1 @@
+<livewire:pms.inventory.wizard :channel="$channelGroup" :modal-id="$modalId"/>

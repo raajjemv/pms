@@ -6,7 +6,9 @@ use Carbon\Carbon;
 use Filament\Forms;
 use App\Models\RatePlan;
 use App\Models\RoomType;
+use Carbon\CarbonPeriod;
 use Filament\Pages\Page;
+use Livewire\Attributes\On;
 use App\Models\ChannelGroup;
 use App\Models\RoomTypeRate;
 use Filament\Actions\Action;
@@ -14,24 +16,25 @@ use Livewire\Attributes\Url;
 use Filament\Facades\Filament;
 use Livewire\Attributes\Computed;
 use Filament\Support\Enums\MaxWidth;
+use Illuminate\Support\Facades\View;
 use Filament\Notifications\Notification;
+use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use Malzariey\FilamentDaterangepickerFilter\Fields\DateRangePicker;
 
 class Inventory extends Page
 {
-    public $monthDays;
 
     #[Url(except: '')]
     public $selectedChannelGroup;
 
     public $channelGroups;
 
-    public $startOfMonth, $endOfMonth;
-
-    public $roomTypes;
-
     protected static ?string $navigationIcon = 'heroicon-o-circle-stack';
 
     protected static string $view = 'filament.pages.inventory';
+
+    #[Url(keep: true, except: '')]
+    public $date;
 
     #[Computed(persist: true)]
     public function roomTypes()
@@ -50,27 +53,42 @@ class Inventory extends Page
 
     public function mount()
     {
+        $this->date = $this->date ? $this->date : today()->format('Y-m');
+
         $this->channelGroups = Filament::getTenant()->channelGroups;
 
         $this->selectedChannelGroup = defaultChannelGroup()->id;
+    }
 
-        $startOfMonth = request('date') ? Carbon::parse(request('date'))->startOfMonth() : Carbon::now()->startOfMonth();
+    #[Computed]
+    public function startOfMonth()
+    {
+        return Carbon::parse($this->date)->startOfMonth();
+    }
 
-        $endOfMonth = request('date') ?  Carbon::parse(request('date'))->endOfMonth() : Carbon::now()->endOfMonth();
+    #[Computed]
+    public function endOfMonth()
+    {
 
-        $this->startOfMonth = $startOfMonth;
+        return Carbon::parse($this->date)->endOfMonth();
+    }
+    #[Computed]
+    public function monthDays()
+    {
+        $this->date ?? today()->format('Y-m');
 
-        $this->endOfMonth = $endOfMonth;
+        $startOfMonth = $this->startOfMonth();
+
+        $endOfMonth = $this->endOfMonth();
 
         $days = $startOfMonth->diffInDays($endOfMonth);
 
         $monthDays = [];
-
         for ($i = 0; $i < $days; $i++) {
             $monthDays[] = $startOfMonth->copy()->addDays($i);
         }
-
-        $this->monthDays = $monthDays;
+        // sleep(2);
+        return $monthDays;
     }
 
     public function updateRoomRate($value = 0,  $plan, $roomType,  $date)
@@ -92,6 +110,13 @@ class Inventory extends Page
         }
     }
 
+    #[On('refresh-inventory')]
+    public function reloadComponent()
+    {
+        unset($this->roomTypes);
+    }
+
+
     protected function getHeaderActions(): array
     {
         return [
@@ -100,14 +125,22 @@ class Inventory extends Page
                 ->icon('heroicon-m-calendar')
                 ->modalHeading('Filter Date')
                 ->form([
-                    Forms\Components\DatePicker::make('date')
+                    Flatpickr::make('date')
+                        ->monthSelect()
+                        ->theme(\Coolsam\FilamentFlatpickr\Enums\FlatpickrTheme::DARK)
                 ])
+                ->action(function ($data) {
+                    $this->date = $data['date'];
+                })
                 ->modalWidth('sm'),
             Action::make('select_channel_group')
                 ->icon('heroicon-m-squares-2x2')
                 ->color('gray')
                 ->label($this->channelGroups->where('id', $this->selectedChannelGroup)->first()->name ?? 'Select Pool')
                 ->modalWidth(MaxWidth::Small)
+                ->fillForm(fn() => [
+                    'channel_group' => $this->selectedChannelGroup
+                ])
                 ->form(function () {
                     return [
                         Forms\Components\Select::make('channel_group')
@@ -123,11 +156,25 @@ class Inventory extends Page
                         ->success()
                         ->send();
                 }),
+            Action::make('update wizard')
+                ->modalWidth('7xl')
+                ->modalFooterActions(fn() => [])
+                ->modalHeading('Inventory Wizard')
+                ->modalContent(static function ($livewire) {
+                    return View::make('pms.inventory.wizard-action', [
+                        'channelGroup' => $livewire->selectedChannelGroup,
+                        'modalId' => $livewire->getId() . '-action',
+
+                    ]);
+                }),
 
             Action::make('bulk update')
                 ->icon('heroicon-m-clipboard-document-check')
                 ->visible($this->selectedChannelGroup ? true : false)
                 ->form([
+                    DateRangePicker::make('dates')
+                        ->displayFormat('DD/MM/YYYY')
+                        ->format('DD/MM/YYYY'),
                     Forms\Components\Select::make('days')
                         ->options([
                             'sunday' => 'Sunday',
@@ -155,21 +202,33 @@ class Inventory extends Page
                     try {
 
 
-                        foreach (collect($data['days']) as $dayName) {
-                            $days = $this->daysByName($dayName);
-                            foreach ($days as $day) {
+                        $dates = explode(' - ', $data['dates']);
+                        $from = Carbon::createFromFormat('d/m/Y', $dates[0]);
+                        $to = Carbon::createFromFormat('d/m/Y', $dates[1]) ?? $from;
+
+                        $period = CarbonPeriod::create($from, $to);
+
+
+                        foreach ($period as $dt) {
+                            $dayOfWeek = strtolower($dt->format('l'));
+                            if (in_array($dayOfWeek, $data['days'])) {
                                 $rate = RoomTypeRate::updateOrCreate(
-                                    ['room_type_id' => $data['room_type'], 'rate_plan_id' => $data['rate_plan'], 'date' => $day, 'channel_group_id' => $this->selectedChannelGroup],
+                                    ['room_type_id' => $data['room_type'], 'rate_plan_id' => $data['rate_plan'], 'date' => $dt->format('Y-m-d'), 'channel_group_id' => $this->selectedChannelGroup],
                                     ['rate' => $data['rate'], 'tenant_id' => auth()->user()->current_tenant_id, 'user_id' => auth()->id()]
                                 );
                             }
                         }
+
+
+
+                        unset($this->roomTypes);
 
                         Notification::make()
                             ->title('Bulk updated room rates successfully')
                             ->success()
                             ->send();
                     } catch (\Throwable $th) {
+
                         Notification::make()
                             ->title('An error occured, ' . $th->getMessage())
                             ->danger()
@@ -182,23 +241,6 @@ class Inventory extends Page
         ];
     }
 
-    public function daysByName($dayName)
-    {
-        $days = [];
-
-        // Clone to avoid modifying the original startOfMonth
-        $startDate = clone $this->startOfMonth;
-        $startDate->modify('this ' . $dayName);
-
-        $endDate = $this->endOfMonth;
-
-        while ($startDate <= $endDate) {
-            $days[] = $startDate->format('Y-m-d');
-            $startDate->modify('+1 week');
-        }
-
-        return $days;
-    }
 
     public static function canAccess(): bool
     {

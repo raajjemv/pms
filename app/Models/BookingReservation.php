@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ScopedBy([TenantScope::class])]
 class BookingReservation extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = [];
 
@@ -38,6 +38,11 @@ class BookingReservation extends Model
     public function room()
     {
         return $this->belongsTo(Room::class);
+    }
+
+    public function roomType()
+    {
+        return $this->belongsTo(RoomType::class);
     }
 
 

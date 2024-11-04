@@ -4,7 +4,9 @@ namespace App\Filament\ActionsExtended\MoveRoomAction;
 
 use Filament\Forms;
 use App\Models\Room;
+use App\Enums\Status;
 use App\Http\Traits\CachedQueries;
+use App\Livewire\Pms\Reservation\Reservation;
 use App\Models\BookingReservation;
 use App\Models\BookingTransaction;
 use Illuminate\Support\Collection;
@@ -49,11 +51,14 @@ trait MoveRoomActionTrait
                     ->options(function ($get, $livewire) use (&$rooms): Collection {
                         $room_type_id = $get('room_type');
                         $reservations = BookingReservation::query()
-                            ->whereHas('room', function ($q) use ($room_type_id) {
-                                $q->where('room_type_id', $room_type_id);
+                            ->where('room_type_id', $room_type_id)
+                            // ->whereBetween('from', [$livewire->selectedFolio->from, $livewire->selectedFolio->to])
+                            // ->orWhereBetween('to', [$livewire->selectedFolio->from, $livewire->selectedFolio->to])
+                            ->where(function ($query) use ($livewire) {
+                                $query->whereDate('from', '<=',  $livewire->selectedFolio->to)
+                                    ->whereDate('to', '>=', $livewire->selectedFolio->from);
                             })
-                            ->whereBetween('from', [$livewire->selectedFolio->from, $livewire->selectedFolio->to])
-                            ->orWhereBetween('to', [$livewire->selectedFolio->from, $livewire->selectedFolio->to])
+                            ->whereNotNull('room_id')
                             ->get();
                         return Room::query()
                             ->where('room_type_id', $get('room_type'))
@@ -73,8 +78,8 @@ trait MoveRoomActionTrait
 
         $this->action(function ($data, $livewire): void {
             $reservation = BookingReservation::find($livewire->selectedFolio->id);
-            if (isset($data['adjust_rate'])) {
-                $rate = roomTypeRate($data['room_type'], $reservation->from->format('Y-m-d'), $reservation->rate_plan_id);
+            if (isset($data['adjust_rate']) && $data['adjust_rate'] == true) {
+                $rate = roomTypeRate($data['room_type'], $reservation->from->format('Y-m-d'));
                 $reservation->bookingTransactions()->where('transaction_type', 'room_charge')
                     ->where('date', '>=', now()->format('Y-m-d'))
                     ->update([
@@ -83,7 +88,18 @@ trait MoveRoomActionTrait
             }
             $old_room = $reservation->room->room_number;
             $reservation->room_id = $data['room'];
+            $reservation->room_type_id = $data['room_type'];
             $reservation->save();
+
+            $reservation->refresh();
+ 
+            $reservation->booking->bookingReservations->where('status', Status::Maintenance)->each(function ($br) use ($reservation) {
+                if ($reservation->room->family_room_id !== $br->room->family_room_id) {
+                    $this->deleteBookingTransactions($br->id);
+                    $br->forceDelete();
+                }
+            });
+
             $reservation->refresh();
 
             $livewire->dispatch('refresh-scheduler');
@@ -97,5 +113,12 @@ trait MoveRoomActionTrait
         });
 
         $this->after(function ($livewire, $data) {});
+    }
+
+
+    protected function deleteBookingTransactions($reservation_id): void
+    {
+        $reservation = BookingTransaction::where('booking_reservation_id', $reservation_id)
+            ->delete();
     }
 }

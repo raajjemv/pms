@@ -14,12 +14,14 @@ class ReservationService
 
     public function create(Booking $booking, $data): BookingReservation
     {
+
         $from = Carbon::parse($data['from'])->setTimeFromTimeString(tenant()->check_in_time);
 
         $to = Carbon::parse($data['to'])->setTimeFromTimeString(tenant()->check_out_time);
 
         $booking_reservation = $booking->bookingReservations()->create([
             'tenant_id' => Filament::getTenant()->id,
+            'room_type_id' => $data['room_type'],
             'room_id' => $data['room'],
             'adults' => $data['adults'] ?? 0,
             'children' => $data['children'] ?? 0,
@@ -77,6 +79,7 @@ class ReservationService
                 $data['from'] = $booking_reservation->from;
                 $data['to'] = $booking_reservation->to;
                 $data['room'] = $cr->id;
+                $data['room_type'] = $cr->room_type_id;
 
                 $reservation = $this->create($booking, $data);
             }

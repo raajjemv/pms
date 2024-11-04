@@ -130,14 +130,14 @@ class NewBooking extends Component implements HasForms
                                 ->live(),
 
                             Forms\Components\Select::make('room')
-                                ->options(function ($get, $set) use (&$rooms): Collection {
-                                    $room_type_id = $get('room_type');
+                                ->options(function ($get, $set): Collection {
                                     $reservations = BookingReservation::query()
-                                        ->whereHas('room', function ($q) use ($room_type_id) {
-                                            $q->where('room_type_id', $room_type_id);
+                                        ->where('room_type_id', $get('room_type'))
+                                        ->where(function ($query) {
+                                            $query->where('from', '<=', $this->to)
+                                                ->where('to', '>=', $this->from);
                                         })
-                                        ->whereBetween('from', [$this->from, $this->to])
-                                        ->orWhereBetween('to', [$this->from, $this->to])
+                                        ->whereNotNull('room_id')
                                         ->get();
                                     return Room::query()
                                         ->where('room_type_id', $get('room_type'))
@@ -203,8 +203,6 @@ class NewBooking extends Component implements HasForms
     public function createBooking()
     {
         $data = $this->form->getState();
-
-
 
         DB::transaction(function () use ($data) {
             $bookingService = new BookingService;

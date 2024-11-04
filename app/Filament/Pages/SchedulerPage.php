@@ -69,8 +69,7 @@ class SchedulerPage extends Page
             })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
                 $query->where('from', '<', $startOfMonth)
                     ->where('to', '>', $endOfMonth);
-            })
-                ->withTrashed();
+            });
         }])
             ->get();
         return $rooms;

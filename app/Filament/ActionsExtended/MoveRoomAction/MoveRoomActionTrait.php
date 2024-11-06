@@ -9,6 +9,7 @@ use App\Http\Traits\CachedQueries;
 use App\Livewire\Pms\Reservation\Reservation;
 use App\Models\BookingReservation;
 use App\Models\BookingTransaction;
+use App\Services\ReservationService;
 use Illuminate\Support\Collection;
 use Filament\Support\Enums\MaxWidth;
 use Illuminate\Support\Facades\Cache;
@@ -101,6 +102,9 @@ trait MoveRoomActionTrait
             });
 
             $reservation->refresh();
+
+            $reservationService = new ReservationService;
+            $blockConnectingRooms = $reservationService->blockConnectingRooms($reservation->booking, $reservation);
 
             $livewire->dispatch('refresh-scheduler');
             $livewire->dispatch('refresh-edit-reservation');

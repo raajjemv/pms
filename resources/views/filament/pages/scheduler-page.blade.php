@@ -73,18 +73,18 @@
     
             {{-- if (this.getDaysBetweenDates(this.startGridDate, this.endGridDate) > 0) { --}}
     
-                $wire.mountAction('quickReservationActions', {
-                    id: 'new-booking',
-                    from: this.startGridDate,
-                    to: this.endGridDate,
-                    room_id: roomId,
-                    room_type_id: roomTypeId
-                })
+            $wire.mountAction('quickReservationActions', {
+                id: 'new-booking',
+                from: this.startGridDate,
+                to: this.endGridDate,
+                room_id: roomId,
+                room_type_id: roomTypeId
+            })
     
-                this.startGridDate = '';
-                this.endGridDate = '';
-                this.roomId = '';
-                this.selectedDays = [];
+            this.startGridDate = '';
+            this.endGridDate = '';
+            this.roomId = '';
+            this.selectedDays = [];
             {{-- } --}}
         },
         isDateWithinRange(dateToCheck, room) {
@@ -148,9 +148,18 @@
                                 </div>
                                 <div class="flex">
                                     @foreach ($this->monthDays as $day)
+                                        @php
+                                            $rt = $roomNumbers->first()->room_type_id;
+                                            $unassignedRooms = $this->unassignedRooms->filter(function ($rs) use ($day, $rt) {
+                                                return \Carbon\Carbon::parse($rs->from)->format('Y-m-d') ===
+                                                    \Carbon\Carbon::parse($day)->format('Y-m-d') &&
+                                                    $rs->room_type_id == $rt;
+                                            });
+                                        @endphp
                                         <div class="flex-none  w-[90px] border-[0.8px] border-gray-300">
                                             <div>
-                                                <x-rooms-available-count :day="$day" :roomNumbers="$roomNumbers" />
+                                                <x-rooms-available-count :day="$day" :roomNumbers="$roomNumbers"
+                                                    :unassignedRooms="$unassignedRooms" />
                                                 @livewire('pms.room-rate', ['roomType' => $roomNumbers->first()->roomType, 'day' => $day], key('rates' . $day . '-' . $roomNumbers->first()->room_type_id))
 
                                             </div>
@@ -233,10 +242,10 @@
         </div>
     </div>
 
-   
+
     <livewire:pms.reservation.maintenance-booking-summary />
     <livewire:pms.reservation.booking-summary />
-    
+
     <livewire:pms.reservation.reservation />
 
     <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl" :autofocus="false">

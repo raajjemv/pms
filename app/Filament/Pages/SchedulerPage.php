@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Filament\Forms;
 use App\Models\Room;
 use App\Models\Booking;
+use App\Models\BookingReservation;
 use App\Models\RoomType;
 use App\Services\BookingService;
 use App\Services\ReservationService;
@@ -60,17 +61,34 @@ class SchedulerPage extends Page
                 $qq->whereBetween('date', [$startOfMonth, $endOfMonth]);
             }]);
         }, 'bookingReservations' => function ($query) use ($startOfMonth, $endOfMonth) {
-            $query->with(['customer', 'booking' => fn($q) => $q->withTrashed()])->where(function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->where('from', '>=', $startOfMonth)
-                    ->where('from', '<=', $endOfMonth);
-            })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->where('to', '>=', $startOfMonth)
-                    ->where('to', '<=', $endOfMonth);
-            })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
-                $query->where('from', '<', $startOfMonth)
-                    ->where('to', '>', $endOfMonth);
-            });
+            $query->with(['customer', 'booking' => fn($q) => $q->withTrashed()])
+                ->where(function ($query) use ($startOfMonth, $endOfMonth) {
+                    $query->where('from', '>=', $startOfMonth)
+                        ->where('from', '<=', $endOfMonth);
+                })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
+                    $query->where('to', '>=', $startOfMonth)
+                        ->where('to', '<=', $endOfMonth);
+                })->orWhere(function ($query) use ($startOfMonth, $endOfMonth) {
+                    $query->where('from', '<', $startOfMonth)
+                        ->where('to', '>', $endOfMonth);
+                });
         }])
+            ->get();
+        return $rooms;
+    }
+
+    #[Computed]
+    public function unassignedRooms()
+    {
+        $startOfMonth = $this->startOfMonth();
+
+        $endOfMonth = $this->endOfMonth();
+
+        $rooms = BookingReservation::whereNull('room_id')
+            ->where(function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->where('from', '<=', $endOfMonth)
+                    ->where('to', '>=', $startOfMonth);
+            })
             ->get();
         return $rooms;
     }

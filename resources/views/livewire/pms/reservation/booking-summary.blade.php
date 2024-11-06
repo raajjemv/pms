@@ -147,13 +147,19 @@
                         </td>
                         <td class="px-2 py-3">
                             <div class="text-xs">Room Category</div>
-                            <div class="text-sm font-medium">{{ $this->selectedFolio?->room->roomType->name }}</div>
+                            <div class="text-sm font-medium">{{ $this->selectedFolio?->room?->roomType->name }}</div>
                         </td>
                     </tr>
                     <tr>
                         <td class="px-2 py-3">
                             <div class="text-xs">Room Number</div>
-                            <div class="text-sm font-medium">{{ $this->selectedFolio?->room->room_number }}</div>
+                            <div class="text-sm font-medium">
+                                @if ($this->selectedFolio?->room_id)
+                                    {{ $this->selectedFolio?->room?->room_number }}
+                                @else
+                                    Room not assgined
+                                @endif
+                            </div>
                         </td>
                         <td class="px-2 py-3">
                             <div class="text-xs">Rate Plan</div>

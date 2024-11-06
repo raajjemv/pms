@@ -30,6 +30,7 @@ use App\Livewire\Pms\Reservation\Reservation;
 use App\Http\Controllers\Pdf\ReservationInvoice;
 
 Route::get('/', function () {
+    
     return redirect('/admin');
 });
 Route::middleware(['auth', 'auth.session'])->group(function () {

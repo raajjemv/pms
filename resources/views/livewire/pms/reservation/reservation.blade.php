@@ -69,8 +69,8 @@
                                     <i class="pr-2 fas fa-minus"></i> {{ $reservation->booking_customer }}
                                 </button>
                                 <div class="text-xs text-gray-600">
-                                    {{ $reservation->room->roomType->name }} -
-                                    {{ $reservation->room->room_number }}
+                                    {{ $reservation->room?->roomType->name }} -
+                                    {{ $reservation->room?->room_number }}
                                 </div>
                             </div>
                         @endforeach

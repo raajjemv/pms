@@ -17,7 +17,8 @@
         @endphp
     </div>
     @if ($unassignedRooms->count())
-        <button wire:click="assignRoomAction('{{ $unassignedRooms->pluck('id') }}')" class="inline-block px-2 py-0.5 rounded  bg-blue-200 text-xs" title="Unassigned Rooms">
+        <button @click="$dispatch('bulk-room-assign',{ ids: {{ $unassignedRooms->pluck('id') }}})"
+            class="inline-block px-2 py-0.5 rounded  bg-blue-200 text-xs" title="Unassigned Rooms">
             {{ $unassignedRooms->count() }}
         </button>
     @endif

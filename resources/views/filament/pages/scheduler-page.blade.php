@@ -5,7 +5,7 @@
             var container = document.getElementById('scheduler-wrapper');
             if (isCurrentMonthAndYear(date)) {
                 var today = new Date().getDate();
-                {{-- today = String(today - 2).padStart(2, '0'); --}}
+                today = String(today - 2).padStart(2, '0');
                 const targetDiv = document.getElementById('day-' + today);
                 const targetOffset = targetDiv.offsetLeft - 200;
                 container.scrollTo({ left: targetOffset, behavior: 'smooth' });
@@ -247,6 +247,8 @@
     <livewire:pms.reservation.booking-summary />
 
     <livewire:pms.reservation.reservation />
+
+    <livewire:pms.reservation.bulk-room-assign />
 
     <x-filament::modal :close-by-clicking-away="false" id="new-booking" width="7xl" :autofocus="false">
         <x-slot name="heading">

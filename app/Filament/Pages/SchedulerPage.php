@@ -229,10 +229,11 @@ class SchedulerPage extends Page
 
     public function floatingReservationAction($status, $booking_id, $reservation_id)
     {
-        if ($status == 'maintenance') {
-            $this->dispatch('maintenance-booking-summary', booking_id: $booking_id, reservation_id: $reservation_id);
-            return;
-        }
-        $this->dispatch('booking-summary', booking_id: $booking_id, reservation_id: $reservation_id);
+
+        $this->dispatch(
+            $status === 'maintenance' ? 'maintenance-booking-summary' : 'booking-summary',
+            booking_id: $booking_id,
+            reservation_id: $reservation_id
+        );
     }
 }

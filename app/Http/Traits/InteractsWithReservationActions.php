@@ -46,6 +46,7 @@ trait InteractsWithReservationActions
                     clearSchedulerCache($reservation->from, $reservation->to);
                 });
                 $this->dispatch('refresh-scheduler');
+                $this->dispatch('refresh-reservations');
                 Notification::make()
                     ->title('Check-In Successfull!')
                     ->success()
@@ -81,6 +82,8 @@ trait InteractsWithReservationActions
 
                 });
                 $this->dispatch('refresh-scheduler');
+                $this->dispatch('refresh-reservations');
+
                 Notification::make()
                     ->title('Check-Out Successfull!')
                     ->success()

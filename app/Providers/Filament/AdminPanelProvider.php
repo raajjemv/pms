@@ -72,7 +72,6 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ])
-            ->sidebarCollapsibleOnDesktop()
             ->darkMode(false)
 
             ->plugins([
@@ -90,6 +89,8 @@ class AdminPanelProvider extends PanelProvider
                         override: true,
                     )
             ])
+          
+            ->sidebarCollapsibleOnDesktop()
             ->globalSearch(true)
             ->globalSearchKeyBindings(['command+x', 'ctrl+k'])
             ->userMenuItems([

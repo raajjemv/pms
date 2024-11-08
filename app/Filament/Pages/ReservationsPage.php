@@ -6,6 +6,7 @@ use Filament\Forms;
 use App\Models\Room;
 use Filament\Tables;
 use App\Enums\Status;
+use App\Filament\ActionsExtended\RoomAssignAction\RoomAssignTableAction;
 use Filament\Pages\Page;
 use Filament\Tables\Table;
 use Livewire\Attributes\On;
@@ -58,7 +59,7 @@ class ReservationsPage extends Page implements HasForms, HasTable
     #[Computed]
     public function departureReservations()
     {
-        return BookingReservation::whereDate('to', today())
+        return BookingReservation::whereDate('to', '<=', today())
             ->with('booking')
             ->whereHas('room')
             ->whereIn('status', [Status::CheckIn, Status::Overstay]);
@@ -124,62 +125,7 @@ class ReservationsPage extends Page implements HasForms, HasTable
                 // ...
             ])
             ->actions([
-                Tables\Actions\Action::make('Assign Room')
-                    ->fillForm(fn($record) => [
-                        'room_type' => $record->room_type_id,
-                        'rate_plan' => $record->rate_plan_id
-                    ])
-                    ->form(function ($record) use ($roomTypes) {
-                        return [
-                            Forms\Components\Group::make([
-                                Forms\Components\Select::make('room_type')
-                                    ->options($roomTypes->pluck('name', 'id'))
-                                    ->required()
-                                    ->searchable()
-                                    ->live(),
-
-                                Forms\Components\Select::make('rate_plan')
-                                    ->options(fn($get) => $get('room_type') ? $roomTypes->where('id', $get('room_type'))->first()->ratePlans->pluck('name', 'id') : [])
-                                    ->required()
-                                    ->searchable()
-                                    ->afterStateUpdated(function ($get, $set) use ($roomTypes) {})
-                                    ->live(),
-
-                                Forms\Components\Select::make('room')
-                                    ->options(function ($get, $set) use ($record): Collection {
-                                        $reservations = BookingReservation::query()
-                                            ->where('room_type_id', $get('room_type'))
-                                            ->where(function ($query) use ($record) {
-                                                $query->whereDate('from', '<=', $record->to)
-                                                    ->whereDate('to', '>=', $record->from);
-                                            })
-                                            ->whereNotNull('room_id')
-                                            ->get();
-                                        return Room::query()
-                                            ->where('room_type_id', $get('room_type'))
-                                            ->whereNotIn('id', $reservations->pluck('room_id'))
-                                            ->pluck('room_number', 'id');
-                                    })
-                                    ->required()
-                                    // ->searchable()
-                                    ->disableOptionsWhenSelectedInSiblingRepeaterItems()
-                                    ->live()
-                            ])
-
-                        ];
-                    })
-                    ->action(function ($data, $record) {
-                        $record->update([
-                            'room_id' => $data['room']
-                        ]);
-                        $this->dispatch('refresh-reservations');
-                        $this->dispatch('refresh-scheduler');
-                        Notification::make()
-                            ->title('Room Assigned Succssful')
-                            ->success()
-                            ->send();
-                    })
-                    ->visible(fn($record) => is_null($record->room_id)),
+                RoomAssignTableAction::make(),
                 Tables\Actions\Action::make('view')
                     ->action(fn($record) => $this->dispatch('booking-summary', booking_id: $record->booking_id, reservation_id: $record->id))
             ])

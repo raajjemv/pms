@@ -76,7 +76,7 @@ class User extends Authenticatable  implements FilamentUser, HasTenants
     }
     public function canAccessTenant(Model $tenant): bool
     {
-        return true;
+        return $this->tenants()->whereKey($tenant)->exists();
     }
 
     public function allRoles(): BelongsToMany

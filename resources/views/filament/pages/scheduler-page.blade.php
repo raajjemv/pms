@@ -115,6 +115,7 @@
                 <x-booking-scheduler.legends />
             </div>
         </div>
+        <span class="fas fa-home"></span>
         <div wire:loading.remove wire:target="date" id="scheduler-wrapper"
             class="pb-5 overflow-x-scroll text-sm text-black rounded-lg bg-gray-50">
             <div class="">
@@ -150,7 +151,10 @@
                                     @foreach ($this->monthDays as $day)
                                         @php
                                             $rt = $roomNumbers->first()->room_type_id;
-                                            $unassignedRooms = $this->unassignedRooms->filter(function ($rs) use ($day, $rt) {
+                                            $unassignedRooms = $this->unassignedRooms->filter(function ($rs) use (
+                                                $day,
+                                                $rt,
+                                            ) {
                                                 return \Carbon\Carbon::parse($rs->from)->format('Y-m-d') ===
                                                     \Carbon\Carbon::parse($day)->format('Y-m-d') &&
                                                     $rs->room_type_id == $rt;
@@ -170,8 +174,19 @@
                             @foreach ($roomNumbers as $room)
                                 <div class="relative flex ">
                                     <div
-                                        class="sticky left-0 z-20 bg-white flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium pl-3 py-1">
-                                        {{ $room->room_number }}</div>
+                                        class="sticky left-0 z-20 bg-white flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium py-1">
+                                        <div class="flex items-center justify-between w-full">
+                                            <div>{{ $room->room_number }}</div>
+                                            <div class="text-xl text-gray-400">
+                                                @if ($room->smoking)
+                                                    <i title="No Smoking" class="fa-solid fa-smoking "></i>
+                                                @else
+                                                    <i title="Smoking" class="fa-solid fa-ban-smoking"></i>
+                                                @endif
+                                            </div>
+                                        </div>
+
+                                    </div>
                                     <div class="relative flex overflow-hidde">
                                         @foreach ($this->monthDays as $day)
                                             <div wire:key="selection-day-{{ $day }}" day="{{ $day }}"

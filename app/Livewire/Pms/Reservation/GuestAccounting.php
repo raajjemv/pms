@@ -34,6 +34,7 @@ use App\Filament\ActionsExtended\PaymentAction\PaymentTableAction;
 use App\Filament\ActionsExtended\MoveRoomAction\MoveRoomTableAction;
 use App\Filament\ActionsExtended\ExtendStayAction\ExtendStayTableAction;
 use App\Filament\ActionsExtended\EarlyCheckOutAction\EarlyCheckOutTableAction;
+use Mockery\Matcher\Not;
 
 class GuestAccounting extends Component implements HasForms, HasTable
 {
@@ -85,7 +86,7 @@ class GuestAccounting extends Component implements HasForms, HasTable
             ])
             ->headerActions([
                 PaymentTableAction::make(),
-           
+
                 ChargeTableAction::make(),
 
                 Actions\ActionGroup::make([
@@ -151,15 +152,30 @@ class GuestAccounting extends Component implements HasForms, HasTable
                                 ->numeric(),
                             Forms\Components\TextInput::make('transaction_type')
                                 ->disabled(),
+                            Forms\Components\Toggle::make('update_whole_stay')
+                                ->label('Update for whole stay?')
+                                ->visible(fn($get) => $get('transaction_type') == 'room_charge'),
+
                         ])
                         ->action(function ($record, $data) {
-                            $record->update([
-                                'rate' => $data['rate']
-                            ]);
+                            BookingTransaction::query()
+                                ->when($data['update_whole_stay'], function ($q) use ($record) {
+                                    $q->where('booking_reservation_id', $record->booking_reservation_id)
+                                        ->where('transaction_type', 'room_charge');
+                                }, function ($q) use ($record) {
+                                    $q->where('id', $record->id);
+                                })
+                                ->update([
+                                    'rate' => $data['rate']
+                                ]);
                         })
                         ->after(function () {
                             Cache::forget('reservationBalance_' . $this->selectedFolio->id);
                             $this->dispatch('refresh-edit-reservation');
+                            Notification::make()
+                                ->title('Updated Successfully')
+                                ->success()
+                                ->send();
                         })
                         ->modalWidth(MaxWidth::Small)
                         ->slideOver(),

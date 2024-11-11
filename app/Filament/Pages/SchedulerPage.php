@@ -201,6 +201,7 @@ class SchedulerPage extends Page
                     );
                     return;
                 }
+
                 $bookingService = new BookingService;
                 $reservationService = new ReservationService;
 
@@ -208,12 +209,14 @@ class SchedulerPage extends Page
                 $data['guest_name'] = $data['remarks'];
                 $data['status'] = 'maintenance';
 
+
                 $booking = $bookingService->create($data);
 
+
                 $data['from'] = $arguments['from'];
-                $data['to'] = $arguments['to'];
-                $data['room_id'] = $arguments['room_id'];
-                $data['room'] = $data['room_id'];
+                $data['to'] = $data['to'];
+                $data['room_type'] = $arguments['room_type_id'];
+                $data['room'] = $arguments['room_id'];
 
                 $reservation = $reservationService->create($booking, $data);
 

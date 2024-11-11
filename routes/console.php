@@ -7,5 +7,4 @@ use Illuminate\Support\Facades\Schedule;
 
 
 Schedule::job(new ReservationStatusObserver)
-    ->everyMinute()
-    ->between('11:00', '23:30');
+    ->everyMinute();

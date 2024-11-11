@@ -115,7 +115,6 @@
                 <x-booking-scheduler.legends />
             </div>
         </div>
-        <span class="fas fa-home"></span>
         <div wire:loading.remove wire:target="date" id="scheduler-wrapper"
             class="pb-5 overflow-x-scroll text-sm text-black rounded-lg bg-gray-50">
             <div class="">

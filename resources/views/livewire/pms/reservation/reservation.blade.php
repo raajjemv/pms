@@ -60,7 +60,7 @@
                         @foreach ($booking->bookingReservations as $reservation)
                             <div class="flex flex-col">
                                 <button wire:key="reservation-{{ $reservation->id }}"
-                                    wire:click="$set('reservation_id',{{ $reservation->id }})"
+                                    wire:click="switchReservation({{ $reservation->id }})"
                                     @class([
                                         'text-sm text-left font-medium',
                                         'text-blue-500' => $this->reservation->id == $reservation->id,

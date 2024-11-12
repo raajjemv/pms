@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use App\Enums\DocumentType;
 use Livewire\Attributes\On;
 use Filament\Tables\Actions;
+use Livewire\Attributes\Lazy;
 use Filament\Facades\Filament;
 use Livewire\Attributes\Reactive;
 use App\Models\BookingReservation;
@@ -24,6 +25,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use App\Http\Traits\InteractsWithGuestRegistration;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Livewire\Attributes\Computed;
 
 class GuestProfiles extends Component implements HasForms, HasTable, HasActions
 {
@@ -33,7 +35,6 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
     use InteractsWithActions;
 
     public $booking;
-
 
     #[Reactive]
     public $selectedFolio;
@@ -45,17 +46,11 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
         $this->form->fill();
     }
 
-    #[On('refresh-edit-reservation')]
-    public function refreshComponent() {}
-
-
     public function table(Table $table): Table
     {
 
-        $reservationGuestCount = $this->booking->customers()->wherePivot('booking_reservation_id', $this->selectedFolio->id)->count();
-
         return $table
-            ->relationship(fn(): BelongsToMany => $this->booking->customers()->wherePivot('booking_reservation_id', $this->selectedFolio->id))
+            ->relationship(fn(): BelongsToMany => $this->selectedFolio->customers())
             ->columns([
 
                 Tables\Columns\TextColumn::make('name'),
@@ -72,8 +67,8 @@ class GuestProfiles extends Component implements HasForms, HasTable, HasActions
             ])
             ->headerActions([
                 Actions\Action::make('Initiate Guest')
-                    ->disabled(fn() => $this->selectedFolio->totalPax() == $reservationGuestCount)
-                    ->label(fn() => $reservationGuestCount ? 'Add Sharer' : 'Initiate Guest')
+                    ->disabled(fn() => $this->selectedFolio->totalPax() == $this->getTableRecords()->count())
+                    ->label(fn() => $this->getTableRecords()->count() ? 'Add Sharer' : 'Initiate Guest')
                     ->modalWidth(MaxWidth::Small)
                     ->visible(fn() => !in_array($this->selectedFolio->status, [Status::Archived, Status::Cancelled, Status::Void, Status::Disputed, Status::NoShow]))
                     ->form([

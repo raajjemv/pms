@@ -67,7 +67,10 @@ trait InteractsWithGuestRegistration
                 Forms\Components\Select::make('guest')
                     // ->options(Customer::selectRaw('CONCAT(name, " - ", document_number) AS name, id')->limit(5)->pluck('name', 'id'))
                     ->searchable()
-                    ->getSearchResultsUsing(fn(string $search): array => Customer::where('name', 'like', "%{$search}%")->orWhere('document_number', 'like', "%{$search}%")->selectRaw('CONCAT(name, " - ", document_number) AS name, id')->limit(5)->pluck('name', 'id')->toArray())
+                    ->getSearchResultsUsing(fn(string $search): array => Customer::where('name', 'like', "%{$search}%")
+                    ->orWhere('document_number', 'like', "%{$search}%")
+                    ->orWhere('phone_number', 'like', "%{$search}%")
+                    ->selectRaw('CONCAT(name, " - ", document_number) AS name, id')->limit(5)->pluck('name', 'id')->toArray())
                     ->placeholder('Search by name or document number')
                     ->preload(false),
 

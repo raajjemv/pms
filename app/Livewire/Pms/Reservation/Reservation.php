@@ -64,7 +64,6 @@ class Reservation extends Component implements HasForms, HasActions
     #[Computed(persist: true)]
     public function reservation()
     {
-        // return BookingReservation::with('bookingTransactions')->find($this->reservation_id);
         return $this->booking?->bookingReservations->where('id', $this->reservation_id)->first();
     }
 
@@ -73,7 +72,7 @@ class Reservation extends Component implements HasForms, HasActions
     {
         $this->reset(['booking', 'reservation_id', 'activeTab']);
         $this->dispatch('refresh-scheduler');
-        unset($this->reservation); 
+        unset($this->reservation);
     }
 
 
@@ -102,7 +101,7 @@ class Reservation extends Component implements HasForms, HasActions
                     activity()->performedOn($reservation)->log('Check-In Processed');
                 });
                 $this->dispatch('refresh-scheduler');
-                unset($this->reservation); 
+                unset($this->reservation);
 
                 Notification::make()
                     ->title('Check-In Successfull!')
@@ -137,14 +136,20 @@ class Reservation extends Component implements HasForms, HasActions
                     activity()->performedOn($reservation)->log('Check-Out Processed');
                 });
                 $this->dispatch('refresh-scheduler');
-                unset($this->reservation); 
-                
+                unset($this->reservation);
+
                 Notification::make()
                     ->title('Check-Out Successfull!')
                     ->success()
                     ->send();
             })
             ->requiresConfirmation();
+    }
+
+    public function switchReservation($reservation_id)
+    {
+        $this->reservation_id = $reservation_id;
+        unset($this->reservation);
     }
 
     public function render()

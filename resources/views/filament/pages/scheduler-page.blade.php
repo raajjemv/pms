@@ -50,6 +50,8 @@
         startGridDate: null,
         endGridDate: null,
         isSelecting: false,
+        hoverRoom: '',
+        hoverDay: '',
     
         getDaysBetweenDates(startDateStr, endDateStr) {
             const startDate = new Date(startDateStr);
@@ -58,7 +60,7 @@
     
             const daysDifference = millisecondsDifference / (1000 * 60 * 60 * 24);
     
-            return daysDifference;
+            return daysDifference.toFixed(0);
         },
         selectDays(event) {
             const roomId = event.currentTarget.dataset.room;
@@ -70,8 +72,6 @@
             for (let i = start; i <= end; i++) {
                 this.selectedDays.push(i);
             }
-    
-            {{-- if (this.getDaysBetweenDates(this.startGridDate, this.endGridDate) > 0) { --}}
     
             $wire.mountAction('quickReservationActions', {
                 id: 'new-booking',
@@ -85,7 +85,6 @@
             this.endGridDate = '';
             this.roomId = '';
             this.selectedDays = [];
-            {{-- } --}}
         },
         isDateWithinRange(dateToCheck, room) {
             const checkDate = new Date(dateToCheck);
@@ -126,9 +125,9 @@
                         </div>
                         @foreach ($this->monthDays as $day)
                             <div id="day-{{ $day->format('d') }}" @class([
-                                'flex-none border-[0.8px] border-gray-200 flex items-center justify-center w-[90px] px-1 py-1',
+                                'flex-none border-[0.8px] border-gray-200 flex items-center justify-center w-[90px] px-1 py-1 transition-all ease-in-out duration-300',
                                 'bg-amber-100' => $day->isFriday() || $day->isSaturday(),
-                            ])>
+                            ]) :class="{'bg-red-300' : {{ $day->day }} == hoverDay}">
                                 <div class="text-center">
                                     <div>{{ $day->format('D') }}</div>
                                     <div class="font-semibold">{{ $day->format('d') }}</div>
@@ -173,8 +172,8 @@
                             @foreach ($roomNumbers as $room)
                                 <div class="relative flex ">
                                     <div
-                                        class="sticky left-0 z-20 bg-white flex-none w-[200px] flex items-center px-1 border-[0.8px] border-gray-200 font-medium py-1">
-                                        <div class="flex items-center justify-between w-full">
+                                        class="sticky left-0 z-20 bg-white flex-none w-[200px] flex items-center  border-[0.8px] border-gray-200 font-medium ">
+                                        <div class="flex items-center justify-between w-full px-1 py-1 transition-all duration-300 ease-in-out" :class="{'bg-red-300' : {{ $room->id }} == hoverRoom}">
                                             <div>{{ $room->room_number }}</div>
                                             <div class="text-xl text-gray-400">
                                                 @if ($room->smoking)
@@ -197,7 +196,9 @@
                                                 @mousedown="isSelecting = true; startGridDate = $event.target.getAttribute('day');roomId = '{{ $room->id }}'"
                                                 @mouseup="isSelecting = false; endGridDate = $event.target.getAttribute('day'); selectDays($event);"
                                                 @mousemove="isSelecting && (endGridDate = $event.target.getAttribute('day'))"
-                                                class="flex-none  flex items-center w-[90px] px-1  border-[0.8px] border-gray-200">
+                                                @mouseover="hoverRoom = '{{ $room->id }}';hoverDay = '{{ $day->day }}'"
+                                                class="flex-none  flex items-center w-[90px] px-1  border-[0.8px] border-gray-200 ">
+
                                             </div>
                                         @endforeach
 

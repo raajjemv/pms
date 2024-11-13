@@ -4,7 +4,7 @@
 
             <div class="text-2xl">
                 <div>{{ $this->reservation?->booking_customer }}</div>
-                <div class="text-sm text-gray-600">{{ $booking?->booking_number }} |
+                <div class="text-sm text-gray-600">{{ $this->booking?->booking_number }} |
                     {{ $this->reservation?->created_at->format('jS M Y H:i') }}</div>
             </div>
 
@@ -55,20 +55,23 @@
                 <x-slot name="description">
                     Folio Accounts
                 </x-slot>
-                @if ($booking?->bookingReservations)
+                @if ($this->booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance)->count())
                     <div class="space-y-3">
-                        @foreach ($booking->bookingReservations as $reservation)
+                        @foreach ($this->booking->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance) as $reservation)
                             <div class="flex flex-col">
                                 <button wire:key="reservation-{{ $reservation->id }}"
-                                    wire:click="switchReservation({{ $reservation->id }})"
-                                    @class([
+                                    wire:click="switchReservation({{ $reservation->id }})" @class([
                                         'text-sm text-left font-medium',
-                                        'text-blue-500' => $this->reservation->id == $reservation->id,
-                                        'text-gray-500' => $this->reservation->id != $reservation->id,
+                                        'text-blue-500' => $this->reservation?->id == $reservation->id,
+                                        'text-gray-500' => $this->reservation?->id != $reservation->id,
+                                        'line-through decoration-red-400 decoration-2' => $reservation->trashed(),
                                     ])>
                                     <i class="pr-2 fas fa-minus"></i> {{ $reservation->booking_customer }}
                                 </button>
-                                <div class="text-xs text-gray-600">
+                                <div @class([
+                                    'text-xs text-gray-600',
+                                    'line-through decoration-red-400 decoration-2' => $reservation->trashed(),
+                                ])>
                                     {{ $reservation->room?->roomType->name }} -
                                     {{ $reservation->room?->room_number }}
                                 </div>
@@ -78,24 +81,24 @@
                 @endif
 
             </x-filament::section>
-            @if ($booking)
+            @if ($this->booking)
                 <div class="col-span-4">
                     @switch($activeTab)
                         @case('guest-accounting')
-                            <livewire:pms.reservation.guest-accounting :booking="$booking" @refresh-edit-reservation="$refresh"
-                                :selected-folio="$this->reservation" wire:key="ga-{{ $booking->id }}">
+                            <livewire:pms.reservation.guest-accounting :booking="$this->booking" @refresh-edit-reservation="$refresh"
+                                :selected-folio="$this->reservation" wire:key="ga-{{ $this->booking->id }}">
                             @break
 
                             @case('booking-detail')
-                                <livewire:pms.reservation.booking-detail :booking="$booking" :selected-folio="$this->reservation" />
+                                <livewire:pms.reservation.booking-detail :booking="$this->booking" :selected-folio="$this->reservation" />
                             @break
 
                             @case('guest-profile')
-                                <livewire:pms.reservation.guest-profiles :booking="$booking" :selected-folio="$this->reservation" />
+                                <livewire:pms.reservation.guest-profiles :booking="$this->booking" :selected-folio="$this->reservation" />
                             @break
 
                             @case('print-email')
-                                <livewire:pms.reservation.print-email :booking="$booking" :selected-folio="$this->reservation" />
+                                <livewire:pms.reservation.print-email :booking="$this->booking" :selected-folio="$this->reservation" />
                             @break
 
                             @default

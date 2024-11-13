@@ -3,7 +3,11 @@
         $reservationTotals = $this->selectedFolio ? reservationTotals($this->selectedFolio?->id) : 0;
     @endphp
     <x-filament::modal :close-by-clicking-away="false" :autofocus="false" closeEventName="close-booking-summary-modal"
-        id="booking-summary" slide-over :width="$booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance)->count() > 1 ? 'xl' : 'sm'">
+        id="booking-summary" slide-over :width="$booking?->bookingReservations
+            ->whereNotIn('status', [App\Enums\Status::Maintenance, App\Enums\Status::Void])
+            ->count() > 1
+            ? 'xl'
+            : 'sm'">
         <x-slot name="heading">
             <div class="flex items-center space-x-3">
                 <x-svg-icons.location />
@@ -210,16 +214,15 @@
                     </tr>
                 </table>
             </div>
-            @if ($booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance)->count() > 1)
+            @if ($booking?->bookingReservations->whereNotIn('status', [App\Enums\Status::Maintenance, App\Enums\Status::Void])->count() > 1)
                 <div class="w-2/5 px-3 border-l">
                     <div class="mb-2 text-sm font-semibold">Reservations</div>
                     <div class="space-y-3 ">
                         @php
-                            $bookingOtherReservations = $booking?->bookingReservations->where(
-                                'status',
-                                '!=',
+                            $bookingOtherReservations = $booking?->bookingReservations->whereNotIn('status', [
                                 App\Enums\Status::Maintenance,
-                            );
+                                App\Enums\Status::Void,
+                            ]);
                         @endphp
                         @foreach ($bookingOtherReservations as $bookingReservations)
                             <x-filament::button wire:key="booking-reservation-{{ $bookingReservations->id }}"

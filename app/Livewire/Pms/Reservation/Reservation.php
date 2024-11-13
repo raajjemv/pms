@@ -29,7 +29,7 @@ class Reservation extends Component implements HasForms, HasActions
     use InteractsWithForms;
     use InteractsWithGuestRegistration;
 
-    public $booking;
+    public $booking_id;
 
     public $reservation_id;
 
@@ -44,21 +44,29 @@ class Reservation extends Component implements HasForms, HasActions
     public function loadReservationDetails($booking_id, $reservation_id)
     {
         $this->activeTab = 'guest-accounting';
+        unset($this->booking);
+        unset($this->reservation);
 
-        $booking = Booking::with(['bookingReservations' => function ($q) {
-            $q->with('room.roomType')->withTrashed();
-        }, 'bookingReservations' => function ($q) {
-            $q->with('ratePlan')->withTrashed();
-        }])
-            ->withTrashed()
-            ->find($booking_id);
 
-        $this->booking = $booking;
+        $this->booking_id = $booking_id;
 
         $this->reservation_id = $reservation_id;
 
-
         $this->dispatch('open-modal', id: 'reservation-modal');
+    }
+
+    #[Computed(persist: true)]
+    public function booking()
+    {
+        if ($this->booking_id) {
+            return Booking::with(['bookingReservations' => function ($q) {
+                $q->with('room.roomType')->withTrashed();
+            }, 'bookingReservations' => function ($q) {
+                $q->with('ratePlan')->withTrashed();
+            }])
+                ->withTrashed()
+                ->find($this->booking_id);
+        }
     }
 
     #[Computed(persist: true)]
@@ -70,8 +78,9 @@ class Reservation extends Component implements HasForms, HasActions
     #[On('close-reservation-modal')]
     public function closeReservationModal()
     {
-        $this->reset(['booking', 'reservation_id', 'activeTab']);
+        $this->reset(['reservation_id', 'activeTab']);
         $this->dispatch('refresh-scheduler');
+        unset($this->booking);
         unset($this->reservation);
     }
 
@@ -148,6 +157,7 @@ class Reservation extends Component implements HasForms, HasActions
 
     public function switchReservation($reservation_id)
     {
+        // 
         $this->reservation_id = $reservation_id;
         unset($this->reservation);
     }

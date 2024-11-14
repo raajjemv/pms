@@ -41,9 +41,14 @@
                 Booking Details
             </x-filament::tabs.item>
 
+            <x-filament::tabs.item :active="$activeTab === 'modify-reservation'" wire:click="$set('activeTab', 'modify-reservation')">
+                Modiy Reservation
+            </x-filament::tabs.item>
+
             <x-filament::tabs.item :active="$activeTab === 'guest-profile'" wire:click="$set('activeTab', 'guest-profile')">
                 Guest Profile
             </x-filament::tabs.item>
+
             <x-filament::tabs.item :active="$activeTab === 'print-email'" wire:click="$set('activeTab', 'print-email')">
                 Print / Email
             </x-filament::tabs.item>
@@ -53,7 +58,7 @@
         <div class="grid grid-cols-1 gap-3 mt-5 lg:grid-cols-5">
             <x-filament::section class="" :headerActions="[$this->addFolioAccountAction()]">
                 <x-slot name="description">
-                    Folio Accounts
+                    Accounts
                 </x-slot>
                 @if ($this->booking?->bookingReservations->where('status', '!=', App\Enums\Status::Maintenance)->count())
                     <div class="space-y-3">
@@ -91,6 +96,10 @@
 
                             @case('booking-detail')
                                 <livewire:pms.reservation.booking-detail :booking="$this->booking" :selected-folio="$this->reservation" />
+                            @break
+
+                            @case('modify-reservation')
+                                <livewire:pms.reservation.modify-reservation :booking="$this->booking" :selected-folio="$this->reservation" />
                             @break
 
                             @case('guest-profile')

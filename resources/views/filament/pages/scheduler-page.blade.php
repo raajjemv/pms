@@ -127,7 +127,7 @@
                             <div id="day-{{ $day->format('d') }}" @class([
                                 'flex-none border-[0.8px] border-gray-200 flex items-center justify-center w-[90px] px-1 py-1 transition-all ease-in-out duration-300',
                                 'bg-amber-100' => $day->isFriday() || $day->isSaturday(),
-                            ]) :class="{'bg-red-300' : {{ $day->day }} == hoverDay}">
+                            ]) :class="{'bg-gray-200' : {{ $day->day }} == hoverDay}">
                                 <div class="text-center">
                                     <div>{{ $day->format('D') }}</div>
                                     <div class="font-semibold">{{ $day->format('d') }}</div>
@@ -173,7 +173,7 @@
                                 <div class="relative flex ">
                                     <div
                                         class="sticky left-0 z-20 bg-white flex-none w-[200px] flex items-center  border-[0.8px] border-gray-200 font-medium ">
-                                        <div class="flex items-center justify-between w-full px-1 py-1 transition-all duration-300 ease-in-out" :class="{'bg-red-300' : {{ $room->id }} == hoverRoom}">
+                                        <div class="flex items-center justify-between w-full px-1 py-1 transition-all duration-300 ease-in-out" :class="{'bg-gray-200' : {{ $room->id }} == hoverRoom}">
                                             <div>{{ $room->room_number }}</div>
                                             <div class="text-xl text-gray-400">
                                                 @if ($room->smoking)

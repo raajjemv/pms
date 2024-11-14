@@ -37,7 +37,11 @@ class Reservation extends Component implements HasForms, HasActions
     public $activeTab = '';
 
     #[On('refresh-edit-reservation')]
-    public function refreshComponent() {}
+    public function refreshComponent()
+    {
+        unset($this->booking);
+        unset($this->reservation);
+    }
 
 
     #[On('open-reservation')]
@@ -110,7 +114,7 @@ class Reservation extends Component implements HasForms, HasActions
                     activity()->performedOn($reservation)->log('Check-In Processed');
                 });
                 $this->dispatch('refresh-scheduler');
-                unset($this->reservation);
+                $this->dispatch('refresh-edit-reservation');
 
                 Notification::make()
                     ->title('Check-In Successfull!')
@@ -145,7 +149,8 @@ class Reservation extends Component implements HasForms, HasActions
                     activity()->performedOn($reservation)->log('Check-Out Processed');
                 });
                 $this->dispatch('refresh-scheduler');
-                unset($this->reservation);
+                $this->dispatch('refresh-edit-reservation');
+
 
                 Notification::make()
                     ->title('Check-Out Successfull!')

@@ -19,7 +19,7 @@
                     ) {
                         $disabled = true;
                     }
-                    if ($reservation->customers_count < $reservation->totalPax()) {
+                    if (in_array($getType(), ['check-out', 'early-check-out']) && $reservation->customers_count < $reservation->totalPax()) {
                         $disabled = true;
                     }
                 @endphp
@@ -40,7 +40,7 @@
                         <span class="text-sm text-red-600">Checked-Out</span>
                     @endif
                 </label>
-                @if ($reservation->customers_count < $reservation->totalPax())
+                @if (in_array($getType(), ['check-out', 'early-check-out']) && $reservation->customers_count < $reservation->totalPax())
                     <div class="mt-1 text-sm text-gray-500 pl-7">Guest Details Missing</div>
                 @endif
                 @if (

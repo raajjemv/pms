@@ -26,6 +26,8 @@ class SchedulerPage extends Page
 
     protected static string $view = 'filament.pages.scheduler-page';
 
+    protected static ?string $navigationGroup = 'Front Desk';
+
     protected ?string $heading = 'Scheduler';
 
     // public $monthDays;

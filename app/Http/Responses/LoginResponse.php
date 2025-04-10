@@ -13,7 +13,9 @@ class LoginResponse extends \Filament\Http\Responses\Auth\LoginResponse
     public function toResponse($request): RedirectResponse|Redirector
     {
         if (Filament::getCurrentPanel()->getId() === 'admin') {
-            return redirect()->to(SchedulerPage::getUrl(['tenant' => auth()->user()->current_tenant_id]));
+
+            return redirect()->to('/admin');
+            // return redirect()->to(SchedulerPage::getUrl(['tenant' => auth()->user()->current_tenant_id]));
         }
     }
 }

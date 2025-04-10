@@ -34,6 +34,8 @@ class ReservationsPage extends Page implements HasForms, HasTable
 
     protected static ?string $navigationIcon = 'heroicon-o-list-bullet';
 
+    protected static ?string $navigationGroup = 'Front Desk';
+
     protected static string $view = 'filament.pages.reservations-page';
 
     #[Url(keep: true, except: '')]

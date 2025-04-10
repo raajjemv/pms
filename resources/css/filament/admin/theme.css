@@ -1,9 +1,15 @@
 @import "/vendor/filament/filament/resources/css/theme.css";
-@import 'flatpickr';
-@import 'flatpickr/dist/plugins/monthSelect/style';
+@import "flatpickr";
+@import "flatpickr/dist/plugins/monthSelect/style";
 
 @config 'tailwind.config.js';
 
 [x-cloak] {
     display: none !important;
+}
+.fi-sidebar-nav-groups {
+    @apply !gap-y-1.5;
+}
+.fi-sidebar-item a {
+    @apply !py-1;
 }
